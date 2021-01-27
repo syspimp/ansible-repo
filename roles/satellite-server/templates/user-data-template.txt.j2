@@ -1,0 +1,190 @@
+<%#
+kind: user_data
+name: RedHat UserData default
+model: ProvisioningTemplate
+oses:
+- CentOS
+- Fedora
+- Debian
+- Ubuntu
+-%>
+<%#
+This template accepts the following parameters:
+- ssh_pwauth: boolean (default=true unless ssh_authorized_keys)
+- ssh_authorized_keys: string w newline seperated keys (default="")
+- package_upgrade: boolean (default=false)
+- reboot: boolean (default=false)
+-%>
+<%
+  ssh_pwauth = host_param('ssh_pwauth') ? host_param_true?('ssh_pwauth') : !host_param('ssh_authorized_keys')
+  rhel_compatible = @host.operatingsystem.family == 'Redhat' && @host.operatingsystem.name != 'Fedora'
+  # safemode renderer does not support unary negation
+  pm_set = @host.puppetmaster.empty? ? false : true
+  puppet_enabled = pm_set || host_param_true?('force-puppet')
+  salt_enabled = host_param('salt_master') ? true : false
+  chef_enabled = @host.respond_to?(:chef_proxy) && @host.chef_proxy
+-%>
+#cloud-config
+hostname: <%= @host.shortname %>
+fqdn: <%= @host %>
+manage_etc_hosts: true
+groups:
+- admin
+users:
+- default
+- name: admin
+  primary-group: admin
+  groups: users
+  shell: /bin/bash
+  sudo: ['ALL=(ALL) ALL']
+  lock-passwd: false
+<% if ssh_pwauth -%>
+<%# Don't enable this in production. It is very insecure! Use ssh_authorized_keys instead...
+    http://cloudinit.readthedocs.io/en/latest/topics/examples.html#including-users-and-groups -%>
+  ssh_pwauth: true
+  passwd: <%= @host.root_pass %>
+<% end -%>
+<% if host_param('ssh_authorized_keys') -%>
+  ssh_authorized_keys:
+<% host_param('ssh_authorized_keys').split("\n").each do |ssh_key| -%>
+  - <%= ssh_key %>
+<% end -%>
+<% end -%>
+- name: cloud-user
+  primary-group: cloud-user
+  groups: wheel
+  shell: /bin/bash
+  sudo: ['ALL=(ALL) NOPASSWD:ALL']
+  lock-passwd: false
+<% if ssh_pwauth -%>
+<%# Don't enable this in production. It is very insecure! Use ssh_authorized_keys instead...
+    http://cloudinit.readthedocs.io/en/latest/topics/examples.html#including-users-and-groups -%>
+  ssh_pwauth: true
+  passwd: <%= @host.root_pass %>
+<% end -%>
+<% if host_param('ssh_authorized_keys') -%>
+<%# Allow user to specify additional SSH key as host paramter -%>
+  ssh_authorized_keys:
+<% host_param('ssh_authorized_keys').split("\n").each do |ssh_key| -%>
+  - <%= ssh_key %>
+<% end -%>
+<% end -%>
+write_files:
+- path: /etc/sudoers.d/999-cloud-user
+  permissions: '0440'
+  content: |
+    Defaults:cloud-user !requiretty
+- path: /sbin/ifup-local
+  permissions: '0755'
+  content: |
+    #!/bin/bash
+    key="gf4EVCTbbAcmXctzrIZUvg=="
+    server="10.55.102.5"
+    zone="dev.maskedadmins.com"
+    hostname="$(hostname --short)"
+    hostip=$(ip addr list eth0 | grep 'inet ' | cut -d ' ' -f 6 | cut -d / -f1)
+    reverse=$(echo $hostip | awk -F. '{print $4"."$3"." $2"."$1}')
+    reversezone=$(echo $hostip | awk -F. '{print $3"." $2"."$1}')
+    temp=/tmp.$$
+    touch $temp
+    cat > ${temp} <<EOF
+    server ${server}
+    key dhcpupdate ${key}
+    zone ${reversezone}.in-addr.arp
+    update delete ${reverse}.in-addr.arpa. PTR
+    update add ${reverse}.in-addr.arpa. 300 IN PTR ${hostname}.${zone}.
+    send
+    zone ${zone}
+    update delete ${hostname}.${zone}. A
+    update add ${hostname}.${zone}. 300 IN A $hostip
+    send
+    EOF
+    nsupdate -v ${temp}
+    echo "$*" >> /tmp/dnsmasq.updater.txt
+    rm -f ${temp}
+    extravars="{\\\"fqdn\\\":\\\"${hostname}.${zone}\\\",\\\"zone\\\":\\\"$zone\\\"}"
+    curl -s -f -k -H 'Content-Type: application/json' -XPOST -d "{\"extra_vars\":\"${extravars}\"}" \
+    --user admin:redhat https://{ host_config_server }}:443/api/v2/job_templates/14/launch/ \
+    || true
+- path: /tmp/firstboot.sh
+  permissions: '0755'
+  owner: root:root
+  content: |
+    #!/bin/bash
+    # managed by cloud-config
+    # this exists to give aws networking time to come up before phoning home
+    if [ -d /var/log/firstboot ]
+    then
+       echo "*** firstboot.sh already run"
+       echo "*** firstboot.sh delete /var/log/firstboot to run again"
+       exit 0
+    fi
+    mkdir /var/log/firstboot
+    sleep 60
+    # wait until tower/aws returns a success message
+    while [[ ! -e /tmp/.success ]]
+    do
+      curl -s -k --data 'host_config_key={{ host_config_key }}' https://{{ host_config_server }}:443/api/v2/job_templates/{{ host_config_jobid }}/callback/ | \
+      grep msg || \
+      touch /tmp/.success
+      sleep 60
+    done
+- path: /tmp/foreman-userdata.sh
+  permissions: '0755'
+  content: |
+    #!/bin/bash
+    <%= indent 4 do
+      snippet 'redhat_register'
+    end %>
+    ## ansible tower callback
+    yum -y install bind-utils
+    /sbin/ifup-local
+<%= indent 4 do
+      snippet 'ansible_provisioning_callback'
+    end %>
+    systemctl daemon-reload
+    #systemctl start ansible-callback
+    systemctl disable ansible-callback
+		/tmp/firstboot.sh
+
+<% if host_param_true?('package_upgrade') -%>
+package_upgrade: true
+<% end -%>
+
+runcmd:
+<% if rhel_compatible -%>
+- |
+<%= indent(2) { snippet('epel') } %>
+<% end -%>
+- |
+<%= indent(2) { snippet('remote_execution_ssh_keys') } %>
+<% if chef_enabled -%>
+- |
+<%= indent(2) { snippet('chef_client') } %>
+<% end -%>
+<% if puppet_enabled -%>
+- |
+<%= indent(2) { snippet('puppetlabs_repo') } %>
+- |
+<%= indent(2) { snippet('puppet_setup') } %>
+<% end -%>
+<% if salt_enabled -%>
+- |
+<%= indent(2) { snippet('saltstack_setup') } %>
+<% end -%>
+- [ cloud-init-per, once, foreman-userdata, /tmp/foreman-userdata.sh ]
+output: {all: '| tee -a /root/install.userdata.log'}
+
+<%# Contact Foreman to confirm instance is built -%>
+phone_home:
+  url: <%= foreman_url('built') %>
+  post: []
+  tries: 10
+
+<% if host_param_true?('reboot') -%>
+power_state:
+  mode: reboot
+  timeout: 30
+  condition: true
+<% end -%>
+

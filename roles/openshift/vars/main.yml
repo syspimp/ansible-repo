@@ -1,0 +1,45 @@
+---
+tower_server: "{{ default_tower_server }}"
+multinode: "no"
+node1_ip: ""
+node1_hostname: ""
+node2_ip: ""
+node2_hostname: ""
+ose_add_user: "admin"
+ose_add_pass: "CHANGEPASS"
+ose_add_project: "redhat-lab"
+ose_add_project_description: "This is an example project to demonstrate OpenShift v3"
+ose_add_project_displayname: "Redhat Lab Demo Project"
+ose_outbound_network_cidr: "10.55.0.0/16"
+ocp_variant: "3.11"
+cfme_user: "admin"
+cfme_pass: "smartvm"
+cfme_creds: "admin:smartvm"
+cfme_type: "ManageIQ::Providers::Openshift::ContainerManager"
+cfme_server: "cloudforms.dev.maskedadmins.com"
+cfme_project: redhat-lab
+ose_name: "OCP"
+ose_server: "ose-cluster-master.dev.maskedadmins.com"
+ose_security: ssl
+ose_repos: ['rhel-7-server-ose-3.11-rpms','rhel-7-fast-datapath-rpms']
+ose_pkgs: ['net-tools','bind-utils','iptables-services','bridge-utils','httpd-tools','iptables-services','sos','psacct','bash-completion','yum-utils','git','wget','kexec-tools']
+ose_svcs: ['chronyd','NetworkManager']
+rh_openshift_pool_id: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          36643733623133376163663039653136363732653433313334623062663865656533306365346638
+          3632653136336633353935323532653334363535303537360a346139333561386133366664386231
+          38326531346562393564613461313561353730323466623231303437383865393464313264393962
+          3333323236373933340a383863323137626631383164633737356534373164393636316536663363
+          38656438306238303537613466343036353430313861396335666631353939353732373261393132
+          6539316534613831343062343039393137396663613130386330
+openstack:
+  name: 'OSP13 Redhat Lab'
+  description: 'Openstack 13'
+  user: dtaylor
+  pass: CHANGEPASS
+  tenantid: "42703655d32d4506855b8815682567b2"
+  tenant: "{{ vault_os_project }}"
+  region: "RegionOne"
+  controller: "{{ osp10_controller }}"
+  auth: "http://{{ osp10_controller }}:5000/v3"
+  subnetid: "242b2296-f5e6-416b-b7c1-5d8293935921"

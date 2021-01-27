@@ -1,0 +1,293 @@
+---
+- name: "Firstboot check"
+  shell: |
+    if [ -e "/opt/.firstboot" ]
+    then
+      echo "true"
+    else
+      echo "false"
+    fi
+  register: firstbootcheck
+
+- name: "First boot configuration block"
+  block:
+    - name: "Set up /etc/hosts file and hostname"
+      shell: |
+        shortname=$(hostname --short)
+        hostname=${shortname}.{{ dns_domain }}
+        echo "${hostname}" > /etc/hostname
+        hostnamectl set-hostname ${hostname}
+        grep "{{ ansible_default_ipv4['address'] }}" /etc/hosts || echo "{{ ansible_default_ipv4['address'] }} ${hostname} ${shortname}" >> /etc/hosts
+        grep "{{ sat6['url'] }}" /etc/hosts || echo "{{ sat6['ip'] }} {{ sat6['url'] }}" >> /etc/hosts
+        #service network restart
+      become: true
+      args:
+        creates: /opt/.firstboot
+    
+    - name: "Check if in aws"
+      shell: |
+        curl -s http://169.254.169.254/2019-10-01/meta-data/public-ipv4 || echo "html"
+      register: dc
+      
+    - name: "AWS: get instance id"
+      shell: |
+        curl -s http://169.254.169.254/2019-10-01/meta-data/instance-id
+      register: instanceid
+      when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
+
+    - name: "AWS: get region id"
+      shell: |
+        curl -s http://169.254.169.254/2019-10-01/meta-data/placement/availability-zone
+      register: regionid
+      when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
+
+    - name: "Check for hosts not in aws"
+      set_fact:
+        in_aws: "{{ ansible_system_vendor | regex_search('EC2') }} or ansible_system_vendor | regex_search('Xen')"
+
+    - name: "Get the aws short hostname"
+      shell: |
+        hostname --short  
+      register: awsshortname
+      when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
+
+    - name: "Set ntp server"
+      set_fact:
+        ntp_server: "0.rhel.pool.ntp.org"
+      when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
+
+    - name: "Set ntp to true"
+      shell: |
+        ntpdate server {{ ntp_server }} iburst
+        timedatectl set-ntp true
+        systemctl restart chronyd
+      poll: 0
+      async: 1
+      become: true
+      ignore_errors: yes
+      args:
+        creates: /opt/.firstboot
+    
+    - name: Set authorized key for root
+      authorized_key:
+        user: root
+        state: present
+        key: "{{ cloud_user_pub_key }}"
+    
+    - name: "Enabling and restarting services {{ enabled_svcs }}"
+      service:
+        name: "{{ item }}"
+        #state: restarted
+        enabled: yes
+      with_items: "{{ enabled_svcs }}"
+      become: true
+    
+ #   - name: "Stopping and disabling services {{ disabled_svcs }}"
+ #     service:
+ #       name: "{{ item }}"
+ #       state: stopped
+ #       enabled: no
+ #     with_items: "{{ disabled_svcs }}"
+ #     ignore_errors: yes
+ #     become: true
+    
+    - name: "update dns with the real hostname given in openstack"
+      template:
+        src: dns-updater.sh.j2
+        dest: /usr/sbin/ifup-local
+        owner: root
+        group: root
+        mode: 0755
+    
+#    - name: "put dns helper on tower server for aws hosts"
+#      template:
+#        src: dns-helper.sh.j2
+#        dest: /opt/dns-helper.sh
+#        owner: root
+#        group: root
+#        mode: 0755
+#      delegate_to: sat6
+#      when: "ansible_system_vendor | regex_search('EC2') "
+
+    - name: "Run the AWS dns helper"
+      shell: |
+        /usr/sbin/ifup-local
+      when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
+
+#    - name: "AWS: Tag the instance with DNS"
+#      ec2_tag:
+#        region: "{{ regionid.stdout }}"
+#        resource: "{{ instanceid.stdout }}"
+#        state: present
+#        tags:
+#          DNS: "{{awsshortname.stdout}}.{{ dns_domain }}"
+#      delegate_to: localhost
+#      become: no
+#      when: "ansible_system_vendor | regex_search('EC2') "
+
+    - name: "Updating MOTD"
+      template: 
+        src: tiger.ascii.j2
+        dest: /etc/motd 
+        owner: root 
+        group: root 
+        mode: 0644
+    
+  when: firstbootcheck.stdout == "false"
+
+- name: "Fall back to RHSM, Check if we are registered"
+  shell: "subscription-manager status || true"
+  register: rhsm_reg
+    
+- name: "Bootstrap check"
+  shell: |
+    if [ -e "/opt/.bootstrap" ]
+    then
+      echo "true"
+    else
+      echo "false"
+    fi
+  register: bootstrapcheck
+
+- name: "Try to register to Satellite 6"
+  block:
+    - name: "Get the bootstrap python script"
+      get_url:
+        url: "http://{{ sat6['url'] }}/pub/bootstrap.py"
+        dest: /opt/bootstrap.py
+        mode: 0755
+
+    - name: "Save the command to register to satellite server"
+      template:
+        src: reg-to-satellite.sh.j2
+        dest: /opt/reg-to-satellite.sh
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: "Run the satellite bootstrap script"
+      shell: |
+        /opt/reg-to-satellite.sh
+        #/bin/false
+      become: true
+      register: satbootstrap
+      #when: "'Current' not in rhsm_reg.stdout"
+      when: bootstrapcheck.stdout == "false"
+
+    - name: "bootstrap complete"
+      file:
+        path: /opt/.bootstrap
+        state: touch
+        mode: 0444
+  when: bootstrapcheck.stdout == "false"
+
+  rescue:
+    - name: "Clean up from Sat 6"
+      shell: |
+        subscription-manager remove --all
+        subscription-manager clean
+        [ -e /etc/rhsm/rhsm.conf.kat-backup ] && cp -f /etc/rhsm/rhsm.conf.kat-backup /etc/rhsm/rhsm.conf
+      become: true
+      ignore_errors: true
+
+    - name: Register and subscribe to multiple pools for virtual hosts
+      redhat_subscription:
+        state: present
+        username: "{{ rh_satellite_user }}"
+        password: "{{ rh_satellite_pass }}"
+        pool_ids: "{{ rh_subscription_pool_ids }}"
+    #    pools: "{{ rh_subscription_pools }}"
+      become: true
+      register: rhsm_status
+      when: "'Current' not in rhsm_reg.stdout"
+      #when: "'Current' not in rhsm_reg.stdout and ansible_virtualization_role == 'guest' "
+      retries: 10
+      until: rhsm_status.msg.find("System successfully registered") != -1
+      delay: 1
+
+    - name: "bootstrap complete"
+      file:
+        path: /opt/.bootstrap
+        state: touch
+        mode: 0444
+#    - name: Register and subscribe to multiple pools for physical hosts
+#      redhat_subscription:
+#        state: present
+#        username: "{{ rh_satellite_user }}"
+#        password: "{{ rh_satellite_pass }}"
+#        pool_ids: "{{ rh_subscription_pool_physical_ids }}"
+#    #    pools: "{{ rh_subscription_pools }}"
+#      become: true
+#      register: rhsm_status
+#      when: "'Current' not in rhsm_reg.stdout  and ansible_virtualization_role != 'guest' "
+#      retries: 10
+#      until: rhsm_status.msg.find("System successfully registered") != -1
+#      delay: 1
+  always:
+    - name: "Disabling all repos"
+      shell: "subscription-manager repos --disable={{ item }}"
+      with_items: "{{ rh_disabled_repos }}"
+      become: true
+      args:
+        creates: /opt/.firstboot
+    
+    - name: "Enabling needed repos"
+      shell: "subscription-manager repos --enable={{ item }}"
+      with_items: "{{ rh_enabled_repos }}"
+      become: true
+      args:
+        creates: /opt/.firstboot
+    
+    - name: "Perform a yum clean all"
+      shell:  yum clean all
+      become: true
+      args:
+        creates: /opt/.firstboot
+
+    - name: "Installing base config rpms"
+      yum:
+        name: "{{ redhat_packages }}"
+        state: latest
+      become: true
+
+    - name: "Update dns entry"
+      shell: "/sbin/ifup-local || true"
+      become: true
+      ignore_errors: yes
+      args:
+        creates: /opt/.firstboot
+
+#    - name: "Run yum update. Please wait. SSH to Host and tail /tmp/tower.output for status"
+#      shell: |
+#        exec &> >(tee -a /tmp/tower.output)
+#        yum -y update
+#      become: true
+#      args:
+#        executable: /bin/bash
+#        creates: /opt/.firstboot
+
+    - name: "first boot complete"
+      file:
+        path: /opt/.firstboot
+        state: touch
+        mode: 0444
+
+    - name: "Reboot."
+      shell: |
+        shutdown -r +1 || true
+      become: true
+      args:
+        executable: /bin/bash
+        creates: /opt/.firstboot
+
+    - name: "Wait 5 to 11 mins for host to reboot"
+      wait_for:
+        port: 22
+        host: "{{ ansible_ssh_host | default(inventory_hostname) }}"
+        #search_regex: OpenSSH
+        delay: 120
+        timeout: 660
+      delegate_to: localhost
+      become: false
+
+  when: firstbootcheck.stdout == "false"

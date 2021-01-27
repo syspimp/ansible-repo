@@ -1,0 +1,260 @@
+---
+- name: "Check if we are entitled for Satellite Capsule"
+  become: yes
+  shell: "subscription-manager list --consumed"
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
+  register: rhsm_reg
+    
+- name: "Try to Entitle to use Satellite 6"
+  block:
+    - name: "Add Satellite Entitlement to Server"
+      redhat_subscription:
+        state: present
+        username: "{{ rh_satellite_user }}"
+        password: "{{ rh_satellite_pass }}"
+        pool_ids: "{{ rh_satellite_pool_id }}"
+      become: true
+      register: rhsm_status
+      retries: 10
+      delay: 1
+  when: "'Red Hat Satellite' not in rhsm_reg.stdout"
+
+- name: "Satellite Capsule Setup check"
+  shell: |
+    if [ -e "/root/.setup/capsule-rpms" ]
+    then
+      echo "true"
+    else
+      echo "false"
+    fi
+  register: initialsetup
+  become: true
+
+- name: "Block to perform initial setup"
+  block:
+    - name: "make setup tracking dir"
+      file:
+        path: /root/.setup
+        state: directory
+        mode: 0755
+  
+    - name: "Disabling all repos"
+      shell: "subscription-manager repos --disable='*'"
+      become: true
+    
+    - name: "Enable satellite-capsule repos"
+      shell: |
+        subscription-manager repos --enable rhel-7-server-rpms \
+                           --enable rhel-server-rhscl-7-rpms \
+                           --enable rhel-7-server-satellite-capsule-{{ satellite_version }}-rpms \
+                           --enable rhel-7-server-satellite-tools-{{ satellite_version }}-rpms \
+                           --enable=rhel-7-server-satellite-maintenance-6-rpms \
+                           --enable=rhel-7-server-ansible-2.8-rpms 
+      become: true
+    
+    - name: "Clean out old yum metadata"
+      shell: |
+        yum clean all
+      become: true
+    
+    - name: "Installing satellite-capsule rpms"
+      yum:
+        name: ['satellite-capsule','katello-agent']
+        #name: ['satellite-capsule','policycoreutils-python']
+        state: latest
+      become: true
+
+    - name: "Enable and start goferd"
+      service:
+        name: goferd
+        enabled: yes
+        state: started
+
+    - name: "rpms complete"
+      file:
+        path: /root/.setup/capsule-rpms
+        state: touch
+        mode: 0444
+
+  when: initialsetup.stdout == "false"
+
+- name: "Satellite Capsule Setup check"
+  shell: |
+    if [ -e "/root/.setup/capsule-configed" ]
+    then
+      echo "true"
+    else
+      echo "false"
+    fi
+  register: capsulesetup
+  become: true
+
+- name: "Block to perform satellie-capsule setup"
+  block:
+    - name: "Get short hostname"
+      shell: |
+        hostname --short
+      register: shortname
+    
+    - name: "Set the short hostname fact"
+      set_fact:
+        shorthostname: "{{ shortname.stdout }}"
+
+    - name: "Generate the capsule certs"
+      shell: |
+        capsule-certs-generate \
+        --foreman-proxy-fqdn {{ shorthostname}}.{{ dns_domain }} \
+        --certs-tar "/var/www/html/pub/{{ shorthostname}}.{{ dns_domain }}-certs.tar" \
+        --foreman-proxy-cname {{ capsule_loadbalancer_fqdn }}
+      become: true
+      register: certoutput
+      delegate_to: "{{ sat6_server }}"
+      # logically I want this, but if it already exists
+      # this task will not run, breaking the playbook
+      #args:
+      #  creates: "/var/www/html/pub/{{ ansible_fqdn }}-certs.tar"
+    
+    - name: "Set selinux context on cert tar file"
+      shell: |
+        restorecon /var/www/html/pub/{{ shorthostname}}.{{ dns_domain }}-certs.tar
+      become: true
+      delegate_to: "{{ sat6_server }}"
+    
+    - name: "Grab certs from the sat server"
+      get_url:
+        url: "http://{{ sat6_server }}/pub/{{ shorthostname}}.{{ dns_domain }}-certs.tar"
+        dest: "/root/{{ shorthostname}}.{{ dns_domain }}-certs.tar"
+      become: yes
+
+    - name: "Set the oauth facts"
+      set_fact:
+        oauth_consumer_key: "{{ item.split('\"')[1] }}"
+      when: "'oauth-consumer-key' in item"
+      with_items: "{{ certoutput.stdout_lines }}"
+
+    - name: "Set the oauth facts"
+      set_fact:
+        oauth_consumer_secret: "{{ item.split('\"')[1] }}"
+      when: "'oauth-consumer-secret' in item"
+      with_items: "{{ certoutput.stdout_lines }}"
+
+    - name: "Run the satellite-installer ..."
+      shell: |
+        satellite-installer \
+                    --scenario capsule \
+                    --certs-tar-file                              "/root/{{ shorthostname}}.{{ dns_domain }}-certs.tar"\
+                    --foreman-proxy-content-parent-fqdn           "{{ sat6_server }}"\
+                    --foreman-proxy-register-in-foreman           "true"\
+                    --foreman-proxy-foreman-base-url              "https://{{ sat6_server }}"\
+                    --foreman-proxy-trusted-hosts                 "{{ sat6_server }}"\
+                    --foreman-proxy-trusted-hosts                 "{{ shorthostname}}.{{ dns_domain }}"\
+                    --foreman-proxy-oauth-consumer-key            "{{ oauth_consumer_key }}"\
+                    --foreman-proxy-oauth-consumer-secret         "{{ oauth_consumer_secret }}"\
+                    --puppet-server-foreman-url                   "https://{{ sat6_server }}"\
+                    --certs-cname                              "{{ capsule_loadbalancer_fqdn }}" \
+                    --puppet-dns-alt-names                     "{{ capsule_loadbalancer_fqdn }}" \
+                    --puppet-ca-server                         "{{ shorthostname}}.{{ dns_domain }}" \
+                    --foreman-proxy-puppetca                   "true" \
+                    --puppet-server-ca                         "true" \
+                    --enable-foreman-proxy-plugin-remote-execution-ssh \
+                    --enable-foreman-proxy-plugin-ansible \
+                    --enable-foreman-proxy-plugin-openscap
+
+
+    - name: "make sure we are registered to the satellite server"
+      shell:
+        subscription-manager config | grep 'hostname = \[subscription.rhsm.redhat.com\]' || true
+      register: bootstrap
+      
+    - name: "Unregister from the redhat cdn"
+      shell:
+        subscription-manager unregister && \
+        subscription-manager clean
+      when: "'subscription.rhsm.redhat.com' in bootstrap.stdout"
+
+    - name: "Install the katello certificate"
+      shell:
+        rpm -Uvh http://sat6.dev.maskedadmins.com/pub/katello-ca-consumer-latest.noarch.rpm
+      when: "'subscription.rhsm.redhat.com' in bootstrap.stdout"
+
+    - name: "Re-run subscription-manager"
+      shell:
+        subscription-manager register --org="{{ sat6['org'] }}" --activationkey="{{ sat6['activation_key'] }}"
+      when: "'subscription.rhsm.redhat.com' in bootstrap.stdout"
+
+    - name: "Reboot."
+      shell: |
+        shutdown -r +1 || true
+      become: true
+      args:
+        executable: /bin/bash
+
+    - name: "Wait 5 to 11 mins for host to reboot"
+      wait_for:
+        port: 22
+        host: "{{ ansible_ssh_host | default(inventory_hostname) }}"
+        #search_regex: OpenSSH
+        delay: 120
+        timeout: 660
+      delegate_to: localhost
+      become: false
+
+    - name: "capsule config complete"
+      file:
+        path: /root/.setup/capsule-configed
+        state: touch
+        mode: 0444
+  when: capsulesetup.stdout == "false"
+
+- name: "Tower Inventory Setup check"
+  shell: |
+    if [ -e "/root/.setup/tower-configed" ]
+    then
+      echo "true"
+    else
+      echo "false"
+    fi
+  register: towersetup
+  become: true
+
+- name: "Block add to Ansible Tower inventory"
+  block:
+    - name: "Get host id to add to the 'capsules' Group Inventory"
+      uri:
+        url: "https://{{ default_tower_server }}/api/v2/hosts/?name={{ inventory_hostname }}"
+        validate_certs: no
+        method: GET
+        user: admin
+        password: "{{ ipmi_pass }}"
+        force_basic_auth: yes
+        status_code: [200,202,204]
+        body_format: json
+      register: hostidcheck
+
+    - name: "Set the host_id fact"
+      set_fact:
+        sat_host_id: "{{ hostidcheck.json.results[0].id }}"
+
+    - name: "Add host to the 'capsules' Group Inventory"
+      uri:
+        url: "https://{{ default_tower_server }}/api/v2/groups/{{ capsules_inventory_group }}/hosts/"
+        validate_certs: no
+        method: POST
+        body: >
+          {
+             "id": {{ sat_host_id }}
+          }
+        user: admin
+        password: "{{ ipmi_pass }}"
+        force_basic_auth: yes
+        status_code: [201,202,204]
+        body_format: json
+
+    - name: "tower config complete"
+      file:
+        path: /root/.setup/tower-configed
+        state: touch
+        mode: 0444
+  when: towersetup.stdout == "false"

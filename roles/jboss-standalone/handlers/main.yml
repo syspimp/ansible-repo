@@ -1,0 +1,6 @@
+---
+- name: restart jboss
+  systemd: name=jboss state=restarted
+
+- name: restart iptables
+  systemd: name=iptables state=restarted

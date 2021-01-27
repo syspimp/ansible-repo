@@ -1,0 +1,122 @@
+---
+osp8_controller: 10.55.102.155
+osp10_controller: 10.55.102.159
+#osp10_computes: "10.55.102.158,10.55.102.157,10.55.102.156,10.55.102.159"
+osp10_computes: "10.55.102.159"
+os_packstack_use_answerfile: "yes"
+os_controller_nodes: "{{ osp10_controller }}"
+os_compute_nodes: "{{ osp10_computes }}"
+os_network_nodes: "{{ osp10_controller }}"
+os_storage_node: "{{ osp10_controller }}"
+os_cinder_volumesgroup_size: "1000G"
+os_amqp_nodes: "{{ osp10_controller }}"
+os_mariadb_nodes: "{{ osp10_controller }}"
+#os_cinder_device: "/dev/sda"
+#os_cinder_devicepart: "/dev/sda3"
+# for shelf
+#os_cinder_device: "/dev/sda1"
+#os_swift_device: "/dev/sda"
+#os_swift_devicepart: "/dev/sda4"
+ml2_drivers: "local,flat,vlan"
+ml2_networks: "local,vlan"
+ml2_bridge_name: "inter-vlan"
+ml2_vlan_ranges: "2:120"
+#ovs_bridged_interface: "enp10s0f1"
+ovs_bridged_interface: "em2"
+openstack:
+  version: 14
+  enabled_repos: ['rhel-7-server-openstack-14-rpms','rhel-7-server-rh-common-rpms','rhel-7-server-extras-rpms','rhel-7-server-openstack-14-devtools-rpms']
+  controller_packages: ['yum-utils','openstack-packstack','openstack-utils']
+  #controller_packages: ['yum-utils']
+  compute_packages: ['openstack-nova']
+  project_name: Redhat_Lab
+  project_user: dtaylor
+  project_pass: CHANGEPASS
+  dns_server: 10.55.102.5
+  dhcp_server: 10.55.102.5
+  dhcp_domain: dev.maskedadmins.com
+  dhcp_mtu: 1454
+  cinder:
+    use: "yes"
+    device: "/dev/sda"
+    devicepart: "3"
+    size: "364"
+  swift:
+    use: "yes"
+    device: "/dev/sda"
+    devicepart: "4"
+    size: "398"
+  cpupinning:
+    use: "no"
+    device: "/dev/sda"
+  hugepages:
+    use: "no"
+    device: /dev/sda
+  glance:
+    mount_nfs: "yes"
+    import: "yes"
+    image_path: /mnt/compute1/glance-images
+    nfs_target: 10.55.102.155:/mnt/drobo/software/BackUp/openstack/glance-images
+    image_names: ['PXE-client-bare.raw','RHEL-7.5-Cloud-bare.qcow2','UCSPE_3.2.3e-bare.vmdk']
+    #image_names: ['PXE-client-bare.raw','cfme-rhos-5.8.0.17-1.x86_64.qcow2','RHEL-7.3-Cloud-bare.qcow2','RHEL-Atomic-7.2.6-1-bare.qcow2']
+  networks:
+    Management_101:
+      cidr: 10.55.101.0/24
+      vlanid: 101
+      subnet_name: NET101
+      dhcp_start: 10.55.101.10
+      dhcp_end: 10.55.101.50
+      gateway: 10.55.101.1
+    Provisioning_102:
+      cidr: 10.55.102.0/24
+      vlanid: 102
+      subnet_name: NET102
+      dhcp_start: 10.55.102.200
+      dhcp_end: 10.55.102.225
+      gateway: 10.55.102.1
+    Dev_103:
+      cidr: 10.55.103.0/24
+      vlanid: 103
+      subnet_name: NET103
+      dhcp_start: 10.55.103.200
+      dhcp_end: 10.55.103.225
+      gateway: 10.55.103.1
+    Test_104:
+      cidr: 10.55.104.0/24
+      vlanid: 104
+      subnet_name: NET104
+      dhcp_start: 10.55.104.200
+      dhcp_end: 10.55.104.225
+      gateway: 10.55.104.1
+    Storage_105:
+      cidr: 10.55.105.0/24
+      vlanid: 105
+      subnet_name: NET105
+      dhcp_start: 10.55.105.200
+      dhcp_end: 10.55.105.225
+      gateway: 10.55.105.1
+    Prod_106:
+      cidr: 10.55.106.0/24
+      vlanid: 106
+      subnet_name: NET106
+      dhcp_start: 10.55.106.200
+      dhcp_end: 10.55.106.225
+      gateway: 10.55.106.1
+cfme_user: "admin"
+cfme_pass: "smartvm"
+cfme_server: "{{ ansible_hostname }}"
+cfme_project: redhat-lab
+cfme:
+  compute_resources:
+    - name: 'OSP8'
+      description: 'Openstack 8 Redhat Lab'
+      user: 'dtaylor'
+      pass: "{{ ipmi_pass }}"
+      security: non-ssl
+      server: "{{ osp8_controller }}"
+    - name: 'OSP10'
+      description: 'Openstack 10'
+      user: dtaylor
+      pass: CHANGEPASS
+      security: non-ssl
+      server: "{{ osp10_controller }}"

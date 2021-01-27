@@ -1,0 +1,325 @@
+---
+- name: "Satellite Oscap setup check"
+  shell: |
+    if [ -e "/root/.setup/oscap-rpms" ]
+    then
+      echo "true"
+    else
+      echo "false"
+    fi
+  register: oscapsetup
+  become: true
+
+- name: "Block to perform initial setup"
+  block:
+    - name: "make setup tracking dir"
+      file:
+        path: /root/.setup
+        state: directory
+        mode: 0755
+  
+    - name: "Enable satellite tools repos"
+      shell: |
+        subscription-manager repos \
+        --enable rhel-7-server-satellite-tools-{{ satellite_version }}-rpms \
+        --enable=rhel-7-server-extras-rpms
+      become: true
+
+    - name: "Installing oscap rpms"
+      yum:
+        name: ['openscap-scanner','scap-security-guide']
+        state: latest
+      become: true
+
+    - name: "rpms complete"
+      file:
+        path: /root/.setup/oscap-rpms
+        state: touch
+        mode: 0444
+
+  when: oscapsetup.stdout == "false"
+
+- name: "Oscap profile setup check"
+  shell: |
+    if [ -e "/root/.setup/oscap-configed" ]
+    then
+      echo "true"
+    else
+      echo "false"
+    fi
+  register: oscapsetup
+  become: true
+
+- name: "Block to perform satellie-capsule setup"
+  block:
+    - name: "Save info on the RHEL 7 Standard Security Profile"
+      shell: |
+        oscap info /usr/share/xml/scap/ssg/content/ssg-rhel7-ds.xml
+      register: profileinfo
+    
+    - name: "Save the proxy id for the capsule"
+      shell: |
+        hammer --csv capsule list | grep {{ ansible_fqdn }} | cut -f1 -d,
+      delegate_to: "{{ sat6_server }}"
+      register: proxyid
+
+    - name: "Save the location id for the capsule"
+      shell: |
+        hammer --csv location list | grep "{{ sat6_default_location }}" | cut -f1 -d,
+      delegate_to: "{{ sat6_server }}"
+      register: locid
+
+    - name: "Output the RHEL 7 Standard Security Profile info"
+      debug:
+        var: profileinfo.stdout
+
+    - name: "Generate html with the RHEL 7 Standard Security Profile info"
+      shell: |
+        oscap xccdf generate guide \
+        --profile xccdf_org.ssgproject.content_profile_standard \
+        /usr/share/xml/scap/ssg/content/ssg-rhel7-ds.xml > /var/www/html/pub/rhel7-security-profile.html
+      args:
+        creates: /var/www/html/pub/rhel7-security-profile.html
+      become: true
+    
+    - name: "Generate html with the RHEL 8 Standard Security Profile info"
+      shell: |
+        oscap xccdf generate guide \
+        --profile xccdf_org.ssgproject.content_profile_pci-dss \
+        /usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml > /var/www/html/pub/rhel8-security-profile.html
+      args:
+        creates: /var/www/html/pub/rhel8-security-profile.html
+      become: true
+
+    - name: "Configure Satellite to use the security profiles"
+      shell: |
+        foreman-rake foreman_openscap:bulk_upload:default && \
+        touch /opt/.foremanrake
+      args:
+        creates: /opt/.foremanrake
+      become: true
+      delegate_to: "{{ sat6_server }}"
+    
+    - name: "Do we have to install rpms check"
+      shell: "rpm -qa rhel-system-roles"
+      ignore_errors: yes
+      register: rolecheck
+
+    - name: "Install the Ansible System Roles"
+      shell: |
+        satellite-maintain packages install -y rhel-system-roles
+      become: true
+      when: "'rhel-system-roles' not in rolecheck.stdout"
+
+    # https://nvd.nist.gov/ncp/checklist/909
+    - name: "Grab Openscap guides from the Redhat CDN"
+      unarchive:
+        src: "https://access.redhat.com/sites/default/files/attachments/{{ item }}"
+        dest: "/tmp"
+        remote_src: yes
+      become: yes
+      delegate_to: "{{ sat6_server }}"
+      loop:
+      - scap-security-guide-0.1.50-scap-1.3-rhel8.zip
+      - scap-security-guide-0.1.50-scap-1.3-rhel7.zip
+
+    # org is hardcoded as an exercise for the reader to correct
+    - name: "Upload the Openscap xml files to create the scans"
+      shell: |
+        hammer scap-content create --location-id {{ locid.stdout }} --organization-id 1 --title "{{ item.title }}" --scap-file {{ item.file }} && \
+        touch /opt/.scapuploaded
+      become: yes
+      delegate_to: "{{ sat6_server }}"
+      args:
+        creates: /opt/.scapuploaded
+      loop:
+      - title: RHEL 8 SCAP ds-1.2
+        file: /tmp/scap-security-guide-0.1.50-scap-1.3-rhel8/ssg-rhel8-ds-1.2.xml
+      - title: RHEL 7 SCAP ds-1.2
+        file: /tmp/scap-security-guide-0.1.50-scap-1.3-rhel7/ssg-rhel7-ds-1.2.xml
+
+    - name: "Install the foreman scap client role"
+      shell: |
+        ansible-galaxy -p /etc/ansible/roles install theforeman.foreman_scap_client
+      become: yes
+
+    - name: "Install the ansible roles to remediate PCI DSS"
+      shell: |
+        ansible-galaxy -p /etc/ansible/roles install {{ item }}
+      become: yes
+      loop:
+      - redhatofficial.rhel8_pci_dss
+      - redhatofficial.rhel7_pci_dss
+
+    - name: "Install the ansible roles to remediate Health Insurance Portability and Accountability Act (HIPAA)"
+      shell: |
+        ansible-galaxy -p /etc/ansible/roles install {{ item }}
+      become: yes
+      loop:
+      - redhatofficial.rhel8_hipaa
+      - redhatofficial.rhel7_hipaa
+
+    - name: "Install the ansible roles to remediate FBI Criminal Justice Information Services (FBI CJIS)"
+      shell: |
+        ansible-galaxy -p /etc/ansible/roles install {{ item }}
+      become: yes
+      loop:
+      - redhatofficial.rhel8_cjis
+      - redhatofficial.rhel7_cjis
+
+    - name: "Install the ansible roles to remediate NIST 800-171 (Controlled Unclassified Information)"
+      shell: |
+        ansible-galaxy -p /etc/ansible/roles install {{ item }}
+      become: yes
+      loop:
+      - redhatofficial.rhel8_cui
+      - redhatofficial.rhel7_cui
+
+    - name: "Install the ansible roles to remediate NIST National Checklist for RHEL 7.x/8.x"
+      shell: |
+        ansible-galaxy -p /etc/ansible/roles install {{ item }}
+      become: yes
+      loop:
+      - redhatofficial.rhel8_ospp
+      - redhatofficial.rhel7_ospp
+
+
+    - name: "Import the ansible roles into Satellite"
+      shell: |
+        hammer ansible roles import --location-id {{ locid.stdout }} --organization-id 1 --proxy-id {{ proxyid.stdout }}
+      delegate_to: "{{ sat6_server }}"
+      become: yes
+
+    - name: "Import the ansible variables into Satellite"
+      shell: |
+        hammer ansible variables import --location-id {{ locid.stdout }} --organization-id 1 --proxy-id {{ proxyid.stdout }}
+      delegate_to: "{{ sat6_server }}"
+      become: yes
+
+#    - name: "Set the oauth facts"
+#      set_fact:
+#        oauth_consumer_key: "{{ item.split('\"')[1] }}"
+#      when: "'oauth-consumer-key' in item"
+#      with_items: "{{ certoutput.stdout_lines }}"
+#
+#    - name: "Set the oauth facts"
+#      set_fact:
+#        oauth_consumer_secret: "{{ item.split('\"')[1] }}"
+#      when: "'oauth-consumer-secret' in item"
+#      with_items: "{{ certoutput.stdout_lines }}"
+#
+#    - name: "Run the satellite-installer ..."
+#      shell: |
+#        satellite-installer \
+#                    --scenario capsule \
+#                    --certs-tar-file                              "/root/{{ shorthostname}}.{{ dns_domain }}-certs.tar"\
+#                    --foreman-proxy-content-parent-fqdn           "{{ sat6_server }}"\
+#                    --foreman-proxy-register-in-foreman           "true"\
+#                    --foreman-proxy-foreman-base-url              "https://{{ sat6_server }}"\
+#                    --foreman-proxy-trusted-hosts                 "{{ sat6_server }}"\
+#                    --foreman-proxy-trusted-hosts                 "{{ shorthostname}}.{{ dns_domain }}"\
+#                    --foreman-proxy-oauth-consumer-key            "{{ oauth_consumer_key }}"\
+#                    --foreman-proxy-oauth-consumer-secret         "{{ oauth_consumer_secret }}"\
+#                    --puppet-server-foreman-url                   "https://{{ sat6_server }}"\
+#                    --certs-cname                              "{{ capsule_loadbalancer_fqdn }}" \
+#                    --puppet-dns-alt-names                     "{{ capsule_loadbalancer_fqdn }}" \
+#                    --puppet-ca-server                         "{{ shorthostname}}.{{ dns_domain }}" \
+#                    --foreman-proxy-puppetca                   "true" \
+#                    --puppet-server-ca                         "true" \
+#                    --enable-foreman-proxy-plugin-remote-execution-ssh
+#
+#    - name: "make sure we are registered to the satellite server"
+#      shell:
+#        subscription-manager config | grep 'hostname = \[subscription.rhsm.redhat.com\]' || true
+#      register: bootstrap
+#      
+#    - name: "Unregister from the redhat cdn"
+#      shell:
+#        subscription-manager unregister && \
+#        subscription-manager clean
+#      when: "'subscription.rhsm.redhat.com' in bootstrap.stdout"
+#
+#    - name: "Install the katello certificate"
+#      shell:
+#        rpm -Uvh http://sat6.dev.maskedadmins.com/pub/katello-ca-consumer-latest.noarch.rpm
+#      when: "'subscription.rhsm.redhat.com' in bootstrap.stdout"
+#
+#    - name: "Re-run subscription-manager"
+#      shell:
+#        subscription-manager register --org="{{ sat6['org'] }}" --activationkey="{{ sat6['activation_key'] }}"
+#      when: "'subscription.rhsm.redhat.com' in bootstrap.stdout"
+#
+#    - name: "Reboot."
+#      shell: |
+#        shutdown -r +1 || true
+#      become: true
+#      args:
+#        executable: /bin/bash
+#
+#    - name: "Wait 5 to 11 mins for host to reboot"
+#      wait_for:
+#        port: 22
+#        host: "{{ ansible_ssh_host | default(inventory_hostname) }}"
+#        #search_regex: OpenSSH
+#        delay: 120
+#        timeout: 660
+#      delegate_to: localhost
+#      become: false
+#
+#    - name: "Oscap profile config complete"
+#      file:
+#        path: /root/.setup/oscap-configed
+#        state: touch
+#        mode: 0444
+#  when: oscapsetup.stdout == "false"
+#
+#- name: "Tower Inventory Setup check"
+#  shell: |
+#    if [ -e "/root/.setup/tower-configed" ]
+#    then
+#      echo "true"
+#    else
+#      echo "false"
+#    fi
+#  register: towersetup
+#  become: true
+#
+#- name: "Block add to Ansible Tower inventory"
+#  block:
+#    - name: "Get host id to add to the 'capsules' Group Inventory"
+#      uri:
+#        url: "https://{{ default_tower_server }}/api/v2/hosts/?name={{ inventory_hostname }}"
+#        validate_certs: no
+#        method: GET
+#        user: admin
+#        password: redhat
+#        force_basic_auth: yes
+#        status_code: [200,202,204]
+#        body_format: json
+#      register: hostidcheck
+#
+#    - name: "Set the host_id fact"
+#      set_fact:
+#        sat_host_id: "{{ hostidcheck.json.results[0].id }}"
+#
+#    - name: "Add host to the 'capsules' Group Inventory"
+#      uri:
+#        url: "https://{{ default_tower_server }}/api/v2/groups/{{ capsules_inventory_group }}/hosts/"
+#        validate_certs: no
+#        method: POST
+#        body: >
+#          {
+#             "id": {{ sat_host_id }}
+#          }
+#        user: admin
+#        password: redhat
+#        force_basic_auth: yes
+#        status_code: [201,202,204]
+#        body_format: json
+#
+#    - name: "tower config complete"
+#      file:
+#        path: /root/.setup/tower-configed
+#        state: touch
+#        mode: 0444
+#  when: towersetup.stdout == "false"

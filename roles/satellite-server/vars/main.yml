@@ -1,0 +1,202 @@
+---
+satellite_version: 6.7
+openstack_version: 14
+openshift_version: 3.11
+host_config_key: firstboot
+host_config_jobid: 14
+redhat_packages: ['nspr','redhat-access-insights','deltarpm','bash-completion','vim-enhanced','ntp','ntpdate','git','wget','bind-utils']
+dns_domain: "dev.maskedadmins.com"
+compute_resources:
+#  - name: 'OSP8 Redhat Lab'
+#    description: 'Openstack 8 Redhat Lab'
+#    user: 'dtaylor'`
+#    pass: "{{ ipmi_pass }}"
+#    tenant: "Redhat Lab"
+#    controller: "{{ osp8_controller }}"
+#    url: "http://{{ osp8_controller }}:5000/v2.0/tokens"
+#  - name: 'OSP8 Masked Admins'
+#    description: 'Openstack 8 Masked_Admins'
+#    user: dtaylor
+#    pass: "{{ ipmi_pass }}"
+#    tenant: "Masked_Admins"
+#    controller: "{{ osp8_controller }}"
+#    url: "http://{{ osp8_controller }}:5000/v2.0/tokens"
+  - name: 'OSP13 Redhat Lab'
+    description: 'Openstack 13'
+    user: dtaylor
+    pass: CHANGEPASS
+    tenant: "Redhat_Lab"
+    controller: "{{ osp10_controller }}"
+    url: "http://{{ osp10_controller }}:5000/v3/auth/tokens"
+sat6:
+  subs_for_activationkeys:
+    - "Employee SKU"
+  environments:
+    - name: 'development'
+      prior: 'Library'
+    - name: 'testing'
+      prior: 'development'
+    - name: 'production'
+      prior: 'testing'
+  locations:
+    - "Private_Cloud"
+  domains:
+    - "maskedadmins.com"
+    - "dev.maskedadmins.com"
+    - "test.maskedadmins.com"
+    - "prod.maskedadmins.com"
+    - "strg.maskedadmins.com"
+  subnets:
+    - name: "Prov_102"
+      gw: "10.55.102.1"
+      network: "10.55.102.0"
+      mask: "255.255.255.0"
+      dns: "10.55.102.5"
+      domain: "maskedadmins.com"
+      location: "Private_Cloud"
+      org: "Redhat_Lab"
+      activation_key: "Redhat_Lab-production-key"
+    - name: "Dev_103"
+      gw: "10.55.103.1"
+      network: "10.55.103.0"
+      mask: "255.255.255.0"
+      dns: "10.55.102.5"
+      domain: "dev.maskedadmins.com"
+      location: "Private_Cloud"
+      org: "Redhat_Lab"
+      activation_key: "Redhat_Lab-development-key"
+    - name: "Test_104"
+      gw: "10.55.104.1"
+      network: "10.55.104.0"
+      mask: "255.255.255.0"
+      dns: "10.55.102.5"
+      domain: "test.maskedadmins.com"
+      location: "Private_Cloud"
+      org: "Redhat_Lab"
+      activation_key: "Redhat_Lab-testing-key"
+    - name: "Storage_105"
+      gw: "10.55.105.1"
+      network: "10.55.105.0"
+      mask: "255.255.255.0"
+      dns: "10.55.102.5"
+      domain: "strg.maskedadmins.com"
+      location: "Private_Cloud"
+      org: "Redhat_Lab"
+      activation_key: "Redhat_Lab-production-key"
+    - name: "Prod_106"
+      gw: "10.55.106.1"
+      network: "10.55.106.0"
+      mask: "255.255.255.0"
+      dns: "10.55.102.5"
+      domain: "prod.maskedadmins.com"
+      location: "Private_Cloud"
+      org: "Redhat_Lab"
+      activation_key: "Redhat_Lab-production-key"
+  orgs:
+    - name: "Redhat_Lab"
+      label: "redhatlab"
+      description: "Our example sub organization for managing content."
+      locations:
+        - 'Private_Cloud'
+      domains:
+        - "maskedadmins.com"
+        - "dev.maskedadmins.com"
+        - "test.maskedadmins.com"
+        - "prod.maskedadmins.com"
+        - "strg.maskedadmins.com"
+      subnets:
+        - "Prov_102"
+        - "Dev_103"
+        - "Test_104"
+        - "Storage_105"
+        - "Prod_106"
+tower_key: firstboot
+tower_server: "{{ default_tower_server }}"
+tower_jobid: 14
+sat6_default_org: Redhat_Lab
+sat6_default_location: Private_Cloud
+sat6_default_hostcollection: RHEL_7_x86_64
+sat6_default_hostgroup: "RHEL_7_x86_64_Hostgroup"
+sat6_default_domain: "dev.maskedadmins.com"
+sat6_default_subnet: "Dev_103"
+sat6_default_environment: "development"
+sat6_manifest: "manifest_45ae3ee1-3c5f-4a90-8b3b-341b46c7db21.zip"
+sat6_pool_ids: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          37303861666631306262666162306133616361623137373735653234623232333436313238316239
+          3037306231366463383134363631663336356237363232300a636235346536386564306566663761
+          32326134616436383765653664613630646433336332623434346264333934376634666536376337
+          3261613733343633390a666365666330633231343538613666616436363261663961663232633137
+          65306135646231653535663331663334386630346161353638616337383031656563636230313561
+          6131346335643636633630616232326631663465636565613432
+sat6_enabled_products:
+  - "Red Hat Enterprise Linux Server"
+#  - "Red Hat Enterprise Linux Fast Datapath"
+#  - "Red Hat OpenStack"
+#  - "Red Hat OpenShift Container Platform"
+  - "Red Hat Ansible Engine"
+  - "Red Hat Satellite Capsule"
+  - "Red Hat Software Collections (for RHEL Server)"
+sat6_enabled_repos:
+  - name: "Red Hat Enterprise Linux 7 Server (RPMs)"
+    product: "Red Hat Enterprise Linux Server"
+  - name: "Red Hat Enterprise Linux 7 Server (Kickstart)"
+    product: "Red Hat Enterprise Linux Server"
+  - name: "Red Hat Enterprise Linux 7 Server - RH Common (RPMs)"
+    product: "Red Hat Enterprise Linux Server"
+  - name: "Red Hat Enterprise Linux 7 Server - Optional (RPMs)"
+    product: "Red Hat Enterprise Linux Server"
+#  - name: "Red Hat Enterprise Linux Fast Datapath (RHEL 7 Server) (RPMs)"
+#    product: "Red Hat Enterprise Linux Fast Datapath"
+  - name: "Red Hat Ansible Engine 2.8 RPMs for Red Hat Enterprise Linux 7 Server"
+    product: "Red Hat Ansible Engine"
+  - name: "Red Hat Satellite Maintenance 6 for RHEL 7 Server (RPMs)"
+    product: "Red Hat Enterprise Linux Server"
+  - name: "Red Hat Satellite Capsule 6.7 for RHEL 7 Server (RPMs)"
+    product: "Red Hat Satellite Capsule"
+sat6_enabled_repos_tools:
+  - name: "Red Hat Satellite Tools 6.7 (for RHEL 7 Server) (RPMs)"
+    product: "Red Hat Enterprise Linux Server"
+  - name: "Red Hat Enterprise Linux 7 Server - Extras (RPMs)"
+    product: "Red Hat Enterprise Linux Server"
+  - name: "Red Hat Satellite Maintenance 6 for RHEL 7 Server (RPMs)"
+    product: "Red Hat Enterprise Linux Server"
+  - name: "Red Hat Satellite Capsule 6.7 for RHEL 7 Server (RPMs)"
+    product: "Red Hat Satellite Capsule"
+  - name: "Red Hat Satellite Maintenance 6 (for RHEL 7 Server) (RPMs)"
+    product: "Red Hat Satellite"
+#sat6_enabled_repos_openstack:
+#  - name: "Red Hat OpenStack Platform {{ openstack_version }} for RHEL 7 (RPMs)"
+#    product: "Red Hat OpenStack"
+#  - name: "Red Hat OpenStack Platform {{ openstack_version }} Developer Tools for RHEL 7 (RPMs)"
+#    product: "Red Hat OpenStack"
+sat6_enabled_repos_openshift:
+#  - name: "Red Hat OpenShift Container Platform {{ openshift_version }} (RPMs)"
+#    product: "Red Hat OpenShift Container Platform"
+sat6_url: "https://{{ ansible_fqdn }}/"
+sat6_user: "admin"
+sat6_pass: "CHANGEPASS"
+fusor_installer_lease_from: 10.55.102.200
+fusor_installer_lease_to: 10.55.102.211
+rh_satellite_user: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          66303665653237346337653462353236326331613164396230396538343936343836646163376231
+          6430356164626130633232356439613861646434366135310a353862326361636537303634636439
+          66336138623539656133313365303631653330393761303864343636333338363333386539636431
+          3333623934326465370a663939333139626661653137346562353634613433303866616564353233
+          3366
+rh_satellite_pass: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          35616361353738643730646133333835393138633634343536623634386333613534386137336564
+          3033343639643532643238396137643331343865303663350a623331336432356262303262653864
+          34376633326435326131613833333065643563343162326330396631636336613334616138323238
+          6266386466663165380a353531373366666264393366366463333739633437393737393930326639
+          6461
+rh_satellite_pool_id: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          31366133363937383532663131643738373237303463393633653964376664396435373332326161
+          3163363761373261396133313138393563303039623931330a343830626638643463336538653030
+          64663233636362666632356235643465303365303733373535633761323536336537613261626266
+          3163383231356566610a346465663937613564613936633531393237303934373730373238623465
+          34623265623330346637363730386135666134626265386534643935626431353135623130323332
+          3839666635356437663530313764623962656262323366333562

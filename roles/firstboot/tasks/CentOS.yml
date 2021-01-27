@@ -1,0 +1,145 @@
+---
+- name: "Firstboot check"
+  shell: |
+    if [ -e "/opt/.firstboot" ]
+    then
+      echo "true"
+    else
+      echo "false"
+    fi
+  register: firstbootcheck
+
+- name: "First boot configuration block"
+  block:
+    - name: "Get short hostname"
+      shell: echo $(hostname --short)
+      register: shortname
+        
+    - name: "Set up /etc/hosts file and hostname"
+      shell: |
+        shortname=$(hostname --short)
+        hostname=${shortname}.{{ dns_domain }}
+        echo "${hostname}" > /etc/hostname
+        hostnamectl set-hostname ${hostname}
+        grep "{{ ansible_default_ipv4['address'] }}" /etc/hosts || echo "{{ ansible_default_ipv4['address'] }} ${hostname} ${shortname}" >> /etc/hosts
+        grep "{{ sat6['url'] }}" /etc/hosts || echo "{{ sat6['ip'] }} {{ sat6['url'] }}" >> /etc/hosts
+        #service network restart
+      become: true
+      args:
+        creates: /opt/.firstboot
+
+    - name: "Check for hosts not in aws"
+      set_fact:
+        in_aws: "{{ ansible_system_vendor | regex_search('EC2') }} or ansible_system_vendor | regex_search('Xen')"
+
+    - name: "Set up /etc/hosts file on Sat server"
+      shell: |
+        grep "{{ ansible_default_ipv4['address'] }}" /etc/hosts || echo "{{ ansible_default_ipv4['address'] }} {{ shortname.stdout }}.{{ dns_domain }} {{ ansible_fqdn }}" >> /etc/hosts
+      become: true
+      delegate_to: "{{ sat6['ip'] }}"
+    
+    - name: Set authorized key for root
+      authorized_key:
+        user: root
+        state: present
+        key: "{{ cloud_user_pub_key }}"
+    
+    - name: "Enabling and restarting services {{ enabled_svcs }}"
+      service:
+        name: "{{ item }}"
+        state: restarted
+        enabled: yes
+      with_items: "{{ enabled_svcs }}"
+      become: true
+    
+    - name: "Stopping and disabling services {{ disabled_svcs }}"
+      service:
+        name: "{{ item }}"
+        state: stopped
+        enabled: no
+      with_items: "{{ disabled_svcs }}"
+      become: true
+      when: (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
+      ignore_errors: yes
+
+    - name: "update dns with the real hostname we want"
+      template:
+        src: dns-updater.sh.j2
+        dest: /usr/sbin/ifup-local
+        owner: root
+        group: root
+        mode: 0755
+
+#    - name: "put dns helper on tower server for aws hosts"
+#      template:
+#        src: dns-helper.sh.j2
+#        dest: /opt/dns-helper.sh
+#        owner: root
+#        group: root
+#        mode: 0755
+#      delegate_to: sat6
+#      when: "ansible_system_vendor | regex_search('EC2') "
+
+    - name: "Run the AWS dns helper"
+      shell: |
+        /usr/sbin/ifup-local
+      when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
+
+    - name: "Installing rpms {{ centos_packages }}"
+      yum:
+        name: "{{ item }}"
+        state: latest
+      with_items: "{{ centos_packages }}"
+      become: true
+    
+    - name: "Updating MOTD"
+      template: 
+        src: tiger.ascii.j2
+        dest: /etc/motd 
+        owner: root 
+        group: root 
+        mode: 0644
+
+    - name: "Firstboot check"
+      shell: |
+        yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        yum -y install https://fedorapeople.org/groups/katello/releases/yum/3.4/katello/el7/x86_64/katello-repos-latest.rpm
+        yum -y install http://{{ sat6['ip']}}/pub/katello-ca-consumer-latest.noarch.rpm
+        yum -y install katello-agent subscription-manager 
+        subscription-manager register --org="Redhat_Lab" --activationkey Centos7_Prod_Key --insecure
+
+
+#    - name: "Run yum update. Please wait. SSH to Host and tail /tmp/tower.output for status"
+#      shell: |
+#        exec &> >(tee -a /tmp/tower.output)
+#        yum -y update
+#      become: true
+#      args:
+#        executable: /bin/bash
+#        creates: /opt/.firstboot
+
+    - name: "first boot complete"
+      file:
+        path: /opt/.firstboot
+        state: touch
+        mode: 0444
+
+    - name: "Reboot."
+      shell: |
+        shutdown -r +1 || true
+      become: true
+      args:
+        executable: /bin/bash
+        creates: /opt/.firstboot
+
+    - name: "Wait 5 to 11 mins for host to reboot"
+      wait_for:
+        port: 22
+        host: "{{ ansible_ssh_host | default(inventory_hostname) }}"
+        #search_regex: OpenSSH
+        delay: 120
+        timeout: 660
+      delegate_to: localhost
+      become: false
+
+  when: firstbootcheck.stdout == "false"
