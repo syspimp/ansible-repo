@@ -1,0 +1,373 @@
+---
+# Creates a new instance with provisioning userdata using Cloud-Init
+# Uses a while loop to sit and wait until a success response from tower/awx callback
+# Set the tower job id and callback key here, group_vars, or in tower/awx
+# Creates a fact in /etc/ansible/facts.d to determines which role to apply
+# Updates the tower/awx inventory
+- name: launch an instance in ec2
+  hosts: localhost
+  gather_facts: no
+  vars:
+    aws_location: RTO
+    # this fact will be used later to include role in the callback
+    # - name: "Include roles for AWS servers"
+    #   include_role:
+    #     name: "{{ ansible_local['awsroles']['default']['role'] }}"
+    #   when: ansible_local['awsroles'] is defined
+    default_tower_server: 11.22.33.77
+    aws_role: ansible-tower
+    sdlc_environment: development
+    dns_domain: dev.maskedadmins.com
+    aws_location: TFOUND
+    # the public key for cloud-user user
+    #cloud_user_pub_key: "rsa ..."
+    # the root user password
+    root_password: "redhat123"
+    # aws specific configuration
+    aws_vmname: testvm
+    aws_assign_public_ip: yes
+    aws_volume_size: 150
+    aws_security_group_name: "Redhat_Lab-sg-ansible"
+    #aws_security_group_allow_cidr: "173.15.218.96/29"
+    aws_security_group_allow_cidr: "0.0.0.0/0"
+    aws_region: us-east-1
+    aws_number_of_vms: 1
+    #aws_vpc_id: vpc-0494b7798600fd4de
+    aws_vpc_id: vpc-030130353f09b2b95
+    # CentOS 7
+    centos7_ami_id: ami-0affd4508a5d2481b
+    # RHEL 7 old and busted
+    #rhel7_ami_id: ami-029c0fbe456d58bd1
+    # RHEL 7 new hotness (cheap)
+    rhel7_ami_id: ami-0315fe0b0bfdfedda
+    # RHEL 8 old and busted
+    #rhel8_ami_id: ami-098bb5d92c8886ca1
+    # RHEL 8 new hotnesss (Cheap)
+    rhel8_ami_id: ami-058f90e71a7d69115
+    #aws_instance_type: t3.medium
+    aws_instance_type: m4.xlarge
+    aws_instance_tags:
+      Name: RHEL Ansible Tower
+    aws_instance_private_tags:
+      Name: Private RHEL Ansible Demo VM
+    aws_instance_public_tags:
+      Name: Public RHEL Ansible Demo VM
+    # tower/awx callback config
+    host_config_key: firstboot
+    host_config_server: "{{ default_tower_server }}"
+    host_config_jobid: "14"
+    # update the tower/awx inventory after launching
+    tower_inventory_ids:
+      - 35
+  environment:
+    # these can be ansible tower/awx credentials
+    AWS_ACCESS_KEY_ID: "{{ AWS_ACCESS_KEY_ID }}"
+    AWS_SECRET_KEY: "{{ AWS_SECRET_KEY }}"
+  tasks:
+    #use this if you forget your encrypted aws creds
+    #- name: "AWS_ACCESS_KEY_ID"
+    #  debug: var=AWS_ACCESS_KEY_ID
+    #- name: "AWS_SECRET_KEY"
+    #  debug: var=AWS_SECRET_KEY
+    - name: Use the correct AWS location
+      set_fact:
+        environment:
+          AWS_ACCESS_KEY_ID: "{{ TFOUND_AWS_ACCESS_KEY_ID }}"
+          AWS_SECRET_KEY: "{{ TFOUND_AWS_SECRET_KEY }}"
+      when: "'TFOUND' in aws_location"
+
+    - name: Set the VM name
+      set_fact:
+        aws_instance_tags:
+          Name: "{{ aws_vmname }}"
+
+    - name: Set the AMI to CentOS7
+      set_fact:
+        aws_image_ami: "{{ centos7_ami_id }}"
+      when: "'centos7' in aws_ostype"
+
+    - name: Set the AMI to RHEL7
+      set_fact:
+        aws_image_ami: "{{ rhel7_ami_id }}"
+      when: "'rhel7' in aws_ostype"
+
+    - name: Set the AMI to RHEL8
+      set_fact:
+        aws_image_ami: "{{ rhel8_ami_id }}"
+      when: "'rhel8' in aws_ostype"
+
+    - name: Set the VM roles
+      set_fact:
+        awsroles:
+          - section: default
+            vars:
+            - name: role
+              value: "{{ aws_role }}"
+#         - section: secondary
+#           vars:
+#           - name: role
+#             value: satellite-oscap
+          - section: config
+            vars:
+            - name: environment
+              value: "{{ sdlc_environment }}"
+            - name: dns_domain
+              value: "{{ dns_domain }}"
+            - name: sat6_location
+              value: "{{ aws_location }} AWS Location"
+    
+    - name: create a security group
+      ec2_group:
+        name: "{{ aws_security_group_name }}"
+        description: "created by ansible"
+        region: "{{ aws_region }}"
+        vpc_id: "{{ aws_vpc_id }}"
+        rules:
+          - proto: tcp
+            from_port: 1
+            to_port: 65535
+            cidr_ip: "{{ aws_security_group_allow_cidr }}"
+      register: security_group
+
+    - name: launch an ec2 instance in a vpc subnet
+      when: aws_vpc_subnet_id is defined
+      ignore_errors: yes
+      ec2:
+        key_name: "{{ aws_key_name }}"
+        instance_type: "{{ aws_instance_type }}"
+        image: "{{ aws_image_ami }}"
+        wait: yes
+        group_id: "{{ security_group.group_id }}"
+        count: "{{ aws_number_of_vms }}"
+        vpc_subnet_id:  "{{ aws_vpc_subnet_id }}"
+        assign_public_ip: "{{ aws_assign_public_ip }}"
+        region: "{{ aws_region }}"
+        instance_tags: "{{ aws_instance_tags }}"
+        volumes:
+          - device_name: /dev/sda1
+            volume_type: gp2
+            volume_size: "{{ aws_volume_size }}"
+            delete_on_termination: true
+        user_data: |
+          #cloud-config
+          # for reference:
+          # http://cloudinit.readthedocs.org/en/latest/topics/examples.html
+          # https://access.redhat.com/articles/rhel-atomic-cloud-init-faq
+          preserve_hostname: false
+          yum_repos:
+            epel:
+              mirrorlist: https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=x86_64
+              enabled: true
+              name: Extra Packages for Enterprise Linux 7 - x86_64
+              gpgcheck: false
+          system_info:
+            default_user:
+              name: cloud-user
+          groups:
+            - cloud-user
+          users:
+            - name: cloud-user
+              primary-group: cloud-user
+              groups: wheel
+              se-linux-user: unconfined_u
+              #ssh_pwauth: true
+              lock-passwd: false
+              sudo: ALL=(ALL) NOPASSWD:ALL
+              ssh-authorized-keys:
+                - "{{ cloud_user_pub_key }}"
+            - name: root
+              lock-passwd: false
+              expire: false
+          ssh_pwauth: true
+          #chpasswd:
+          #  list: |
+          #    root:{{ root_password }}
+          write_files:
+            - path: /etc/sudoers.d/999-cloud-user
+              permissions: '0440'
+              content: |
+                Defaults:cloud-user !requiretty
+            - path: /etc/ansible/facts.d/awsroles.fact
+              permissions: '0444'
+              content: |
+                {% for awsrole in awsroles %}
+                [{{ awsrole.section }}]
+                {% for var in awsrole.vars %}
+                {{ var.name }}={{ var.value }}
+                {% endfor %}{% endfor %}
+
+            - path: /tmp/firstboot.sh
+              permissions: '0755'
+              owner: root:root
+              content: |
+                #!/bin/bash
+                # managed by cloud-config
+                # this exists to give aws networking time to come up before phoning home
+                if [ -d /var/log/firstboot ]
+                then
+                   echo "*** firstboot.sh already run"
+                   echo "*** firstboot.sh delete /var/log/firstboot to run again"
+                   exit 0
+                fi
+                mkdir /var/log/firstboot
+                sleep 60
+                # wait until tower/aws returns a success message
+                while [[ ! -e /tmp/.success ]]
+                do
+                  curl -s -k --data 'host_config_key={{ host_config_key }}' https://{{ host_config_server }}:443/api/v2/job_templates/{{ host_config_jobid }}/callback/ | \
+                  grep msg || \
+                  touch /tmp/.success
+                  sleep 60
+                done
+          runcmd:
+           # this is post configuration job template
+           - /tmp/firstboot.sh
+
+    - name: Update the AWS Inventory
+      uri:
+        url: https://{{ default_tower_server }}/api/v2/inventory_sources/{{ item }}/update/
+        validate_certs: no
+        method: POST
+        user: admin
+        password: "{{ ipmi_pass }}"
+        force_basic_auth: yes
+        status_code: [201,202]
+        body_format: json
+      with_items:
+        - "{{ tower_inventory_ids }}"
+
+#    - name: launch an ec2 instance in a public vpc
+#      when: aws_vpc_subnet_publicid is defined
+#      ignore_errors: yes
+#      ec2:
+#        key_name: "{{ aws_key_name }}"
+#        instance_type: "{{ aws_instance_type }}"
+#        image: "{{ aws_image_ami }}"
+#        wait: yes
+#        group_id: "{{ security_group.group_id }}"
+#        count: "{{ aws_number_of_vms }}"
+#        vpc_subnet_id:  "{{ aws_vpc_subnet_publicid }}"
+#        assign_public_ip: yes
+#        region: "{{ aws_region }}"
+#        instance_tags: "{{ aws_instance_public_tags }}"
+#        volumes:
+#          - device_name: /dev/sda1
+#            volume_type: gp2
+#            volume_size: "{{ aws_volume_size }}"
+#            delete_on_termination: true
+#        user_data: |
+#          #cloud-config
+#          # for reference:
+#          # http://cloudinit.readthedocs.org/en/latest/topics/examples.html
+#          # https://access.redhat.com/articles/rhel-atomic-cloud-init-faq
+#          preserve_hostname: false
+#          yum_repos:
+#            epel:
+#              mirrorlist: https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=x86_64
+#              enabled: true
+#              name: Extra Packages for Enterprise Linux 7 - x86_64
+#              gpgcheck: false
+#          system_info:
+#            default_user:
+#              name: cloud-user
+#          groups:
+#            - cloud-user
+#          users:
+#            - name: cloud-user
+#              primary-group: cloud-user
+#              groups: wheel
+#              se-linux-user: unconfined_u
+#              #ssh_pwauth: true
+#              lock-passwd: false
+#              sudo: ALL=(ALL) NOPASSWD:ALL
+#              ssh-authorized-keys:
+#                - "{{ cloud_user_pub_key }}"
+#            - name: root
+#              ssh_pwauth: true
+#              lock-passwd: false
+#              expire: false
+#          ssh_pwauth: true
+#          chpasswd:
+#            list: |
+#              root:{{ root_password }}
+#          #    cloud-user:redhat123
+#          write_files:
+#          - path: /tmp/firstboot.sh
+#            permissions: '0755'
+#            owner: root:root
+#            content: |
+#              #!/bin/bash
+#              # managed by cloud-config
+#              # this exists to give aws networking time to come up before phoning home
+#              if [ -d /var/log/firstboot ]
+#              then
+#                 echo "*** firstboot.sh already run"
+#                 echo "*** firstboot.sh delete /var/log/firstboot to run again"
+#                 exit 0
+#              fi
+#              sleep 60
+#              #curl -k --data 'host_config_key={{ host_config_key }}' https://{{ host_config_server }}:443/api/v2/job_templates/{{ host_config_jobid }}/callback/
+#              while [[ ! -e /tmp/.success ]] ; do sleep 60; curl -s -k --data 'host_config_key={{ host_config_key }}' https://{{ host_config_server }}:443/api/v2/job_templates/{{ host_config_jobid }}/callback/| grep msg || touch /tmp/.success ; done 
+#          runcmd:
+#           # this is post configuration job template
+#           - /tmp/firstboot.sh
+#
+#    - name: launch an ec2 instance in a private network
+#      when: aws_vpc_subnet_privateid is defined
+#      ignore_errors: yes
+#      ec2:
+#        key_name: "{{ aws_key_name }}"
+#        instance_type: "{{ aws_instance_type }}"
+#        image: "{{ aws_image_ami }}"
+#        wait: yes
+#        group_id: "{{ security_group.group_id }}"
+#        count: "{{ aws_number_of_vms }}"
+#        vpc_subnet_id:  "{{ aws_vpc_subnet_privateid }}"
+#        #assign_public_ip: yes
+#        region: "{{ aws_region }}"
+#        instance_tags: "{{ aws_instance_private_tags }}"
+#        volumes:
+#          - device_name: /dev/sda1
+#            volume_type: gp2
+#            volume_size: "{{ aws_volume_size }}"
+#            delete_on_termination: true
+#        user_data: |
+#          #cloud-config
+#          # for reference:
+#          # http://cloudinit.readthedocs.org/en/latest/topics/examples.html
+#          # https://access.redhat.com/articles/rhel-atomic-cloud-init-faq
+#          preserve_hostname: false
+#          yum_repos:
+#            epel:
+#              mirrorlist: https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=x86_64
+#              enabled: true
+#              name: Extra Packages for Enterprise Linux 7 - x86_64
+#              gpgcheck: false
+#          system_info:
+#            default_user:
+#              name: cloud-user
+#          groups:
+#            - cloud-user
+#          users:
+#            - name: cloud-user
+#              primary-group: cloud-user
+#              groups: wheel
+#              se-linux-user: unconfined_u
+#              #ssh_pwauth: true
+#              lock-passwd: false
+#              sudo: ALL=(ALL) NOPASSWD:ALL
+#              ssh-authorized-keys:
+#                - "{{ cloud_user_pub_key }}"
+#            - name: root
+#              ssh_pwauth: true
+#              lock-passwd: false
+#              expire: false
+#          ssh_pwauth: true
+#          chpasswd:
+#            list: |
+#              root:{{ root_password }}
+#          #    cloud-user:redhat123
+#          runcmd:
+#           # this is post configuration job template
+#           #- "curl -k --data 'host_config_key={{ host_config_key }}' https://{{ host_config_server }}:443/api/v2/job_templates/{{ host_config_jobid }}/callback/"
+#           - "while [[ ! -e /tmp/.success ]] ; do sleep 60; curl -s -k --data 'host_config_key={{ host_config_key }}' https://{{ host_config_server }}:443/api/v2/job_templates/{{ host_config_jobid }}/callback/| grep msg || touch /tmp/.success ; done "
