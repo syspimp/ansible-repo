@@ -349,7 +349,7 @@
     - name: "Subnet section complete"
       debug:  msg="Looks like we are done with subnet and domain section"
 
-- name: "Copy over manifest"
+- name: "Copy over manifest from tower to the sat server"
   #template:
   copy:
       dest: /tmp/manifest.zip
