@@ -748,3 +748,5 @@
             outside: 9090
     body_format: json
     when: ansible_local['awsroles'] is not defined
+
+- include: "tower.yml"
