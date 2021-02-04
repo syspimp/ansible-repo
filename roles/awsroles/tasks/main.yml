@@ -7,4 +7,6 @@
 - name: "Include secondary roles for AWS servers"
   include_role:
     name: "{{ ansible_local['awsroles']['secondary']['role'] }}"
-  when: ansible_local['awsroles']['secondary'] is defined
+  when: 
+  - ansible_local['awsroles']['secondary'] is defined
+  - ansible_local['awsroles']['secondary'] != 'None'
