@@ -102,6 +102,48 @@
       set_fact:
         shorthostname: "{{ shortname.stdout }}"
 
+    - name: "Find Group Inventory for 'satellite-server'"
+      uri:
+        url: "https://{{ tower_server }}/api/v2/groups/?search=satellite-server"
+        validate_certs: no
+        method: GET
+        user: "{{ tower_user }}"
+        password: "{{ tower_pass }}"
+        force_basic_auth: yes
+        status_code: [200,202,204]
+        body_format: json
+      register: groupidcheck
+
+    - name: "Set the host_id fact"
+      set_fact:
+        satgroup_host_id: "{{ groupidcheck.json.results[0].id }}"
+  
+    - name: "Find the name of the satellite-server"
+      uri:
+        url: "https://{{ tower_server }}/api/v2/groups/{{ satgroup_host_id }}/hosts"
+        validate_certs: no
+        method: GET
+        user: "{{ tower_user }}"
+        password: "{{ tower_pass }}"
+        force_basic_auth: yes
+        status_code: [200,202,204]
+        body_format: json
+      register: hostidcheck
+  
+    - name: "Set the host_id fact"
+      set_fact:
+        sat6_server: "{{ hostidcheck.json.results[0].name }}"
+
+    - name: "Get fqdn for the satellite server"
+      shell: |
+        hostname --fqdn
+      register: fqdnname
+      delegate_to: "{{ sat6_server }}"
+    
+    - name: "Set the fqdn hostname fact"
+      set_fact:
+        sat6_fqdn: "{{ fqdnname.stdout }}"
+
     - name: "Generate the capsule certs"
       shell: |
         capsule-certs-generate \
@@ -145,14 +187,14 @@
         satellite-installer \
                     --scenario capsule \
                     --certs-tar-file                              "/root/{{ shorthostname}}.{{ dns_domain }}-certs.tar"\
-                    --foreman-proxy-content-parent-fqdn           "{{ sat6_server }}"\
+                    --foreman-proxy-content-parent-fqdn           "{{ sat6_fqdn }}"\
                     --foreman-proxy-register-in-foreman           "true"\
-                    --foreman-proxy-foreman-base-url              "https://{{ sat6_server }}"\
-                    --foreman-proxy-trusted-hosts                 "{{ sat6_server }}"\
+                    --foreman-proxy-foreman-base-url              "https://{{ sat6_fqdn }}"\
+                    --foreman-proxy-trusted-hosts                 "{{ sat6_fqdn }}"\
                     --foreman-proxy-trusted-hosts                 "{{ shorthostname}}.{{ dns_domain }}"\
                     --foreman-proxy-oauth-consumer-key            "{{ oauth_consumer_key }}"\
                     --foreman-proxy-oauth-consumer-secret         "{{ oauth_consumer_secret }}"\
-                    --puppet-server-foreman-url                   "https://{{ sat6_server }}"\
+                    --puppet-server-foreman-url                   "https://{{ sat6_fqdn }}"\
                     --certs-cname                              "{{ capsule_loadbalancer_fqdn }}" \
                     --puppet-dns-alt-names                     "{{ capsule_loadbalancer_fqdn }}" \
                     --puppet-ca-server                         "{{ shorthostname}}.{{ dns_domain }}" \
