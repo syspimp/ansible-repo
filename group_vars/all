@@ -1,6 +1,5 @@
 ---
 dns_domain: prod.maskedadmins.com
-sat6_server: 11.22.33.102
 sat6_default_location: "RTO AWS Location"
 capsules_inventory_group: 81
 satellite_inventory_group: 710
