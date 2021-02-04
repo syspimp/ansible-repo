@@ -1,5 +1,4 @@
 ---
-tower_server: "{{ default_tower_server }}"
 multinode: "no"
 node1_ip: ""
 node1_hostname: ""

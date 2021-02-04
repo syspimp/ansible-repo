@@ -72,7 +72,7 @@
       authorized_key:
         user: root
         state: present
-        key: "{{ cloud_user_pub_key }}"
+        key: "{{ automation_user_pub_key }}"
     
     - name: "Enabling and restarting services {{ enabled_svcs }}"
       service:

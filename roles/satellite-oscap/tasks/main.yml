@@ -288,11 +288,11 @@
 #  block:
 #    - name: "Get host id to add to the 'capsules' Group Inventory"
 #      uri:
-#        url: "https://{{ default_tower_server }}/api/v2/hosts/?name={{ inventory_hostname }}"
+#        url: "https://{{ tower_server }}/api/v2/hosts/?name={{ inventory_hostname }}"
 #        validate_certs: no
 #        method: GET
-#        user: admin
-#        password: redhat
+#        user: "{{ tower_user }}"
+#        password: "{{ tower_pass }}"
 #        force_basic_auth: yes
 #        status_code: [200,202,204]
 #        body_format: json
@@ -304,15 +304,15 @@
 #
 #    - name: "Add host to the 'capsules' Group Inventory"
 #      uri:
-#        url: "https://{{ default_tower_server }}/api/v2/groups/{{ capsules_inventory_group }}/hosts/"
+#        url: "https://{{ tower_server }}/api/v2/groups/{{ capsules_inventory_group }}/hosts/"
 #        validate_certs: no
 #        method: POST
 #        body: >
 #          {
 #             "id": {{ sat_host_id }}
 #          }
-#        user: admin
-#        password: redhat
+#        user: "{{ tower_user }}"
+#        password: "{{ tower_pass }}"
 #        force_basic_auth: yes
 #        status_code: [201,202,204]
 #        body_format: json

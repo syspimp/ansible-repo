@@ -14,13 +14,12 @@
     #   include_role:
     #     name: "{{ ansible_local['awsroles']['default']['role'] }}"
     #   when: ansible_local['awsroles'] is defined
-    default_tower_server: 11.22.33.77
     aws_role: ansible-tower
     sdlc_environment: development
     dns_domain: dev.maskedadmins.com
     aws_location: TFOUND
     # the public key for cloud-user user
-    #cloud_user_pub_key: "rsa ..."
+    #automation_user_pub_key: "rsa ..."
     # the root user password
     root_password: "redhat123"
     # aws specific configuration
@@ -54,7 +53,7 @@
       Name: Public RHEL Ansible Demo VM
     # tower/awx callback config
     host_config_key: firstboot
-    host_config_server: "{{ default_tower_server }}"
+    host_config_server: "{{ tower_server }}"
     host_config_jobid: "14"
     # update the tower/awx inventory after launching
     tower_inventory_ids:
@@ -174,7 +173,7 @@
               lock-passwd: false
               sudo: ALL=(ALL) NOPASSWD:ALL
               ssh-authorized-keys:
-                - "{{ cloud_user_pub_key }}"
+                - "{{ automation_user_pub_key }}"
             - name: root
               lock-passwd: false
               expire: false
@@ -225,11 +224,11 @@
 
     - name: Update the AWS Inventory
       uri:
-        url: https://{{ default_tower_server }}/api/v2/inventory_sources/{{ item }}/update/
+        url: https://{{ tower_server }}/api/v2/inventory_sources/{{ item }}/update/
         validate_certs: no
         method: POST
-        user: admin
-        password: "{{ ipmi_pass }}"
+        user: "{{ tower_pass }}"
+        password: "{{ tower_pass }}"
         force_basic_auth: yes
         status_code: [201,202]
         body_format: json
@@ -281,7 +280,7 @@
 #              lock-passwd: false
 #              sudo: ALL=(ALL) NOPASSWD:ALL
 #              ssh-authorized-keys:
-#                - "{{ cloud_user_pub_key }}"
+#                - "{{ automation_user_pub_key }}"
 #            - name: root
 #              ssh_pwauth: true
 #              lock-passwd: false
@@ -357,7 +356,7 @@
 #              lock-passwd: false
 #              sudo: ALL=(ALL) NOPASSWD:ALL
 #              ssh-authorized-keys:
-#                - "{{ cloud_user_pub_key }}"
+#                - "{{ automation_user_pub_key }}"
 #            - name: root
 #              ssh_pwauth: true
 #              lock-passwd: false
