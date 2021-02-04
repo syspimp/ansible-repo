@@ -40,6 +40,7 @@ sat6:
       prior: 'testing'
   locations:
     - "Private_Cloud"
+    - "RTO AWS Location"
   domains:
     - "maskedadmins.com"
     - "dev.maskedadmins.com"
@@ -98,6 +99,7 @@ sat6:
       description: "Our example sub organization for managing content."
       locations:
         - 'Private_Cloud'
+        - "RTO AWS Location"
       domains:
         - "maskedadmins.com"
         - "dev.maskedadmins.com"
