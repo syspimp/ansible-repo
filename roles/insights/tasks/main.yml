@@ -11,6 +11,7 @@
 
     - name: "Register to the Red Hat Access Insights Service"
       command: /usr/bin/redhat-access-insights --register
+      args:
         creates: /etc/redhat-access-insights/.registered
       register: reg_insights
       ignore_errors: yes
