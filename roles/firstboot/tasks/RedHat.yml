@@ -44,33 +44,25 @@
         status_code: [200,202,204]
         body_format: json
       register: hostidcheck
-      when:
-      - ansible_local['awsroles']['default'] is defined
-      - ansible_local['awsroles']['default'] != 'satellite-server'
+      when: ( ansible_local['awsroles']['default'] is defined ) and ( ansible_local['awsroles']['default'] != 'satellite-server' )
   
     - name: "Set the host_id fact for non sat servers"
       set_fact:
         sat6_server: "{{ hostidcheck.json.results[0].name }}"
-      when:
-      - ansible_local['awsroles']['default'] is defined
-      - ansible_local['awsroles']['default'] != 'satellite-server'
+      when: ( ansible_local['awsroles']['default'] is defined ) and ( ansible_local['awsroles']['default'] != 'satellite-server' )
 
     - name: "Get fqdn for the satellite server for non sat servers"
       shell: |
         hostname --fqdn
       register: fqdnname
       delegate_to: "{{ sat6_server }}"
-      when:
-      - ansible_local['awsroles']['default'] is defined
-      - ansible_local['awsroles']['default'] != 'satellite-server'
+      when: ( ansible_local['awsroles']['default'] is defined ) and ( ansible_local['awsroles']['default'] != 'satellite-server' )
     
     - name: "Get fqdn for the satellite server from localhost"
       shell: |
         hostname --fqdn
       register: fqdnname
-      when:
-      - ansible_local['awsroles']['default'] is defined
-      - ansible_local['awsroles']['default'] == 'satellite-server'
+      when: ( ansible_local['awsroles']['default'] is defined ) and ( ansible_local['awsroles']['default'] == 'satellite-server' )
 
     - name: "Set the fqdn hostname fact"
       set_fact:
