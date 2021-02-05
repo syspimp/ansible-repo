@@ -218,7 +218,7 @@
 
     - name: "Install the katello certificate"
       shell:
-        rpm -Uvh http://sat6.dev.maskedadmins.com/pub/katello-ca-consumer-latest.noarch.rpm
+        rpm -Uvh http://{{ sat6_fqdn }}/pub/katello-ca-consumer-latest.noarch.rpm
       when: "'subscription.rhsm.redhat.com' in bootstrap.stdout"
 
     - name: "Re-run subscription-manager"
