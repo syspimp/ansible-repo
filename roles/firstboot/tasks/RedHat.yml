@@ -11,6 +11,47 @@
 
 - name: "First boot configuration block"
   block:
+    - name: "Find Group Inventory for 'satellite-server'"
+      uri:
+        url: "https://{{ tower_server }}/api/v2/groups/?search=satellite-server"
+        validate_certs: no
+        method: GET
+        user: "{{ tower_user }}"
+        password: "{{ tower_pass }}"
+        force_basic_auth: yes
+        status_code: [200,202,204]
+        body_format: json
+      register: groupidcheck
+
+    - name: "Set the host_id fact"
+      set_fact:
+        satgroup_host_id: "{{ groupidcheck.json.results[0].id }}"
+  
+    - name: "Find the name of the satellite-server"
+      uri:
+        url: "https://{{ tower_server }}/api/v2/groups/{{ satgroup_host_id }}/hosts"
+        validate_certs: no
+        method: GET
+        user: "{{ tower_user }}"
+        password: "{{ tower_pass }}"
+        force_basic_auth: yes
+        status_code: [200,202,204]
+        body_format: json
+      register: hostidcheck
+  
+    - name: "Set the host_id fact"
+      set_fact:
+        sat6_server: "{{ hostidcheck.json.results[0].name }}"
+
+    - name: "Get fqdn for the satellite server"
+      shell: |
+        hostname --fqdn
+      register: fqdnname
+      delegate_to: "{{ sat6_server }}"
+    
+    - name: "Set the fqdn hostname fact"
+      set_fact:
+        sat6_fqdn: "{{ fqdnname.stdout }}"
     - name: "Set up /etc/hosts file and hostname"
       shell: |
         shortname=$(hostname --short)
@@ -18,7 +59,7 @@
         echo "${hostname}" > /etc/hostname
         hostnamectl set-hostname ${hostname}
         grep "{{ ansible_default_ipv4['address'] }}" /etc/hosts || echo "{{ ansible_default_ipv4['address'] }} ${hostname} ${shortname}" >> /etc/hosts
-        grep "{{ sat6['url'] }}" /etc/hosts || echo "{{ sat6['ip'] }} {{ sat6['url'] }}" >> /etc/hosts
+        grep "{{ sat6_fqdn }}" /etc/hosts || echo "{{ sat6_server }} {{ sat6_fqdn }}" >> /etc/hosts
         #service network restart
       become: true
       args:
@@ -153,7 +194,7 @@
   block:
     - name: "Get the bootstrap python script"
       get_url:
-        url: "http://{{ sat6['url'] }}/pub/bootstrap.py"
+        url: "http://{{ sat6_fqdn }}/pub/bootstrap.py"
         dest: /opt/bootstrap.py
         mode: 0755
 
