@@ -2,4 +2,4 @@
   gather_facts: no
   tasks:
   - pause:
-    minutes: 45
+      minutes: 45
