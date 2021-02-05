@@ -48,10 +48,12 @@
         hostname --fqdn
       register: fqdnname
       delegate_to: "{{ sat6_server }}"
+      ignore_errors: yes
     
     - name: "Set the fqdn hostname fact"
       set_fact:
         sat6_fqdn: "{{ fqdnname.stdout }}"
+
     - name: "Set up /etc/hosts file and hostname"
       shell: |
         shortname=$(hostname --short)
