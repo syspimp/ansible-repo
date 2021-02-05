@@ -38,18 +38,34 @@
         status_code: [200,202,204]
         body_format: json
       register: hostidcheck
+      when:
+      - ansible_local['awsroles']['default'] is defined
+      - ansible_local['awsroles']['default'] != 'satellite-server'
   
     - name: "Set the host_id fact"
       set_fact:
         sat6_server: "{{ hostidcheck.json.results[0].name }}"
+      when:
+      - ansible_local['awsroles']['default'] is defined
+      - ansible_local['awsroles']['default'] != 'satellite-server'
 
     - name: "Get fqdn for the satellite server"
       shell: |
         hostname --fqdn
       register: fqdnname
       delegate_to: "{{ sat6_server }}"
-      ignore_errors: yes
+      when:
+      - ansible_local['awsroles']['default'] is defined
+      - ansible_local['awsroles']['default'] != 'satellite-server'
     
+    - name: "Get fqdn for the satellite server"
+      shell: |
+        hostname --fqdn
+      register: fqdnname
+      when:
+      - ansible_local['awsroles']['default'] is defined
+      - ansible_local['awsroles']['default'] == 'satellite-server'
+
     - name: "Set the fqdn hostname fact"
       set_fact:
         sat6_fqdn: "{{ fqdnname.stdout }}"
