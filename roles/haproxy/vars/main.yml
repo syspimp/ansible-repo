@@ -1,6 +1,6 @@
 ---
-capsule_loadbalancer_fqdn: capsule-lb.dev.maskedadmins.com
-sat6_server: sat6.dev.maskedadmins.com
+capsule_loadbalancer_fqdn: capsule-lb.prod.maskedadmins.com
+capsule_lb_inventory_group: 851
 iface: "{{ ansible_default_ipv4.interface }}"
 haproxy_services:
   - name: http

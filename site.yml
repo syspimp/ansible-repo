@@ -26,9 +26,10 @@
   hosts: capsule*
   roles:
     - satellite-capsule
+    - satellite-oscap
 
 - name: Configure Satellite Capsule Load Balancer
-  hosts: lb-capsule*
+  hosts: capsule-lb*
   roles:
     - haproxy
 

@@ -1,0 +1,5 @@
+---
+- name: Configure Satellite Capsule Load Balancer
+  hosts: capsule-lb*
+  roles:
+    - haproxy

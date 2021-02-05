@@ -1,5 +1,5 @@
 ---
-capsule_loadbalancer_fqdn: lb-capsule.prod.maskedadmins.com
+capsule_loadbalancer_fqdn: capsule-lb.prod.maskedadmins.com
 #sat6_server: ip-11-22-33-182.prod.maskedadmins.com
 satellite_version: 6.8
 capsules_inventory_group: 81
