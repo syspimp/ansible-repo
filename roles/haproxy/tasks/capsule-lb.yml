@@ -1,0 +1,12 @@
+---
+- name: "Spend 10 minutes reconfiguring to ensure load balanced capsules are correct"
+  shell: |
+    i=1
+    while [[ $i -lt 10 ]];
+    do
+      sleep 60
+      rm -rf /var/log/firstboot
+      /tmp/firstboot.sh
+      i=$(( i + 1 ))
+    done
+  become: true
