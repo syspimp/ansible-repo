@@ -56,10 +56,10 @@
           sat6_fqdn: "{{ fqdnname.stdout }}"
     when:
         - ansible_local['awsroles'] is defined
-        - ansible_local['awsroles']['default']['role'] == 'satellite-server'
+#        - ansible_local['awsroles']['default']['role'] == 'satellite-server'
 
     rescue:
-      - name: "Get fqdn for the satellite server from localhost"
+      - name: "[rescue] satellite-servers: Get fqdn for the satellite server from localhost"
         shell: |
           hostname --fqdn
         register: fqdnname
@@ -67,19 +67,27 @@
         - ansible_local['awsroles']['default'] is defined
         - ansible_local['awsroles']['default']['role'] == 'satellite-server'
   
-      - name: "Set the fqdn hostname fact"
+      - name: "[rescue] satellite-servers: Set the fqdn hostname fact"
         set_fact:
           sat6_fqdn: "{{ fqdnname.stdout }}"
         when:
         - ansible_local['awsroles']['default'] is defined
         - ansible_local['awsroles']['default']['role'] == 'satellite-server'
 
-      - name: "Set the server ip fact"
+      - name: "[rescue] satellite-servers: Set the server ip fact"
         set_fact:
           sat6_server: "{{ inventory_hostname }}"
         when:
         - ansible_local['awsroles']['default'] is defined
         - ansible_local['awsroles']['default']['role'] == 'satellite-server'
+
+      - name: "[rescue] No Satellite defined. Set the facts to None"
+        set_fact:
+          sat6_fqdn: "None"
+          sat6_server: "None"
+        when:
+        - ansible_local['awsroles']['default'] is defined
+        - ansible_local['awsroles']['default']['role'] != 'satellite-server'
 
   - name: "Set up /etc/hosts file and hostname"
     shell: |
@@ -88,9 +96,15 @@
       echo "${hostname}" > /etc/hostname
       hostnamectl set-hostname ${hostname}
       grep "{{ ansible_default_ipv4['address'] }}" /etc/hosts || echo "{{ ansible_default_ipv4['address'] }} ${hostname} ${shortname}" >> /etc/hosts
-      grep "{{ sat6_fqdn }}" /etc/hosts || echo "{{ sat6_server }} {{ sat6_fqdn }}" >> /etc/hosts
-      #service network restart
     become: true
+    args:
+      creates: /opt/.firstboot
+  
+  - name: "Set up /etc/hosts file and hostname for Satellite"
+    shell: |
+      grep "{{ sat6_fqdn }}" /etc/hosts || echo "{{ sat6_server }} {{ sat6_fqdn }}" >> /etc/hosts
+    become: true
+    when: sat6_fqdn != "None"
     args:
       creates: /opt/.firstboot
   
@@ -227,7 +241,7 @@
         dest: /opt/bootstrap.py
         mode: 0755
       when:
-      - sat6_fqdn is defined
+      - sat6_fqdn != "None"
 
     - name: "Save the command to register to satellite server"
       template:
@@ -237,7 +251,7 @@
         group: root
         mode: 0755
       when:
-      - sat6_fqdn is defined
+      - sat6_fqdn != "None"
 
     - name: "Run the satellite bootstrap script"
       shell: |
@@ -246,7 +260,9 @@
       become: true
       register: satbootstrap
       #when: "'Current' not in rhsm_reg.stdout"
-      when: bootstrapcheck.stdout == "false"
+      when:
+      - bootstrapcheck.stdout == "false"
+      - sat6_fqdn != "None"
 
     - name: "bootstrap complete"
       file:
@@ -255,7 +271,7 @@
         mode: 0444
   when:
   - bootstrapcheck.stdout == "false"
-  - sat6_fqdn is defined
+  - sat6_fqdn != "None"
 
 
   rescue:
@@ -287,19 +303,6 @@
         path: /opt/.bootstrap
         state: touch
         mode: 0444
-#    - name: Register and subscribe to multiple pools for physical hosts
-#      redhat_subscription:
-#        state: present
-#        username: "{{ rh_satellite_user }}"
-#        password: "{{ rh_satellite_pass }}"
-#        pool_ids: "{{ rh_subscription_pool_physical_ids }}"
-#    #    pools: "{{ rh_subscription_pools }}"
-#      become: true
-#      register: rhsm_status
-#      when: "'Current' not in rhsm_reg.stdout  and ansible_virtualization_role != 'guest' "
-#      retries: 10
-#      until: rhsm_status.msg.find("System successfully registered") != -1
-#      delay: 1
   always:
     - name: "Disabling all repos"
       shell: "subscription-manager repos --disable={{ item }}"
