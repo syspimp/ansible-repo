@@ -87,64 +87,64 @@
     args:
       creates: /opt/.firstboot
   
-    - name: "Check if in aws"
-      shell: |
-        curl -s http://169.254.169.254/2019-10-01/meta-data/public-ipv4 || echo "html"
-      register: dc
-      
-    - name: "AWS: get instance id"
-      shell: |
-        curl -s http://169.254.169.254/2019-10-01/meta-data/instance-id
-      register: instanceid
-      when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
-
-    - name: "AWS: get region id"
-      shell: |
-        curl -s http://169.254.169.254/2019-10-01/meta-data/placement/availability-zone
-      register: regionid
-      when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
-
-    - name: "Check for hosts not in aws"
-      set_fact:
-        in_aws: "{{ ansible_system_vendor | regex_search('EC2') }} or ansible_system_vendor | regex_search('Xen')"
-
-    - name: "Get the aws short hostname"
-      shell: |
-        hostname --short  
-      register: awsshortname
-      when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
-
-    - name: "Set ntp server"
-      set_fact:
-        ntp_server: "0.rhel.pool.ntp.org"
-      when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
-
-    - name: "Set ntp to true"
-      shell: |
-        ntpdate server {{ ntp_server }} iburst
-        timedatectl set-ntp true
-        systemctl restart chronyd
-      poll: 0
-      async: 1
-      become: true
-      ignore_errors: yes
-      args:
-        creates: /opt/.firstboot
+  - name: "Check if in aws"
+    shell: |
+      curl -s http://169.254.169.254/2019-10-01/meta-data/public-ipv4 || echo "html"
+    register: dc
     
-    - name: Set authorized key for root
-      authorized_key:
-        user: root
-        state: present
-        key: "{{ automation_user_pub_key }}"
-    
-    - name: "Enabling and restarting services {{ enabled_svcs }}"
-      service:
-        name: "{{ item }}"
-        #state: restarted
-        enabled: yes
-      with_items: "{{ enabled_svcs }}"
-      become: true
-    
+  - name: "AWS: get instance id"
+    shell: |
+      curl -s http://169.254.169.254/2019-10-01/meta-data/instance-id
+    register: instanceid
+    when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
+
+  - name: "AWS: get region id"
+    shell: |
+      curl -s http://169.254.169.254/2019-10-01/meta-data/placement/availability-zone
+    register: regionid
+    when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
+
+  - name: "Check for hosts not in aws"
+    set_fact:
+      in_aws: "{{ ansible_system_vendor | regex_search('EC2') }} or ansible_system_vendor | regex_search('Xen')"
+
+  - name: "Get the aws short hostname"
+    shell: |
+      hostname --short  
+    register: awsshortname
+    when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
+
+  - name: "Set ntp server"
+    set_fact:
+      ntp_server: "0.rhel.pool.ntp.org"
+    when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
+
+  - name: "Set ntp to true"
+    shell: |
+      ntpdate server {{ ntp_server }} iburst
+      timedatectl set-ntp true
+      systemctl restart chronyd
+    poll: 0
+    async: 1
+    become: true
+    ignore_errors: yes
+    args:
+      creates: /opt/.firstboot
+  
+  - name: Set authorized key for root
+    authorized_key:
+      user: root
+      state: present
+      key: "{{ automation_user_pub_key }}"
+  
+  - name: "Enabling and restarting services {{ enabled_svcs }}"
+    service:
+      name: "{{ item }}"
+      #state: restarted
+      enabled: yes
+    with_items: "{{ enabled_svcs }}"
+    become: true
+  
  #   - name: "Stopping and disabling services {{ disabled_svcs }}"
  #     service:
  #       name: "{{ item }}"
@@ -153,15 +153,15 @@
  #     with_items: "{{ disabled_svcs }}"
  #     ignore_errors: yes
  #     become: true
-    
-    - name: "update dns with the real hostname given in openstack"
-      template:
-        src: dns-updater.sh.j2
-        dest: /usr/sbin/ifup-local
-        owner: root
-        group: root
-        mode: 0755
-    
+  
+  - name: "update dns with the real hostname given in openstack"
+    template:
+      src: dns-updater.sh.j2
+      dest: /usr/sbin/ifup-local
+      owner: root
+      group: root
+      mode: 0755
+  
 #    - name: "put dns helper on tower server for aws hosts"
 #      template:
 #        src: dns-helper.sh.j2
@@ -172,10 +172,10 @@
 #      delegate_to: sat6
 #      when: "ansible_system_vendor | regex_search('EC2') "
 
-    - name: "Run the AWS dns helper"
-      shell: |
-        /usr/sbin/ifup-local
-      when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
+  - name: "Run the AWS dns helper"
+    shell: |
+      /usr/sbin/ifup-local
+    when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
 
 #    - name: "AWS: Tag the instance with DNS"
 #      ec2_tag:
@@ -188,14 +188,14 @@
 #      become: no
 #      when: "ansible_system_vendor | regex_search('EC2') "
 
-    - name: "Updating MOTD"
-      template: 
-        src: tiger.ascii.j2
-        dest: /etc/motd 
-        owner: root 
-        group: root 
-        mode: 0644
-    
+  - name: "Updating MOTD"
+    template: 
+      src: tiger.ascii.j2
+      dest: /etc/motd 
+      owner: root 
+      group: root 
+      mode: 0644
+  
   when: firstbootcheck.stdout == "false"
 
 - name: "Fall back to RHSM, Check if we are registered"
