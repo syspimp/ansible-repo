@@ -166,7 +166,7 @@
 #      template:
 #        src: dns-helper.sh.j2
 #        dest: /opt/dns-helper.sh
-#        owner: root
+##        owner: root
 #        group: root
 #        mode: 0755
 #      delegate_to: sat6
