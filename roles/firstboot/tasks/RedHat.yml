@@ -74,19 +74,19 @@
         - ansible_local['awsroles']['default'] is defined
         - ansible_local['awsroles']['default']['role'] == 'satellite-server'
 
-    - name: "Set up /etc/hosts file and hostname"
-      shell: |
-        shortname=$(hostname --short)
-        hostname=${shortname}.{{ dns_domain }}
-        echo "${hostname}" > /etc/hostname
-        hostnamectl set-hostname ${hostname}
-        grep "{{ ansible_default_ipv4['address'] }}" /etc/hosts || echo "{{ ansible_default_ipv4['address'] }} ${hostname} ${shortname}" >> /etc/hosts
-        grep "{{ sat6_fqdn }}" /etc/hosts || echo "{{ sat6_server }} {{ sat6_fqdn }}" >> /etc/hosts
-        #service network restart
-      become: true
-      args:
-        creates: /opt/.firstboot
-    
+  - name: "Set up /etc/hosts file and hostname"
+    shell: |
+      shortname=$(hostname --short)
+      hostname=${shortname}.{{ dns_domain }}
+      echo "${hostname}" > /etc/hostname
+      hostnamectl set-hostname ${hostname}
+      grep "{{ ansible_default_ipv4['address'] }}" /etc/hosts || echo "{{ ansible_default_ipv4['address'] }} ${hostname} ${shortname}" >> /etc/hosts
+      grep "{{ sat6_fqdn }}" /etc/hosts || echo "{{ sat6_server }} {{ sat6_fqdn }}" >> /etc/hosts
+      #service network restart
+    become: true
+    args:
+      creates: /opt/.firstboot
+  
     - name: "Check if in aws"
       shell: |
         curl -s http://169.254.169.254/2019-10-01/meta-data/public-ipv4 || echo "html"
