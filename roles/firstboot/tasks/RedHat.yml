@@ -81,7 +81,7 @@
       echo "${hostname}" > /etc/hostname
       hostnamectl set-hostname ${hostname}
       grep "{{ ansible_default_ipv4['address'] }}" /etc/hosts || echo "{{ ansible_default_ipv4['address'] }} ${hostname} ${shortname}" >> /etc/hosts
-      grep "{{ sat6_fqdn }}" /etc/hosts || echo "{{ sat6_server }} {{ sat6_fqdn }}" >> /etc/hosts
+      #grep "{{ sat6_fqdn }}" /etc/hosts || echo "{{ sat6_server }} {{ sat6_fqdn }}" >> /etc/hosts
       #service network restart
     become: true
     args:
@@ -219,6 +219,8 @@
         url: "http://{{ sat6_fqdn }}/pub/bootstrap.py"
         dest: /opt/bootstrap.py
         mode: 0755
+      when:
+      - sat6_fqdn is defined
 
     - name: "Save the command to register to satellite server"
       template:
@@ -227,6 +229,8 @@
         owner: root
         group: root
         mode: 0755
+      when:
+      - sat6_fqdn is defined
 
     - name: "Run the satellite bootstrap script"
       shell: |
@@ -242,7 +246,10 @@
         path: /opt/.bootstrap
         state: touch
         mode: 0444
-  when: bootstrapcheck.stdout == "false"
+  when:
+  - bootstrapcheck.stdout == "false"
+  - sat6_fqdn is defined
+
 
   rescue:
     - name: "Clean up from Sat 6"
