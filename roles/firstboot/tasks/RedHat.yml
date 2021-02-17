@@ -240,8 +240,6 @@
         url: "http://{{ sat6_fqdn }}/pub/bootstrap.py"
         dest: /opt/bootstrap.py
         mode: 0755
-      when:
-      - sat6_fqdn != "None"
 
     - name: "Save the command to register to satellite server"
       template:
@@ -269,6 +267,8 @@
         path: /opt/.bootstrap
         state: touch
         mode: 0444
+      when:
+      - sat6_fqdn != "None"
   when:
   - bootstrapcheck.stdout == "false"
   - sat6_fqdn != "None"
