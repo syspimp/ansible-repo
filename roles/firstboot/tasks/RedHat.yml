@@ -74,6 +74,13 @@
         - ansible_local['awsroles']['default'] is defined
         - ansible_local['awsroles']['default']['role'] == 'satellite-server'
 
+      - name: "Set the server ip fact"
+        set_fact:
+          sat6_server: "{{ inventory_hostname }}"
+        when:
+        - ansible_local['awsroles']['default'] is defined
+        - ansible_local['awsroles']['default']['role'] == 'satellite-server'
+
   - name: "Set up /etc/hosts file and hostname"
     shell: |
       shortname=$(hostname --short)
