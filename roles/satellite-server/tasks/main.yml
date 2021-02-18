@@ -40,9 +40,6 @@
     group: root
     mode: 0644
 
-  #add satellite to tower group early
-- include: "tower.yml"
-
 - name: "Block to perform initial setup"
   block:
     - name: "make setup tracking dir"
@@ -51,6 +48,9 @@
         state: directory
         mode: 0755
   
+      #add satellite to tower group early
+    - include: "tower.yml"
+
     - name: "Disabling all repos"
       shell: "subscription-manager repos --disable='*'"
       become: true
