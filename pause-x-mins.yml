@@ -4,4 +4,4 @@
    x: 45
   tasks:
   - pause:
-      minutes: {{ x }}
+      minutes: "{{ x }}"
