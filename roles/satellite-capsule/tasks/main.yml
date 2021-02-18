@@ -202,7 +202,12 @@
                     --puppet-server-ca                         "true" \
                     --enable-foreman-proxy-plugin-remote-execution-ssh \
                     --enable-foreman-proxy-plugin-ansible \
-                    --enable-foreman-proxy-plugin-openscap
+                    --enable-foreman-proxy-plugin-openscap && \
+                    touch /opt/.sat-install-finished
+
+      args:
+        creates: /opt/.sat-install-finished
+
 
 
     - name: "make sure we are registered to the satellite server"
@@ -218,7 +223,7 @@
 
     - name: "Install the katello certificate"
       shell:
-        rpm -Uvh http://{{ sat6_fqdn }}/pub/katello-ca-consumer-latest.noarch.rpm
+        rpm -Uvh --force http://{{ sat6_fqdn }}/pub/katello-ca-consumer-latest.noarch.rpm
       when: "'subscription.rhsm.redhat.com' in bootstrap.stdout"
 
     - name: "Re-run subscription-manager"
