@@ -25,7 +25,7 @@
     --user {{ AWS_ACCESS_KEY_ID }} \
     --password {{ AWS_SECRET_KEY }} \
     --region us-east-1 \
-    --location-id 3 \
+    --location-id 1 \
     --organization-id 1 \
     --name "AWS Hosts"
   args:
