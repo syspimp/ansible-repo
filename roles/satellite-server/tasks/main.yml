@@ -479,11 +479,11 @@
   args:
     creates: /root/.setup/step14
 
-- name: "Provisioning Satellite 6 Puppet Environments"
-  shell: |
-      hammer environment create --name {{ sat6_default_environment }} --locations {{ sat6_default_location }} --organizations {{ sat6_default_org }}
-  args:
-    creates: /root/.setup/step14
+#- name: "Provisioning Satellite 6 Puppet Environments"
+#  shell: |
+#      hammer puppet-environment create --name {{ sat6_default_environment }} --locations {{ sat6_default_location }} --organizations {{ sat6_default_org }} || true
+#  args:
+#    creates: /root/.setup/step14
 
 - name: "Provisionging Lifecycle Complete"
   shell: touch /root/.setup/step14
