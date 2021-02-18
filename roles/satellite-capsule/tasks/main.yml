@@ -91,6 +91,9 @@
   register: capsulesetup
   become: true
 
+  # add ourselves to the tower group early
+- include: "tower.yml"
+
 - name: "Block to perform satellie-capsule setup"
   block:
     - name: "Get short hostname"
@@ -254,4 +257,3 @@
         state: touch
         mode: 0444
   when: capsulesetup.stdout == "false"
-- include: "tower.yml"
