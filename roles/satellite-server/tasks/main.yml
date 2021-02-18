@@ -40,6 +40,9 @@
     group: root
     mode: 0644
 
+  #add satellite to tower group early
+- include: "tower.yml"
+
 - name: "Block to perform initial setup"
   block:
     - name: "make setup tracking dir"
@@ -764,5 +767,4 @@
     body_format: json
     when: ansible_local['awsroles'] is not defined
 
-- include: "tower.yml"
 - include: "compute.yml"
