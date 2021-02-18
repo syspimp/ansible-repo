@@ -6,6 +6,7 @@
 #    --name "{{ item.name }}" \
 #    --description "{{ item.description }}" \
 #    --locations "{{ sat6_default_location }}" \
+#    --organization-id 1 \
 #    --organizations "{{ sat6_default_org }}" \
 #    --provider  Openstack \
 #    --user {{ item.user }} \
@@ -25,8 +26,8 @@
     --user {{ AWS_ACCESS_KEY_ID }} \
     --password {{ AWS_SECRET_KEY }} \
     --region us-east-1 \
-    --location-id 1 \
-    --organization-id 1 \
+    --locations "{{ sat6_default_location }}" \
+    --organizations "{{ sat6_default_org }}" \
     --name "AWS Hosts"
   args:
     creates: /root/.setup/step25

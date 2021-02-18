@@ -726,7 +726,6 @@
     creates: /root/.setup/step28
 
 - name: "Set Capsule to proper location"
-  ignore_errors: yes
   shell: |
     hammer capsule update --id 1 --locations {{ sat6_default_location }} && \
     touch /root/.setup/step29
