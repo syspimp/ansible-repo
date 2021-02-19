@@ -40,6 +40,9 @@
         state: directory
         mode: 0755
   
+    # add ourselves to the tower group early
+    - include: "tower.yml"
+
     - name: "Disabling all repos"
       shell: "subscription-manager repos --disable='*'"
       become: true
@@ -51,7 +54,7 @@
                            --enable rhel-7-server-satellite-capsule-{{ satellite_version }}-rpms \
                            --enable rhel-7-server-satellite-tools-{{ satellite_version }}-rpms \
                            --enable=rhel-7-server-satellite-maintenance-6-rpms \
-                           --enable=rhel-7-server-ansible-2.8-rpms 
+                           --enable=rhel-7-server-ansible-2.9-rpms 
       become: true
     
     - name: "Clean out old yum metadata"
@@ -91,8 +94,6 @@
   register: capsulesetup
   become: true
 
-  # add ourselves to the tower group early
-- include: "tower.yml"
 
 - name: "Block to perform satellie-capsule setup"
   block:

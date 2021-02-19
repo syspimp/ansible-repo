@@ -62,7 +62,7 @@
                            --enable rhel-7-server-satellite-{{ satellite_version }}-rpms \
                            --enable rhel-7-server-satellite-tools-{{ satellite_version }}-rpms \
                            --enable=rhel-7-server-satellite-maintenance-6-rpms \
-                           --enable=rhel-7-server-ansible-2.8-rpms 
+                           --enable=rhel-7-server-ansible-2.9-rpms 
       become: true
     
     - name: "Clean out old yum metadata"
