@@ -168,6 +168,13 @@
       become: true
       delegate_to: "{{ sat6_server }}"
     
+    - name: "Make sure httpd is running"
+      ansible.builtin.systemd:
+          state: started
+          name: httpd
+      become: true
+      delegate_to: "{{ sat6_server }}"
+
     - name: "Grab certs from the sat server"
       get_url:
         url: "http://{{ sat6_server }}/pub/{{ shorthostname}}.{{ dns_domain }}-certs.tar"
