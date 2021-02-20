@@ -45,6 +45,7 @@
   - name: "Set selinux flag to allow haproxy connections"
     shell: |
       /usr/sbin/semanage boolean --modify --on haproxy_connect_any
+    become: yes
 
   - name: "Enable and start haproxy"
     service:
