@@ -28,7 +28,7 @@
       set_fact:
         lb_host_id: "{{ hostidcheck.json.results[0].id }}"
 
-    - name: "Add host to the 'satellite-server' Group Inventory"
+    - name: "Add host to the 'capsule-lb' Group Inventory"
       uri:
         url: "https://{{ tower_server }}/api/v2/groups/{{ capsule_lb_inventory_group }}/hosts/"
         validate_certs: no
