@@ -20,7 +20,7 @@
 
     - name: "Installing haproxy rpms"
       yum:
-        name: ["haproxy"]
+        name: ["haproxy","policycoreutils-python"]
         state: latest
 
     - name: "make setup tracking dir"
