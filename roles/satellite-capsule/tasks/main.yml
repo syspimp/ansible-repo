@@ -181,9 +181,9 @@
         url: "http://{{ sat6_server }}/pub/{{ shorthostname}}.{{ dns_domain }}-certs.tar"
         dest: "/root/{{ shorthostname}}.{{ dns_domain }}-certs.tar"
       become: yes
-      register: grabcerts
+      #register: grabcerts
       retries: 3600
-      until: grabcerts.rc == 0
+      #until: grabcerts.rc == 0
       delay: 10
 
     - name: "Set the oauth facts"
