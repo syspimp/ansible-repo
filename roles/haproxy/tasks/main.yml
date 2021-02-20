@@ -39,6 +39,7 @@
       owner: root
       group: root
       mode: 0600
+    become: yes
     notify: restart haproxy
 
   - name: "Set selinux flag to allow haproxy connections"
