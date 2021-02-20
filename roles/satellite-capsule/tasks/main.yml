@@ -168,12 +168,13 @@
       become: true
       delegate_to: "{{ sat6_server }}"
     
-    - name: "Make sure httpd is running"
-      ansible.builtin.systemd:
-          state: started
-          name: httpd
-      become: true
-      delegate_to: "{{ sat6_server }}"
+    - name: "Wait for httpd to start on the Satellite Server"
+      wait_for:
+        port: 80
+        host: "{{ sat6_server }}"
+        delay: 5
+        timeout: 7200
+      become: false
 
     - name: "Grab certs from the sat server"
       get_url:
