@@ -23,7 +23,8 @@ global
     #
     #    local2.*                       /var/log/haproxy.log
     #
-    log         127.0.0.1 local2
+    #log         127.0.0.1 local2
+    log         /dev/log local0
 
     chroot      /var/lib/haproxy
     pidfile     /var/run/haproxy.pid
@@ -54,9 +55,9 @@ defaults
 {% for service in haproxy_services %}
 frontend {{ service.name }}
    bind *:{{ service.port }}
-	 log global
+   log global
    mode {{ service.mode }}
-   option               tcplog
+   option          tcplog
    default_backend proxy-{{ service.name }}
 
 backend proxy-{{ service.name }}
