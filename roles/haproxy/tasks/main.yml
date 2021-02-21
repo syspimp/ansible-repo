@@ -51,6 +51,7 @@
     service:
       name: haproxy
       enabled: yes
+    become: yes
 
   rescue:
   - name: "You will need to rerun this playbook"
