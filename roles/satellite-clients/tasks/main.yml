@@ -1,7 +1,10 @@
 ---
 - name: "Register to the correct Satellite Server"
   block:
-  - name: "Make sure we are registered to the correct satellite server"
+  - name: "Check if we are registered"
+    shell: "subscription-manager status"
+
+  - name: "Make sure we are pointed to the correct satellite server"
     shell:
       subscription-manager config | grep "{{ sat6['lb_fqdn'] }}"
 
