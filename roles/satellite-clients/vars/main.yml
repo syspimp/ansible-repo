@@ -9,7 +9,7 @@ sat6:
   pass: "CHANGEPASS"
   org: "{{ sat6_org }}"
   hostgroup: "{{ sat6_hostgroup }}"
-  location: "{{ sat6_location }}"
+  location: "{{ sat6_loc }}"
   environment: "{{ sat6_env }}"
   activation_key: "{{ sat6_org }}-{{ sat6_env }}-key"
   lb_fqdn: "capsule-lb.{{ dns_domain }}"
