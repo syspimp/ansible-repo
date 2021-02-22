@@ -1,4 +1,5 @@
 #!/bin/bash -x
+chmod +x /opt/bootstrap.py
 /opt/bootstrap.py -l {{ sat6['user'] }} -p {{ sat6['pass'] }} \
 -s {{ sat6['lb_fqdn'] }} \
 -o "{{ sat6['org'] }}" \
