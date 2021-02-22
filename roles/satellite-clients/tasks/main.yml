@@ -1,0 +1,34 @@
+---
+- name: "Register to the correct Satellite Server"
+  block:
+  - name: "Make sure we are registered to the correct satellite server"
+    shell:
+      subscription-manager config | grep "{{ sat6['lb_fqdn'] }}"
+
+  rescue:
+  - name: "Unregister from the redhat cdn"
+    shell:
+      subscription-manager unregister && \
+      subscription-manager clean
+
+  - name: "Install the katello certificate"
+    shell:
+      rpm -Uvh --force http://{{ sat6_fqdn }}/pub/katello-ca-consumer-latest.noarch.rpm
+
+  - name: "Get the bootstrap python script"
+    get_url:
+      url: "http://{{ sat6['url'] }}/pub/bootstrap.py"
+      dest: /opt/bootstrap.py
+
+  - name: "Save the command to register to satellite server"
+    template:
+      src: reg-to-satellite.sh.j2
+      dest: /opt/reg-to-satellite.sh
+      owner: root
+      group: root
+      mode: 0755
+
+  - name: "Run the satellite bootstrap script"
+    shell: |
+      /opt/reg-to-satellite.sh
+
