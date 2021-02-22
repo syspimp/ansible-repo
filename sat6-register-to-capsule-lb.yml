@@ -1,6 +1,6 @@
 ---
 - name: "Register a host with the correct Satellite 6 Load balancer"
-  hosts: all:!satellite-server
+  hosts: all:!satellite-server:!capsules:!capsule-lb
   become: yes
   roles:
     - satellite-clients
