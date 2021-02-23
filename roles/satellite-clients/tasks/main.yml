@@ -12,7 +12,6 @@
   - name: "Unregister from the redhat cdn"
     ignore_errors: yes
     shell:
-      subscription-manager unregister && \
       subscription-manager clean
 
   - name: "Find Group Inventory for 'satellite-server'"
