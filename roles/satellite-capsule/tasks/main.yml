@@ -268,6 +268,29 @@
       delegate_to: localhost
       become: false
 
+    - name: "Find the id to the capsules/proxies"
+      shell: |
+       hammer capsule list | grep 'Pulp Node' | grep '{{ shorthostname }}' | awk '{ print $1 }'
+      become: true
+      delegate_to: "{{ sat6_server }}"
+      register: capsulelist
+
+    - name: "Add lifecyles to the capsule"
+      shell:
+        hammer capsule content add-lifecycle-environment --id {{ capsulelist.stdout.trim() }} --organization {{ sat6['org'] }} --lifecycle-environment {{ item }}
+      become: true
+      delegate_to: "{{ sat6_server }}"
+      loop:
+      - "production"
+      - "testing"
+      - "development"
+    
+    - name: "Synchronize the content to the capsule/proxy"
+      shell: |
+        hammer capsule content synchronize --id {{ capsulelist.stdout.trim() }} --async
+      become: true
+      delegate_to: "{{ sat6_server }}"
+    
     - name: "capsule config complete"
       file:
         path: /root/.setup/capsule-configed
