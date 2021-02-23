@@ -247,6 +247,10 @@
         subscription-manager register --org="{{ sat6['org'] }}" --activationkey="{{ sat6['activation_key'] }}"
       when: "'subscription.rhsm.redhat.com' in bootstrap.stdout"
 
+    - name: "Fix the selinux context for /opt"
+      shell:
+        restorecon -vR /opt/*
+
     - name: "Reboot."
       shell: |
         shutdown -r +1 || true
