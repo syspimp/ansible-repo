@@ -67,5 +67,5 @@
 
   - name: "Synchronize the content to the capsule/proxy"
     shell: |
-      hammer capsule content synchronize --id {{ item }}
+      hammer capsule content synchronize --id {{ item }} --async
     loop: "{{ capsulelist.stdout.split() }}"
