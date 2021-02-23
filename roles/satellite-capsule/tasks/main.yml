@@ -279,7 +279,7 @@
 
     - name: "Add lifecyles to the capsule"
       shell:
-        hammer capsule content add-lifecycle-environment --id {{ capsulelist.stdout.trim() }} --organization {{ sat6['org'] }} --lifecycle-environment {{ item }}
+        hammer capsule content add-lifecycle-environment --id {{ capsulelist.stdout | trim }} --organization {{ sat6['org'] }} --lifecycle-environment {{ item }}
       become: true
       delegate_to: "{{ sat6_server }}"
       loop:
@@ -289,7 +289,7 @@
     
     - name: "Synchronize the content to the capsule/proxy"
       shell: |
-        hammer capsule content synchronize --id {{ capsulelist.stdout.trim() }} --async
+        hammer capsule content synchronize --id {{ capsulelist.stdout | trim }} --async
       become: true
       delegate_to: "{{ sat6_server }}"
     
