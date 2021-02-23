@@ -282,8 +282,8 @@
       delegate_to: "{{ sat6_server }}"
       loop:
       - "production"
-      - "testing"
-      - "development"
+#      - "testing"
+#      - "development"
     
     - name: "Synchronize the content to the capsule/proxy"
       shell: |

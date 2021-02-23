@@ -39,12 +39,12 @@ sat6:
   subs_for_activationkeys:
     - "Employee SKU"
   environments:
-    - name: 'development'
-      prior: 'Library'
-    - name: 'testing'
-      prior: 'development'
     - name: 'production'
-      prior: 'testing'
+      prior: 'Library'
+#    - name: 'testing'
+#      prior: 'development'
+#    - name: 'production'
+#      prior: 'testing'
   locations:
 #    - "Private_Cloud"
     - "AWS_RTO"
@@ -145,7 +145,7 @@ sat6_enabled_repos:
     product: "Red Hat Enterprise Linux Server"
 #  - name: "Red Hat Enterprise Linux Fast Datapath (RHEL 7 Server) (RPMs)"
 #    product: "Red Hat Enterprise Linux Fast Datapath"
-  - name: "Red Hat Ansible Engine 2.8 RPMs for Red Hat Enterprise Linux 7 Server"
+  - name: "Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server"
     product: "Red Hat Ansible Engine"
   - name: "Red Hat Satellite Maintenance 6 for RHEL 7 Server (RPMs)"
     product: "Red Hat Enterprise Linux Server"
