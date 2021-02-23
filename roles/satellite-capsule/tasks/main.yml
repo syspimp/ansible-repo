@@ -19,7 +19,9 @@
       register: rhsm_status
       retries: 10
       delay: 1
-  when: "'Red Hat Satellite' not in rhsm_reg.stdout"
+  when:
+  - "'Red Hat Satellite' not in rhsm_reg.stdout"
+  - "'Employee' not in rhsm_reg.stdout"
 
 - name: "Satellite Capsule Setup check"
   shell: |
