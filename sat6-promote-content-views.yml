@@ -1,0 +1,71 @@
+---
+- name: Publish and Promote Content Views
+  hosts: satellite-server
+  gather_facts: no
+  become: yes
+  vars_files:
+    - group_vars/satellite.yml
+  vars:
+    publish: no
+    content_view: "Base"
+    environments:
+    - 'development'
+    - 'testing'
+    - 'production'
+    sat6_org: "{{ sat6_default_org }}"
+  tasks:
+  - name: "Grab the Content View ID"
+    shell: |
+      hammer content-view list | grep {{ content_view }} | awk '{print $1}'
+    register: output
+
+  - name: "Set Content View ID"
+    set_fact:
+      base_content_view_id: "{{ output.stdout }}"
+
+  - name: "Publish a new Content View Version, takes about 30 mins to regenerate repodata"
+    shell: |
+      hammer content-view publish --id "{{ base_content_view_id }}" \
+       --organization-label "{{ sat6_org }}"
+    when: publish == 'yes'
+
+  - name: "Grab the new Content View ID"
+    shell: |
+      hammer content-view version list |grep {{ content_view }} | grep Library | awk '{print $1}'
+    register: output
+
+  - name: "Set New Content Version ID"
+    set_fact:
+      content_view_version_id: "{{ output.stdout }}"
+
+  - name: "Content View before the promotion(s)"
+    shell: |
+      hammer content-view version info --id "{{ content_view_version_id }}"
+    register: output
+
+  - name: "Show output"
+    debug: var=output.stdout
+
+  - name: "Promoting Environments"
+    shell: |
+      hammer content-view version promote --id "{{ content_view_version_id }}" \
+      --to-lifecycle-environment "{{ item }}" --organization "{{ sat6_org }}"
+    with_items: "{{ environments }}"
+
+  - name: "Content View after the promotion(s)"
+    shell: |
+      hammer content-view version info --id "{{ content_view_version_id }}"
+    register: output
+
+  - name: "Show output"
+    debug: var=output.stdout
+
+  - name: "Find the id to the capsules/proxies"
+    shell: |
+      hammer capsule list | grep 'Pulp Node' | awk '{ print $1 }'
+    register: capsulelist
+
+  - name: "Synchronize the content to the capsule/proxy"
+    shell: |
+      hammer capsule content synchronize --id {{ item }}
+    loop: "{{ capsulelist.stdout.split() }}"
