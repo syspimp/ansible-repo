@@ -103,10 +103,10 @@
             vars:
             - name: role
               value: "{{ aws_role }}"
-         - section: secondary
-           vars:
-           - name: role
-             value: "{{ aws_secondary_role }}"
+          - section: secondary
+            vars:
+            - name: role
+              value: "{{ aws_secondary_role }}"
           - section: config
             vars:
             - name: environment
