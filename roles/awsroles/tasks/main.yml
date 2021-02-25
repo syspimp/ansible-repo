@@ -9,4 +9,4 @@
     name: "{{ ansible_local['awsroles']['secondary']['role'] }}"
   when: 
   - ansible_local['awsroles']['secondary'] is defined
-  #- ansible_local['awsroles']['secondary'] != 'None'
+  - ansible_local['awsroles']['secondary'] != 'None'
