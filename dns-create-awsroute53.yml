@@ -1,0 +1,43 @@
+---
+- name: "Creates a new DNS entry in AWS Route 53"
+  hosts: localhost
+  gather_facts: no
+  environment:
+    AWS_ACCESS_KEY_ID: "{{ TFOUND_AWS_ACCESS_KEY_ID }}"
+    AWS_SECRET_KEY: "{{ TFOUND_AWS_SECRET_KEY }}"
+  vars:
+    public_ip: "1.1.1.1,2.2.2.2,3.3.3.3"
+    fqdn: "host.foo.com"
+    zone: "foo.com"
+    ttl: "60"
+    type: "A"
+  tasks:
+    - name: "Get record if it exists already, ignore any errors"
+      route53:
+          command: get
+          zone: "{{ zone }}"
+          record: "{{ fqdn }}"
+          type: "{{ type }}"
+      register: rec
+      ignore_errors: yes
+
+    - name: "Delete record if it exists already, ignore any errors"
+      route53:
+          command: delete
+          zone: "{{ zone }}"
+          record: "{{ rec.set.record }}"
+          ttl: "{{ rec.set.ttl }}"
+          type: "{{ rec.set.type }}"
+          value: "{{ rec.set.value }}"
+      ignore_errors: yes
+      when: rec.set.record
+
+    - route53:
+          command: create
+          zone: "{{ zone }}"
+          record: "{{ fqdn }}"
+          type: "{{ type }}"
+          ttl: "{{ ttl }}"
+          value: "{{ public_ip }}"
+          wait: yes
+
