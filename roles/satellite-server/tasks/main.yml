@@ -87,6 +87,9 @@
         name: "satellite"
         state: latest
       become: true
+      loop:
+      - rhel-system-roles
+      - satellite
 
 #    - name: "installing private key to accesss OSP"
 #      template:
