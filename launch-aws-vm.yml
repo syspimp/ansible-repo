@@ -228,7 +228,7 @@
         url: https://{{ tower_server }}/api/v2/inventory_sources/{{ item }}/update/
         validate_certs: no
         method: POST
-        user: "{{ tower_pass }}"
+        user: "{{ tower_user }}"
         password: "{{ tower_pass }}"
         force_basic_auth: yes
         status_code: [201,202]
