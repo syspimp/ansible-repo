@@ -41,5 +41,5 @@
     force_basic_auth: yes
     status_code: [201,202,204]
     body_format: json
-  loop: {{ hostidcheck.json.results }}
+  loop: "{{ hostidcheck.json.results }}"
 
