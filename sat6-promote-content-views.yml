@@ -3,14 +3,14 @@
   hosts: satellite-server
   gather_facts: no
   become: yes
-  vars_files:
-    - group_vars/satellite.yml
+#  vars_files:
+#    - group_vars/satellite.yml
   vars:
     publish: no
     content_view: "Base"
     environments:
-    - 'development'
-    - 'testing'
+#    - 'development'
+#    - 'testing'
     - 'production'
     sat6_org: "{{ sat6_default_org }}"
   tasks:
