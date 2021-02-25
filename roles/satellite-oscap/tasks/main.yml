@@ -172,12 +172,12 @@
 
     - name: "Install the foreman scap client role"
       shell: |
-        ansible-galaxy -p /etc/ansible/roles install theforeman.foreman_scap_client
+        ansible-galaxy role install -p /etc/ansible/roles theforeman.foreman_scap_client
       become: yes
 
     - name: "Install the ansible roles to remediate PCI DSS"
       shell: |
-        ansible-galaxy -p /etc/ansible/roles install {{ item }}
+        ansible-galaxy role install -p /etc/ansible/roles {{ item }}
       become: yes
       loop:
       - redhatofficial.rhel8_pci_dss
@@ -185,7 +185,7 @@
 
     - name: "Install the ansible roles to remediate Health Insurance Portability and Accountability Act (HIPAA)"
       shell: |
-        ansible-galaxy -p /etc/ansible/roles install {{ item }}
+        ansible-galaxy role install -p /etc/ansible/roles {{ item }}
       become: yes
       loop:
       - redhatofficial.rhel8_hipaa
@@ -193,7 +193,7 @@
 
     - name: "Install the ansible roles to remediate FBI Criminal Justice Information Services (FBI CJIS)"
       shell: |
-        ansible-galaxy -p /etc/ansible/roles install {{ item }}
+        ansible-galaxy role install -p /etc/ansible/roles {{ item }}
       become: yes
       loop:
       - redhatofficial.rhel8_cjis
@@ -201,7 +201,7 @@
 
     - name: "Install the ansible roles to remediate NIST 800-171 (Controlled Unclassified Information)"
       shell: |
-        ansible-galaxy -p /etc/ansible/roles install {{ item }}
+        ansible-galaxy role install -p /etc/ansible/roles {{ item }}
       become: yes
       loop:
       - redhatofficial.rhel8_cui
@@ -209,7 +209,7 @@
 
     - name: "Install the ansible roles to remediate NIST National Checklist for RHEL 7.x/8.x"
       shell: |
-        ansible-galaxy -p /etc/ansible/roles install {{ item }}
+        ansible-galaxy role install -p /etc/ansible/roles {{ item }}
       become: yes
       loop:
       - redhatofficial.rhel8_ospp
