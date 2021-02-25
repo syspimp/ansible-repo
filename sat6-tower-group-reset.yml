@@ -1,0 +1,13 @@
+---
+- name: Reset the Satellite Inventory Groups
+  hosts: localhost
+  gather_facts: no
+  tasks:
+  - include: sat6-tower-clean-include.yml
+    loop:
+    - 'satellite-server'
+    - 'capsules'
+    - 'capsule-lb'
+    loop_control:
+      loop_var: group_inventory
+

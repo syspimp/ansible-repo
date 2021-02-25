@@ -1,0 +1,45 @@
+- name: "Find the Group Inventory"
+  uri:
+    url: "https://{{ tower_server }}/api/v2/groups/?search={{ group_inventory }}"
+    validate_certs: no
+    method: GET
+    user: "{{ tower_user }}"
+    password: "{{ tower_pass }}"
+    force_basic_auth: yes
+    status_code: [200,202,204]
+    body_format: json
+  register: groupidcheck
+
+- name: "Set the inventory id fact"
+  set_fact:
+    group_host_id: "{{ groupidcheck.json.results[0].id }}"
+  
+- name: "Find the host in the group"
+  uri:
+    url: "https://{{ tower_server }}/api/v2/groups/{{ group_host_id }}/hosts"
+    validate_certs: no
+    method: GET
+    user: "{{ tower_user }}"
+    password: "{{ tower_pass }}"
+    force_basic_auth: yes
+    status_code: [200,202,204]
+    body_format: json
+  register: hostidcheck
+  
+- name: "Remove the host(s) from the Group Inventory"
+  uri:
+    url: "https://{{ tower_server }}/api/v2/groups/{{ group_host_id }}/hosts/"
+    validate_certs: no
+    method: POST
+    body: >
+      {
+         "id": {{ item.id }},
+         "disassociate": 1
+      }
+    user: "{{ tower_user }}"
+    password: "{{ tower_pass }}"
+    force_basic_auth: yes
+    status_code: [201,202,204]
+    body_format: json
+  loop: {{ hostidcheck.json.results }}
+
