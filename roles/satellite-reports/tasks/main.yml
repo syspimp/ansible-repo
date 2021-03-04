@@ -5,12 +5,12 @@
 - name: "run first report on the sat6 server and save output"
   shell: "hammer report-template generate --id 125"
   register: reporttemplate
-  delegate_to: {{ sat6_server }}
+  delegate_to: "{{ sat6_server }}"
 
 - name: "run second report on the sat6 server and save output"
   shell: "hammer --csv config-report list"
   register: confighosts
-  delegate_to: {{ sat6_server }}
+  delegate_to: "{{ sat6_server }}"
 
 - name: "loop over reporttemplate and add output of confighosts, matching on key of hostname"
   include: merge_reports.yml
