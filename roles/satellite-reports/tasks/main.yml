@@ -22,6 +22,7 @@
 
 - name: "loop over reporttemplate and add output of confighosts, matching on key of hostname"
   include: merge_reports.yml
+  when: "'Id,Host' not in item"
   loop: "{{ reporttemplate.stdout.split('\n') }}"
   loop_control:
     index_var: report_row_num
