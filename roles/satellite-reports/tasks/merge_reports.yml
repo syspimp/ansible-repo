@@ -10,5 +10,5 @@
 - name: "merge the two using the hostname as key"
   set_fact:
    final_result: "{{ final_result | combine( [ report_row + ', ' + item ] ) }}"
-  when: "item.split(',')[1] in report_row"
+  when: "'{{ item.split(',')[1] }}' in report_row"
   loop: "{{ configreports.stdout.split('\n') }}"
