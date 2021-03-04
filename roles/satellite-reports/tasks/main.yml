@@ -49,7 +49,7 @@
       delegate_to: "{{ sat6_server }}"
 
     - name: "generate final report using pandas in /tmp"
-      shell: "python /opt/generate_report.py"
+      shell: "python /tmp/generate_report.py"
       
 - name: "create new list variable to hold the results"
   set_fact:
