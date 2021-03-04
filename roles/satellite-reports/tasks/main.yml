@@ -9,20 +9,22 @@
       register: piplist
 
     - name: "install if not found"
-      shell: pip --user -y install pandas
+      shell: pip install --user pandas
       when: "'pandas' not in piplist.stdout"
   rescue:
-    - name: "install pip"
-      shell: yum -y install python2-pip
-      #ignore_errors: yes
+    # since I'm using Tower, nothing requiring root is used
+    #- name: "install pip"
+    #  shell: yum -y install python2-pip
+    #  #ignore_errors: yes
     - name: "install pandas"
-      shell: pip --user -y install pandas
+      shell: pip install --user pandas
       #ignore_errors: yes
   always:
     - name: "place pandas report python script on localhost( or tower)"
       template:
         src: "generate_report.py.j2"
-        dest: "/opt/generate_report.py"
+        # /tmp so no special permissions required
+        dest: "/tmp/generate_report.py"
 
     - name: "run first report on the sat6 server and save output"
       shell: "hammer report-template generate --id 125 > /tmp/reporttemplate.csv"
