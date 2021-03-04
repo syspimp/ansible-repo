@@ -5,7 +5,7 @@
 - name: "lets use python data analysis to speed things up"
   block:
     - name: "check is python data analysis is installed on localhost (or tower)"
-      shell: which pip && pip list --user
+      shell: pip list --user
       register: piplist
 
     - name: "install if not found"
