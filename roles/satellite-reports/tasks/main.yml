@@ -2,6 +2,51 @@
 - name: "include tower stuff to populate sat6_server variable, or set it yourself somewhere"
   include: tower.yml
 
+- name: "lets use python data analysis to speed things up"
+  block:
+    - name: "check is python data analysis is installed on localhost (or tower)"
+      shell: pip list
+      register: piplist
+
+    - name: "install if not found"
+      shell: pip --user -y install pandas
+      when: "'pandas' not in piplist.stdout"
+  rescue:
+    - name: "install pip"
+      shell: yum -y install python2-pip
+      #ignore_errors: yes
+    - name: "install pandas"
+      shell: pip --user -y install pandas
+      #ignore_errors: yes
+  always:
+    - name: "place pandas report python script on localhost( or tower)"
+      template:
+        src: "generate_report.py.j2"
+        dest: "/opt/generate_report.py"
+
+    - name: "run first report on the sat6 server and save output"
+      shell: "hammer report-template generate --id 125 > /tmp/reporttemplate.csv"
+      delegate_to: "{{ sat6_server }}"
+
+    - name: "run second report on the sat6 server and save output"
+      shell: "hammer --csv config-report list > /tmp/configreport.csv"
+      delegate_to: "{{ sat6_server }}"
+
+    - name: "copy csv files from satellite to localhost (or tower)"
+      fetch:
+        src: /tmp/configreport.csv
+        dest: /tmp/
+        flat: yes
+
+    - name: "copy csv files from satellite to localhost (or tower)"
+      fetch:
+        src: /tmp/reporttemplate.csv
+        dest: /tmp/
+        flat: yes
+
+    - name: "generate final report using pandas in /tmp"
+      shell: "python /opt/generate_report.py"
+      
 - name: "create new list variable to hold the results"
   set_fact:
     final_result: []
