@@ -1,12 +1,12 @@
 ---
 - name: "Working on row of the template report"
   debug:
-    msg: "Row {{ report_row_number }} of {{ reporttemplate.stdout.split('\n') | length }}"
+    msg: "Row {{ report_row_num }} of {{ reporttemplate.stdout.split('\n') | length }}"
 
 - name: "merge the two using the hostname as key"
   set_fact:
    final_result: "{{ final_result + [ report_contents + ', ' + item ] }}"
   when:
   - "'{{ item.split(',')[1] }}' in report_contents"
-  #- "'Id,Host' not in item"
+  - "'Id,Host' not in item"
   loop: "{{ configreports.stdout.split('\n') }}"
