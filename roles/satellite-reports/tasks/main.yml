@@ -39,12 +39,14 @@
         src: /tmp/configreport.csv
         dest: /tmp/
         flat: yes
+      delegate_to: "{{ sat6_server }}"
 
     - name: "copy csv files from satellite to localhost (or tower)"
       fetch:
         src: /tmp/reporttemplate.csv
         dest: /tmp/
         flat: yes
+      delegate_to: "{{ sat6_server }}"
 
     - name: "generate final report using pandas in /tmp"
       shell: "python /opt/generate_report.py"
