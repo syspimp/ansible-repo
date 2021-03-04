@@ -3,12 +3,10 @@
   set_fact:
     final_header: "{{ reporttemplate.stdout.split('/n')[0] }}, {{ configreports.stdout.split('/n')[0] }}"
 
-- name: "create new list variable to hold the results"
-  set_fact:
-    final_result: []
-
 - name: "merge the two using the hostname as key"
   set_fact:
    final_result: "{{ final_result + [ report_contents + ', ' + item ] }}"
-  when: "'{{ item.split(',')[1] }}' in report_contents"
+  when:
+  - "'{{ item.split(',')[1] }}' in report_contents"
+  - "'Id,Host' not in item"
   loop: "{{ configreports.stdout.split('\n') }}"

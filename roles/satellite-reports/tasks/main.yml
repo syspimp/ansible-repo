@@ -2,6 +2,10 @@
 - name: "include tower stuff to populate sat6_server variable, or set it yourself somewhere"
   include: tower.yml
 
+- name: "create new list variable to hold the results"
+  set_fact:
+    final_result: []
+
 - name: "run first report on the sat6 server and save output"
   shell: "hammer report-template generate --id 125"
   register: reporttemplate
