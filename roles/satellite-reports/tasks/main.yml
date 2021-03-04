@@ -16,6 +16,11 @@
   register: configreports
   delegate_to: "{{ sat6_server }}"
 
+- name: "create new variable to hold the csv header"
+  set_fact:
+    final_header: "{{ reporttemplate.stdout.split('/n')[0] }}, {{ configreports.stdout.split('/n')[0] }}"
+
+
 - name: "loop over reporttemplate and add output of confighosts, matching on key of hostname"
   include: merge_reports.yml
   loop: "{{ reporttemplate.stdout.split('\n') }}"

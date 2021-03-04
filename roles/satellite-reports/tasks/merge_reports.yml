@@ -1,8 +1,4 @@
 ---
-- name: "create new variable to hold the csv header"
-  set_fact:
-    final_header: "{{ reporttemplate.stdout.split('/n')[0] }}, {{ configreports.stdout.split('/n')[0] }}"
-
 - name: "merge the two using the hostname as key"
   set_fact:
    final_result: "{{ final_result + [ report_contents + ', ' + item ] }}"
