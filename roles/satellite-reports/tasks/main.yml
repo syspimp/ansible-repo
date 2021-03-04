@@ -34,6 +34,13 @@
       shell: "hammer --csv config-report list > /tmp/configreport.csv"
       delegate_to: "{{ sat6_server }}"
 
+    - name: "run entitlment report on the sat6 server and save output"
+      shell: |
+        hammer report-template generate --id 130 --inputs '{"Days from Now":"no limit"}' > /tmp/entitlements.csv"
+        #fix the header for this one so it matches the other reports
+        sed -i -e 's/^Host Name,Organization/Host,Organization/g' /tmp/entitlements.csv
+      delegate_to: "{{ sat6_server }}"
+
     - name: "copy csv files from satellite to localhost (or tower)"
       fetch:
         src: /tmp/configreport.csv
@@ -48,8 +55,19 @@
         flat: yes
       delegate_to: "{{ sat6_server }}"
 
+    - name: "copy csv files from satellite to localhost (or tower)"
+      fetch:
+        src: /tmp/entitlements.csv
+        dest: /tmp/
+        flat: yes
+      delegate_to: "{{ sat6_server }}"
+
     - name: "generate final report using pandas in /tmp"
       shell: "python /tmp/generate_report.py"
+
+    - name: "hang around for awhile while I grab the reports because tower removes /tmp files from itself after a run"
+      pause:
+        minutes: 5
       
 #- name: "create new list variable to hold the results"
 #  set_fact:

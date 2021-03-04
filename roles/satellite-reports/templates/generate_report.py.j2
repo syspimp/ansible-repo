@@ -8,7 +8,9 @@ goodmorning = today.strftime("%Y%m%d")
 
 reporttemplate = pd.read_csv('/tmp/reporttemplate.csv')
 configreport = pd.read_csv('/tmp/configreport.csv')
+entitlementreport = pd.read_csv('/tmp/entitlements.csv')
 
 finalreport = reporttemplate.merge(configreport, on='Host')
+finaldestination = finalreport.merge(configreport, on='Host')
 
-finalreport.to_csv('/tmp/satellite-report-%s.csv' % goodmorning, index=False)
+finaldestination.to_csv('/tmp/satellite-report-%s.csv' % goodmorning, index=False)
