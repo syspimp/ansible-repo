@@ -36,7 +36,7 @@
 
     - name: "run entitlment report on the sat6 server and save output"
       shell: |
-        hammer report-template generate --id 130 --inputs '{"Days from Now":"no limit"}' > /tmp/entitlements.csv"
+        hammer report-template generate --id 130 --inputs '{"Days from Now":"no limit"}' > /tmp/entitlements.csv
         #fix the header for this one so it matches the other reports
         sed -i -e 's/^Host Name,Organization/Host,Organization/g' /tmp/entitlements.csv
       delegate_to: "{{ sat6_server }}"
