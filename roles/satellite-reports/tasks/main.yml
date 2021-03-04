@@ -19,7 +19,11 @@
     index_var: report_row_num
     loop_var: report_contents
 
+- name: "generate today's date"
+  set_fact:
+    date: "{{ lookup('pipe', 'date +\"%Y%m%d\"') }}"
+
 - name: "generate the csv file in /tmp"
   template:
     src: "sat6-report.csv.j2"
-    dest: "/tmp/sat6-report.csv"
+    dest: "/tmp/sat6-report-{{ date }}.csv"
