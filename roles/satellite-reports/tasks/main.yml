@@ -16,7 +16,8 @@
   include: merge_reports.yml
   loop: "{{ reporttemplate.stdout.split('\n') }}"
   loop_control:
-    index_var: report_row
+    index_var: report_row_num
+    loop_var: report_contents
 
 - name: "generate the csv file in /tmp"
   template:
