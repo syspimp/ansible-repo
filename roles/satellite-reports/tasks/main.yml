@@ -1,0 +1,24 @@
+---
+- name: "include tower stuff to populate sat6_server variable, or set it yourself somewhere"
+  include: tower.yml
+
+- name: "run first report on the sat6 server and save output"
+  shell: "hammer report-template generate --id 125"
+  register: reporttemplate
+  delegate_to: {{ sat6_server }}
+
+- name: "run second report on the sat6 server and save output"
+  shell: "hammer --csv config-report list"
+  register: confighosts
+  delegate_to: {{ sat6_server }}
+
+- name: "loop over reporttemplate and add output of confighosts, matching on key of hostname"
+  include: merge_reports.yml
+  loop: "{{ reporttemplate.stdout.split('\n') }}"
+  loop_control:
+    index_var: report_row
+
+- name: "generate the csv file in /tmp"
+  template:
+    src: "sat6-report.csv.j2"
+    dest: "/tmp/sat6-report.csv"
