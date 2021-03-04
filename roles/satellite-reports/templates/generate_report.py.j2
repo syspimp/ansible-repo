@@ -11,6 +11,6 @@ configreport = pd.read_csv('/tmp/configreport.csv')
 entitlementreport = pd.read_csv('/tmp/entitlements.csv')
 
 finalreport = reporttemplate.merge(configreport, on='Host')
-finaldestination = finalreport.merge(finalreport, on='Host')
+finaldestination = finalreport.merge(entitlementreport, on='Host')
 
 finaldestination.to_csv('/tmp/satellite-report-%s.csv' % goodmorning, index=False)
