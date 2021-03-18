@@ -1,0 +1,21 @@
+- name: Update Ansible Tower inventories
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    # update the tower/awx inventory after launching
+    tower_inventory_ids:
+      - 35
+  tasks:
+    - name: Update the AWS Inventory
+      uri:
+        url: https://{{ tower_server }}/api/v2/inventory_sources/{{ item }}/update/
+        validate_certs: no
+        method: POST
+        user: "{{ tower_user }}"
+        password: "{{ tower_pass }}"
+        force_basic_auth: yes
+        status_code: [201,202]
+        body_format: json
+      with_items:
+        - "{{ tower_inventory_ids }}"
