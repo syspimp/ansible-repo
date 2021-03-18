@@ -63,7 +63,8 @@
       group: root
       mode: 0755
 
-  - name: "Run the satellite bootstrap script"
+  - name: "Run the satellite bootstrap script, ignoring errors"
+    ignore_errors: yes
     shell: |
       /opt/reg-to-satellite.sh
 
