@@ -1,6 +1,8 @@
 ---
 - name: "Check if clevis is installed"
-  shell: "rpm -qa | grep clevis-luks"
+  shell: "rpm -qa | grep clevis-luks || true"
+  args:
+    executable: /bin/bash
   register: isclevisinstalled
 
 - name: "Install tang server to decrypt encrypted block devices"
