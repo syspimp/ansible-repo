@@ -74,3 +74,4 @@
   hosts: tang-*
   roles:
     - nbde-tang-server
+
