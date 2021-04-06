@@ -14,7 +14,7 @@
 - name: "Enable tang.socket"
   service:
     name: "tang.socket"
-    state: "enabled"
+    state: "started"
 
 - name: "Add firewall rules for tang"
   firewalld:
