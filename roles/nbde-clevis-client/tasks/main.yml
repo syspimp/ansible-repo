@@ -7,7 +7,7 @@
   yum:
     name: "{{ item }}"
     state: "present"
-  when: "clevis" not in isclevisinstalled.stdout
+  when: "'clevis' not in isclevisinstalled.stdout"
   loop:
     - clevis-luks
     - clevis-dracut
