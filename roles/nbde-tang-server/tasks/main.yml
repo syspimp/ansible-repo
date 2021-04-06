@@ -13,7 +13,7 @@
 
 - name: "Enable tang.socket"
   service:
-    name: "tang.socket"
+    name: "tangd.socket"
     state: "started"
 
 - name: "Add firewall rules for tang"
