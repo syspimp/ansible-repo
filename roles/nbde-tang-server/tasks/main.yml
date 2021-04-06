@@ -1,6 +1,6 @@
 ---
 - name: "Check if tang is installed"
-  shell: "rpm -qa | grep tang || tang"
+  shell: "rpm -qa | grep tang || true"
   args:
     executable: /bin/bash
   register: istanginstalled
