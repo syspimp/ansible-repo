@@ -1,7 +1,8 @@
 ---
 - name: "Check if tang is installed"
-  shell: "rpm -qa | grep tang"
-  ignore_errors: yes
+  shell: "rpm -qa | grep tang || tang"
+  args:
+    executable: /bin/bash
   register: istanginstalled
 
 - name: "Install tang server to decrypt encrypted block devices"
