@@ -7,7 +7,7 @@
   yum:
     name: "tang"
     state: "present"
-  when: "tang" not in istanginstalled.stdout
+  when: '"tang" not in istanginstalled.stdout'
 
 - name: "Enable tang.socket"
   service:
