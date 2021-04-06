@@ -65,3 +65,12 @@
   roles:
     - ansible-tower
 
+- name: Network Bound Disk Encryption Client
+  hosts: *clevis*
+  roles:
+    - nbde-clevis-client
+
+- name: Network Bound Disk Encryption Server
+  hosts: tang-*
+  roles:
+    - nbde-tang-server
