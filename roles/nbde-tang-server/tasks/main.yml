@@ -22,4 +22,5 @@
     zone: "public"
     permanent: "yes"
     state: "enabled"
+  when: '"firewalld" in istanginstalled.stdout'
 
