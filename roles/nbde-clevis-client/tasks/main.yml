@@ -5,7 +5,7 @@
     executable: /bin/bash
   register: isclevisinstalled
 
-- name: "Install tang server to decrypt encrypted block devices"
+- name: "Install clevis client to decrypt encrypted block devices"
   yum:
     name: "{{ item }}"
     state: "present"
