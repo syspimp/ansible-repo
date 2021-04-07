@@ -24,3 +24,5 @@
     state: "enabled"
   when: '"firewalld" in istanginstalled.stdout'
 
+# add host to the tang-servers tower group inventory
+- include: tower.yml
