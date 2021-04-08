@@ -13,9 +13,9 @@
   block:
   - name: "Grab Satellite information block"
     block:
-      - name: "Find Group Inventory for 'satellite-server'"
+      - name: "Find Group Inventory for 'capsule-lb'"
         uri:
-          url: "https://{{ tower_server }}/api/v2/groups/?search=satellite-server"
+          url: "https://{{ tower_server }}/api/v2/groups/?search=capsule-lb"
           validate_certs: no
           method: GET
           user: "{{ tower_user }}"
