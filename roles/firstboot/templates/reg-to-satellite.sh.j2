@@ -1,6 +1,6 @@
 #!/bin/bash -x
 /opt/bootstrap.py -l {{ sat6['user'] }} -p {{ sat6['pass'] }} \
--s {{ capsule_loadbalancer_fqdn }} \
+-s {{ sat6['lb_fqdn'] }} \
 -o "{{ sat6['org'] }}" \
 -L "{{ sat6['location'] }}" \
 -g "{{ sat6['hostgroup'] }}" \

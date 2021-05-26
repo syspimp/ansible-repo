@@ -16,13 +16,16 @@
     name: "tangd.socket"
     state: "started"
 
+- name: "Enable firewall"
+  service:
+    name: "firewalld"
+    state: "started"
+
 - name: "Add firewall rules for tang"
   firewalld:
     service: "http"
     zone: "public"
     permanent: "yes"
-    state: "enabled"
-  when: '"firewalld" in istanginstalled.stdout'
 
 # add host to the tang-servers tower group inventory
 - include: tower.yml
