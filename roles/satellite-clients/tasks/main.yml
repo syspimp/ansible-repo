@@ -9,6 +9,10 @@
       subscription-manager config | grep "{{ sat6['lb_fqdn'] }}"
 
   rescue:
+  - name: "Save the enabled yum repos"
+    shell: subscription-manager repos --list-enabled | grep "Repo ID:" | awk '{print $3}'
+    register: oldrepos
+
   - name: "Unregister from the redhat cdn"
     ignore_errors: yes
     shell:
@@ -67,4 +71,8 @@
     ignore_errors: yes
     shell: |
       /opt/reg-to-satellite.sh
+
+  - name: "Re enable yum repos"
+    shell: subscription-manager repos --enable {{ item }}
+    loop: oldrepos.stdout | list
 

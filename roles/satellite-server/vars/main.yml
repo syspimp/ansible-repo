@@ -1,5 +1,5 @@
 ---
-satellite_version: 6.8
+satellite_version: 6.9
 openstack_version: 14
 openshift_version: 3.11
 host_config_key: firstboot
@@ -150,16 +150,16 @@ sat6_enabled_repos:
     product: "Red Hat Ansible Engine"
   - name: "Red Hat Satellite Maintenance 6 for RHEL 7 Server (RPMs)"
     product: "Red Hat Enterprise Linux Server"
-  - name: "Red Hat Satellite Capsule 6.8 for RHEL 7 Server (RPMs)"
+  - name: "Red Hat Satellite Capsule {{ satellite_version }} for RHEL 7 Server (RPMs)"
     product: "Red Hat Satellite Capsule"
 sat6_enabled_repos_tools:
-  - name: "Red Hat Satellite Tools 6.8 (for RHEL 7 Server) (RPMs)"
+  - name: "Red Hat Satellite Tools {{ satellite_version }} (for RHEL 7 Server) (RPMs)"
     product: "Red Hat Enterprise Linux Server"
   - name: "Red Hat Enterprise Linux 7 Server - Extras (RPMs)"
     product: "Red Hat Enterprise Linux Server"
   - name: "Red Hat Satellite Maintenance 6 for RHEL 7 Server (RPMs)"
     product: "Red Hat Enterprise Linux Server"
-  - name: "Red Hat Satellite Capsule 6.8 for RHEL 7 Server (RPMs)"
+  - name: "Red Hat Satellite Capsule {{ satellite_version }} for RHEL 7 Server (RPMs)"
     product: "Red Hat Satellite Capsule"
   - name: "Red Hat Satellite Maintenance 6 (for RHEL 7 Server) (RPMs)"
     product: "Red Hat Satellite"
