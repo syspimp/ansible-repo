@@ -1,7 +1,7 @@
 ---
 capsule_loadbalancer_fqdn: capsule-lb.prod.maskedadmins.com
 #sat6_server: ip-11-22-33-182.prod.maskedadmins.com
-satellite_version: 6.8
+satellite_version: 6.9
 capsules_inventory_group: 81
 rh_satellite_user: !vault |
           $ANSIBLE_VAULT;1.1;AES256
