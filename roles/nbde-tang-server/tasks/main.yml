@@ -25,6 +25,7 @@
   firewalld:
     service: "http"
     zone: "public"
+    state: "enabled"
     permanent: "yes"
 
 # add host to the tang-servers tower group inventory

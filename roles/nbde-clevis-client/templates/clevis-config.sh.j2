@@ -1,5 +1,5 @@
 #!/bin/bash
-cfg=$'{"t":${num_of_tang_servers},"pins":{tang:[\n
+cfg=$'{"t":{{ groups['tang-servers'] | length }},"pins":{tang:[\n
 {% for host in groups['tang-servers'] %}
  {"url":"http://{{ host }}"},\n
 {% endfor %}'

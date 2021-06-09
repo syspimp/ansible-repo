@@ -1,0 +1,6 @@
+encrypted:
+  device_block: /dev/vdb
+  device_lv: /dev/mapper/encryptedlv
+  device_name: encrypteddisk
+  device_mountpoint: /mnt/encrypted
+  device_fs: ext4
