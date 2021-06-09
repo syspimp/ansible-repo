@@ -29,7 +29,7 @@
   - name: check the disk
     shell: parted -l | grep {{ encrypted['device'] }}
     register: command_result
-    failed_when: "'unrecognised disk label' not in command_result.stdout"
+    failed_when: "'unrecognised disk label' not in command_result.stderr"
 
   - name: create the partition
     shell: parted /dev/{{ encrypted['device'] }}  mklabel msdos mkpart primary {{ encrypted['device_fs'] }} 1M {{ encrypted['device_size'] }}G
