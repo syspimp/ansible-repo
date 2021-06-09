@@ -1,4 +1,5 @@
 encrypted:
+  device: encrypteddisk
   device_block: /dev/vdb
   device_lv: /dev/mapper/encryptedlv
   device_name: encrypteddisk
