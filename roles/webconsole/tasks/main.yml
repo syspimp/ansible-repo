@@ -1,0 +1,43 @@
+---
+- name: "[Cockpit] Setup check"
+  shell: |
+    if [ -e "/root/.setup/cockpit-rpms" ]
+    then
+      echo "true"
+    else
+      echo "false"
+    fi
+  register: initialsetup
+  become: true
+
+- name: "Block to perform initial setup"
+  block:
+    - name: "[Cockpit] setup tracking dir, if needed"
+      file:
+        path: /root/.setup
+        state: directory
+        mode: 0755
+
+    - name: "[Cockpit] Installing rpms"
+      yum:
+        name: "cockpit"
+        state: latest
+      become: true
+
+    - name: "[Cockpit] Activate!"
+      shell:  systemctl enable --now cockpit.socket
+      become: true
+
+    - name: "[Cockpit] Fix firewall, if installed"
+      ignore_errors:
+      shell:  |
+        firewall-cmd --add-service=cockpit --permanent
+        firewall-cmd --reload
+      become: true
+
+    - name: "[Cockpit] update tracking dir"
+      file:
+        path: /root/.setup/cockpit-rpms
+        state: touch
+        mode: 0440
+  when: initialsetup.stdout == "false"

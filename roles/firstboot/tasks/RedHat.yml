@@ -330,6 +330,12 @@
         state: latest
       become: true
 
+    - name: "Turn on cockpit"
+      shell:  systemctl enable --now cockpit.socket
+      become: true
+      args:
+        creates: /opt/.firstboot
+
     - name: "Update dns entry"
       shell: "/sbin/ifup-local || true"
       become: true
