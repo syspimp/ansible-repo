@@ -200,7 +200,7 @@
       when: "'oauth-consumer-secret' in item"
       with_items: "{{ certoutput.stdout_lines }}"
 
-    - name: "Run the satellite-installer ..."
+    - name: "Run the satellite-installer ... takes 20 mins"
       shell: |
         satellite-installer \
                     --scenario capsule \
