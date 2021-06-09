@@ -15,20 +15,74 @@
     - clevis-dracut
     - clevis
 
+- name: partitioning block
+  block:
+  - name: make sure the disk is present
+    shell: lsblk | grep {{ encrypted['device'] }}
+  rescue:
+  - name: Fail hard
+    fail:
+      msg: "The requested disk {{ encrypted['device'] }} is not present"
+
+- name: partitioning block
+  block:
+  - name: check the disk
+    shell: parted -l | grep {{ encrypted['device'] }}
+    register: command_result
+    failed_when: "'unrecognised disk label' not in command_result.stdout"
+
+  - name: create the partition
+    shell: parted /dev/{{ encrypted['device'] }}  mklabel msdos mkpart primary {{ encrypted['device_fs'] }} 1M {{ encrypted['device_size'] }}G
+  rescue:
+  - name: Fail hard
+    fail:
+      msg:  "Partition is already labeled or partition already exists."
+
+- name: encryption block
+  block:
+  - name: encrypt the partion
+    shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksFormat /dev/{{ encrypted['device'] }}p1 --batch-mode -
+
+  - name: name the encrypted partition
+    shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksOpen /dev/{{ encrypted['device'] }}p1 {{ encrypted['device_name'] }} --batch-mode -
+  rescue:
+  - name: Fail hard
+    fail:
+      msg:  "Partition is already labeled or partition already exists."
+
+- name: format block
+  block:
+  - name: format the partion
+    shell: mkfs.{{ encrypted['device_fs'] }} /dev/mapper/{{ encrypted['device_name'] }}
+
+  - name: "make mount point dir"
+    file:
+      path: "{{ encrypted['device_mountpont'] }}"
+      state: directory
+      mode: 0755
+  
+  - name: test mounting the formatted, encrypted partition
+    shell: mount -t {{ encrypted['device_fs'] }} /dev/mapper/{{ encrypted['device_name'] }} {{ encrypted['device_mountpoint'] }}
+
+  - name: "Configure /etc/crypttab"
+    lineinfile:
+      path: /etc/crypttab
+      line: "{{ encrypted['device_name'] }}  /dev/{{ encrypted['device'] }}p1  none   _netdev"
+  
+  - name: "Configure /etc/fstab"
+    lineinfile:
+      path: /etc/fstab
+      line: "/dev/mapper/{{ encrypted['device_name'] }}  {{ encrypted['device_mountpoint'] }}  {{ encrypted['device_fs'] }}   _netdev   1 2"
+  rescue:
+  - name: Fail hard
+    fail:
+      msg:  "Could not make or mount filesystem"
+
 - name: "Set the clevis config template file"
   template:
     src: clevis-config.sh.j2
     dest: /tmp/clevis-config.sh
     mode: 0755
-
-- name: "Configure clevis to talk to tang servers"
-  shell: |
-    source /tmp/clevis-config.sh
-    clevis luks bind -f -k- -d {{ encrypted['device'] }} sss "$cfg" <<< "{{ encrypted['passphrase'] }}" && \
-    touch /opt/.encryptedsetup
-  args:
-    executable: /bin/bash
-    creates: /opt/.encryptedsetup
 
 - name: "Enable and start clevis-luks-askpath"
   service:
@@ -36,12 +90,12 @@
     enabled: yes
     state: started
 
-- name: "Configure /etc/crypttab"
-  lineinfile:
-    path: /etc/crypttab
-    line: "{{ encrypted['device_name'] }}  {{ encrypted['device'] }}  none   _netdev"
+- name: "Configure clevis to talk to tang servers"
+  shell: |
+    source /tmp/clevis-config.sh
+    clevis luks bind -f -k- -d /dev/{{ encrypted['device'] }}p1 sss "$cfg" <<< "{{ encrypted['passphrase'] }}" && \
+    touch /opt/.encryptedsetup
+  args:
+    executable: /bin/bash
+    creates: /opt/.encryptedsetup
 
-- name: "Configure /etc/fstab"
-  lineinfile:
-    path: /etc/fstab
-    line: "/dev/mapper/{{ encrypted['device_name'] }}  {{ encrypted['device_mountpoint'] }}  {{ encrypted['device_fs'] }}   _netdev   1 2"

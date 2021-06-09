@@ -1,6 +1,6 @@
 encrypted:
-  device: encrypteddisk
-  device_block: /dev/vdb
+  device: nvme1n1
+  device_block: /dev/nvme1n1
   device_lv: /dev/mapper/encryptedlv
   device_name: encrypteddisk
   device_mountpoint: /mnt/encrypted
