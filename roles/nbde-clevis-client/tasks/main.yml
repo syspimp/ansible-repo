@@ -59,7 +59,7 @@
 - name: format block
   block:
   - name: format the partion
-    shell: mkfs.{{ encrypted['device_fs'] }} /dev/mapper/{{ encrypted['device_name'] }}
+    shell: mkfs.{{ encrypted['device_fs'] }} /dev/mapper/{{ encrypted['device_name'] }} && touch /root/.setup/encrypt3
     args:
       creates: /root/.setup/encrypt3
 
