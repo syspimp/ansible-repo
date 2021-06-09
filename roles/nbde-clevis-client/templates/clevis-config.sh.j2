@@ -1,7 +1,6 @@
 #!/bin/bash
 cfg=$'{"t":{{ groups['tang-servers'] | length }},"pins":{tang:[\n
 {% for host in groups['tang-servers'] %}
- {"url":"http://{{ host }}"},\n
-{% endfor %}'
+ {"url":"http://{{ host }}"},\n{% endfor %}'
 export cfg=$(echo $cfg | sed -e "s/,\n'$/]}}'/g")
 echo $cfg
