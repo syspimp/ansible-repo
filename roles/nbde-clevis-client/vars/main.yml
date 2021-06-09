@@ -5,4 +5,5 @@ encrypted:
   device_name: encrypteddisk
   device_mountpoint: /mnt/encrypted
   device_fs: ext4
+  device_size: "{{ aws_volume2_size | default(10,true) }}"
   passphrase: supersecret
