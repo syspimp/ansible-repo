@@ -218,7 +218,9 @@
       mode: 0644
   
   - name: "Put the role in the MOTD"
-    shell: cat /etc/ansible/facts.d/awsroles.fact >> /etc/motd
+    shell: |
+      cat /etc/ansible/facts.d/awsroles.fact >> /etc/motd
+      cat /etc/ansible/facts.d/awsroles.fact
   when: firstbootcheck.stdout == "false"
 
 - name: entitlement block
