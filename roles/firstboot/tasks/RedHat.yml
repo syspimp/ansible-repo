@@ -219,22 +219,24 @@
   
   when: firstbootcheck.stdout == "false"
 
-- name: "Fall back to RHSM, Check if we are registered"
-  shell: "subscription-manager status || true"
-  register: rhsm_reg
-    
-- name: "Bootstrap check"
-  shell: |
-    if [ -e "/opt/.bootstrap" ]
-    then
-      echo "true"
-    else
-      echo "false"
-    fi
-  register: bootstrapcheck
-
-- name: "Try to register to Satellite 6"
+- name: entitlement block
   block:
+  - name: "Fall back to RHSM, Check if we are registered"
+    shell: "subscription-manager status | grep Current"
+    register: rhsm_reg
+  rescue: 
+  - name: "Bootstrap check"
+    shell: |
+      if [ -e "/opt/.bootstrap" ]
+      then
+        echo "true"
+      else
+        echo "false"
+      fi
+    register: bootstrapcheck
+  
+  - name: "Try to register to Satellite 6"
+    block:
     - name: "Get the bootstrap python script"
       get_url:
         url: "http://{{ sat6_fqdn }}/pub/bootstrap.py"
@@ -269,12 +271,11 @@
         mode: 0444
       when:
       - sat6_fqdn != "None"
-  when:
-  - bootstrapcheck.stdout == "false"
-  - sat6_fqdn != "None"
-
-
-  rescue:
+    when:
+    - bootstrapcheck.stdout == "false"
+    - sat6_fqdn != "None"
+  
+    rescue:
     - name: "Clean up from Sat 6"
       shell: |
         subscription-manager remove --all
@@ -292,7 +293,7 @@
     #    pools: "{{ rh_subscription_pools }}"
       become: true
       register: rhsm_status
-      when: "'Current' not in rhsm_reg.stdout"
+      #when: "'Current' not in rhsm_reg.stdout"
       #when: "'Current' not in rhsm_reg.stdout and ansible_virtualization_role == 'guest' "
       retries: 10
       until: rhsm_status.msg.find("System successfully registered") != -1
@@ -303,7 +304,7 @@
         path: /opt/.bootstrap
         state: touch
         mode: 0444
-  always:
+    always:
     - name: "Disabling all repos"
       shell: "subscription-manager repos --disable={{ item }}"
       with_items: "{{ rh_disabled_repos }}"
