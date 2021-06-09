@@ -75,7 +75,12 @@
     shell: |
       /opt/reg-to-satellite.sh
 
+  - name: dump the saved repos
+    debug:
+      var: oldrepos.stdout
+
   - name: "Re enable yum repos"
+    ignore_errors: yes
     shell: subscription-manager repos --enable {{ item }}
     loop: "{{ oldrepos.stdout | list }}"
 
