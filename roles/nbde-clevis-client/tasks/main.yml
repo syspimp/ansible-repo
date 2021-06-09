@@ -32,7 +32,9 @@
     failed_when: "'unrecognised disk label' not in command_result.stderr"
 
   - name: create the partition
-    shell: parted /dev/{{ encrypted['device'] }}  mklabel msdos mkpart primary {{ encrypted['device_fs'] }} 1M {{ encrypted['device_size'] }}G
+    shell: parted /dev/{{ encrypted['device'] }}  mklabel msdos mkpart primary {{ encrypted['device_fs'] }} 1M {{ encrypted['device_size'] }}G && touch /root/.setup/encrypt1
+    args:
+      creates: /root/.setup/encrypt1
   rescue:
   - name: Fail hard
     fail:
@@ -42,9 +44,13 @@
   block:
   - name: encrypt the partion
     shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksFormat /dev/{{ encrypted['device'] }}p1 --batch-mode -
+    args:
+      creates: /root/.setup/encrypt2
 
   - name: name the encrypted partition
-    shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksOpen /dev/{{ encrypted['device'] }}p1 {{ encrypted['device_name'] }} --batch-mode -
+    shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksOpen /dev/{{ encrypted['device'] }}p1 {{ encrypted['device_name'] }} --batch-mode - && touch /root/.setup/encrypt2
+    args:
+      creates: /root/.setup/encrypt2
   rescue:
   - name: Fail hard
     fail:
@@ -54,15 +60,19 @@
   block:
   - name: format the partion
     shell: mkfs.{{ encrypted['device_fs'] }} /dev/mapper/{{ encrypted['device_name'] }}
+    args:
+      creates: /root/.setup/encrypt3
 
   - name: "make mount point dir"
     file:
-      path: "{{ encrypted['device_mountpont'] }}"
+      path: "{{ encrypted['device_mountpoint'] }}"
       state: directory
       mode: 0755
   
   - name: test mounting the formatted, encrypted partition
-    shell: mount -t {{ encrypted['device_fs'] }} /dev/mapper/{{ encrypted['device_name'] }} {{ encrypted['device_mountpoint'] }}
+    shell: mount -t {{ encrypted['device_fs'] }} /dev/mapper/{{ encrypted['device_name'] }} {{ encrypted['device_mountpoint'] }} && touch /root/.setup/encrypt4
+    args:
+      creates: /root/.setup/encrypt4
 
   - name: "Configure /etc/crypttab"
     lineinfile:
@@ -93,9 +103,13 @@
 - name: "Configure clevis to talk to tang servers"
   shell: |
     source /tmp/clevis-config.sh
-    clevis luks bind -f -k- -d /dev/{{ encrypted['device'] }}p1 sss "$cfg" <<< "{{ encrypted['passphrase'] }}" && \
-    touch /opt/.encryptedsetup
+    echo -n '{{ encrypted['passphrase'] }}' | clevis luks bind -f -k- -d /dev/{{ encrypted['device'] }}p1 sss "$cfg" && \
+    touch /root/.setup/encryptedsetup
+  register: output
   args:
     executable: /bin/bash
-    creates: /opt/.encryptedsetup
+    creates: /root/.setup/encryptedsetup
 
+- name:  "output of last command"
+  debug:
+    var: output
