@@ -7,6 +7,9 @@
   - name: "Make sure we are pointed to the correct satellite server"
     shell:
       subscription-manager config | grep "{{ sat6['lb_fqdn'] }}"
+    when:
+    - ansible_local['awsroles'] is defined
+    - ansible_local['awsroles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy']
 
   rescue:
   - name: "Save the enabled yum repos"
