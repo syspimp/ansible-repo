@@ -27,14 +27,18 @@
 - name: partitioning block
   block:
   - name: check the disk
-    shell: parted -l | grep {{ encrypted['device'] }}
+    shell: |
+      parted -l | grep {{ encrypted['device'] }} 
+      touch /root/.setup/encrypt1
     register: command_result
     failed_when: "'unrecognised disk label' not in command_result.stderr"
-
-  - name: create the partition
-    shell: parted /dev/{{ encrypted['device'] }}  mklabel msdos mkpart primary {{ encrypted['device_fs'] }} 1M {{ encrypted['device_size'] }}G && touch /root/.setup/encrypt1
     args:
       creates: /root/.setup/encrypt1
+
+  - name: create the partition
+    shell: parted /dev/{{ encrypted['device'] }}  mklabel msdos mkpart primary {{ encrypted['device_fs'] }} 1M {{ encrypted['device_size'] }}G && touch /root/.setup/encrypt2
+    args:
+      creates: /root/.setup/encrypt2
   rescue:
   - name: Fail hard
     fail:
@@ -45,12 +49,12 @@
   - name: encrypt the partion
     shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksFormat /dev/{{ encrypted['device'] }}p1 --batch-mode -
     args:
-      creates: /root/.setup/encrypt2
+      creates: /root/.setup/encrypt3
 
   - name: name the encrypted partition
-    shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksOpen /dev/{{ encrypted['device'] }}p1 {{ encrypted['device_name'] }} --batch-mode - && touch /root/.setup/encrypt2
+    shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksOpen /dev/{{ encrypted['device'] }}p1 {{ encrypted['device_name'] }} --batch-mode - && touch /root/.setup/encrypt3
     args:
-      creates: /root/.setup/encrypt2
+      creates: /root/.setup/encrypt3
   rescue:
   - name: Fail hard
     fail:
@@ -59,9 +63,9 @@
 - name: format block
   block:
   - name: format the partion
-    shell: mkfs.{{ encrypted['device_fs'] }} /dev/mapper/{{ encrypted['device_name'] }} && touch /root/.setup/encrypt3
+    shell: mkfs.{{ encrypted['device_fs'] }} /dev/mapper/{{ encrypted['device_name'] }} && touch /root/.setup/encrypt4
     args:
-      creates: /root/.setup/encrypt3
+      creates: /root/.setup/encrypt4
 
   - name: "make mount point dir"
     file:
@@ -70,9 +74,9 @@
       mode: 0755
   
   - name: test mounting the formatted, encrypted partition
-    shell: mount -t {{ encrypted['device_fs'] }} /dev/mapper/{{ encrypted['device_name'] }} {{ encrypted['device_mountpoint'] }} && touch /root/.setup/encrypt4
+    shell: mount -t {{ encrypted['device_fs'] }} /dev/mapper/{{ encrypted['device_name'] }} {{ encrypted['device_mountpoint'] }} && touch /root/.setup/encrypt5
     args:
-      creates: /root/.setup/encrypt4
+      creates: /root/.setup/encrypt5
 
   - name: "Configure /etc/crypttab"
     lineinfile:
