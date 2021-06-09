@@ -23,7 +23,7 @@
 
 - name: "Configure clevis to talk to tang servers"
   shell: |
-    /tmp/clevis-config.sh
+    source /tmp/clevis-config.sh
     clevis luks bind -f -k- -d {{ encrypted['device'] }} sss "$cfg" <<< "{{ encrypted['passphrase'] }}" && \
     touch /opt/.encryptedsetup
   args:
