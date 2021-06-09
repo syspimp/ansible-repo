@@ -5,3 +5,4 @@ encrypted:
   device_name: encrypteddisk
   device_mountpoint: /mnt/encrypted
   device_fs: ext4
+  passphrase: supersecret
