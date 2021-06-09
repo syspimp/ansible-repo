@@ -18,9 +18,16 @@
         state: directory
         mode: 0755
 
+    - name: "Enable cockpit repos"
+      shell: |
+        subscription-manager repos --enable rhel-7-server-rpms \
+                           --enable rhel-7-server-optional-rpms\
+                           --enable rhel-7-server-extras-rpms
+      become: true
+
     - name: "[Cockpit] Installing rpms"
       yum:
-        name: "cockpit"
+        name: ["cockpit","cockpit-dashboard"]
         state: latest
       become: true
 
