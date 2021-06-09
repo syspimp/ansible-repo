@@ -74,5 +74,5 @@
 
   - name: "Re enable yum repos"
     shell: subscription-manager repos --enable {{ item }}
-    loop: oldrepos.stdout | list
+    loop: "{{ oldrepos.stdout | list }}"
 
