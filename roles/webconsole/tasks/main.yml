@@ -29,7 +29,7 @@
       become: true
 
     - name: "[Cockpit] Fix firewall, if installed"
-      ignore_errors:
+      ignore_errors: yes
       shell:  |
         firewall-cmd --add-service=cockpit --permanent
         firewall-cmd --reload

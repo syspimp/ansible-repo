@@ -109,6 +109,7 @@
         --foreman-proxy-tftp true \
         --disable-system-checks \
         --enable-foreman-plugin-remote-execution-cockpit \
+        --enable-foreman-plugin-templates \
         --enable-foreman-plugin-discovery && touch /root/.setup/fusor.success
       become: true
       args:
