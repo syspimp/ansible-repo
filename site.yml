@@ -23,7 +23,7 @@
     - satellite-server
 
 - name: Configure Satellite Capsules
-  hosts: capsule*
+  hosts: capsules*
   roles:
     - satellite-capsule
     - satellite-oscap
