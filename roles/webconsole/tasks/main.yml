@@ -40,4 +40,7 @@
         path: /root/.setup/cockpit-rpms
         state: touch
         mode: 0440
-  when: initialsetup.stdout == "false"
+  when:
+  - initialsetup.stdout == "false"
+  - ansible_local['awsroles'] is defined
+  - ansible_local['awsroles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy']
