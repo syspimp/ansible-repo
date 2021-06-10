@@ -334,7 +334,7 @@
         rpm -qa | grep epel || rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
         yum-config-manager --disable epel
         yum -y install --enablerepo=epel python2-pip
-        pip install pexpect
+        pip install --upgrade pexpect
       become: true
       ignore_errors: yes
       args:

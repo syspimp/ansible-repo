@@ -1,0 +1,206 @@
+---
+    1  w
+    2  ps ax
+    3  dmesg
+    4  w
+    5  ps ax
+    6  mkdir /openshift
+    7  cat /etc/exports
+    8  ps ax
+    9  vi /etc/exports
+   10  rpm -qa|grep nfs
+   11  systemctl enable nfs-server
+   12  systemctl enable rpcbind
+   13  systemctl enable nfs-lock
+   14  systemctl enable nfs-idmap
+   15  systemctl start rpcbind
+   16  systemctl start nfs-serve
+   17  systemctl start nfs-server
+   18  systemctl start nfs-lock
+   19  systemctl start nfs-idmap
+   20  systemctl status nfs
+   21  exports
+   22  exportfs
+   23  ip a
+   24  chmod 777 /openshift
+   25  ls /openshift/
+   26  yum install policycoreutils-python-utils policycoreutils-python
+   27  export FIREWALLD_DEFAULT_ZONE=`firewall-cmd --get-default-zone`
+   28  echo ${FIREWALLD_DEFAULT_ZONE}
+   29  getenforce
+   30  setsebool -P nfs_export_all_rw 1
+   31  setsebool -P nfs_export_all_ro 1
+   32  semanage fcontext -a -t public_content_rw_t  "/openshift(/.*)?"
+   33  restorecon -R /openshift/
+   34  tail /var/log/messages
+   35  vi /var/log/messages
+   36  vi /etc/exports
+   37  exportfs -r
+   38  tail /var/log/messages 
+   39  tail /var/log/messages -f
+   40  cd /openshift/
+   41  ls
+   42  ls -lhtrZ
+   43  ls /openshift/
+   44  ls /openshift/zenoss-monitoring-zenoss4-nginx-claim0-pvc-bcdc5478-9e98-4f95-9133-4274c8c05463/
+   45  cd /openshift/
+   46  ls
+   47  rm -rf *
+   48  ls
+   49  cd /op
+   50  cd /openshift/
+   51  ls
+   52  cd zenoss-test-zenoss4-mariadb-claim0-pvc-4bf30c13-8321-49f8-bb5a-522c49b7cb1f/
+   53  ls
+   54  cd ../zenoss-test-zenoss4-mariadb-claim1-pvc-af4e8fcc-0c36-4df2-a9a1-b9b1592d9748/
+   55  ls
+   56  cd ../zenoss-test-zenoss4-mariadb-claim2-pvc-5fdea75d-ef79-4eb8-9905-6a86ba8b561e/
+   57  ls
+   58  yum install net-snmp net-snmp-devel
+   59  mv /etc/snmp/snmpd.conf /etc/snmp/snmpd.conf.default 
+   60  vi /etc/snmp/snmp
+   61  vi /etc/snmp/snmpd.conf.default 
+   62  vi /etc/snmp/snmpd.conf
+   63  systemctl restart snmpd
+   64  systemctl enablesnmpd
+   65  systemctl enable snmpd
+   66  cat /etc/snmp/snmpd.conf
+   67  cd /openshift/
+   68  ls
+   69  ls -ltrhs
+   70  vi zenoss-test-zenoss4-nginx-claim0-pvc-eb7aecc7-becb-425f-ad0b-c7a6dc42edeb/default.conf 
+   71  vi zenoss-test-zenoss4-nginx-claim0-pvc-d78f639f-4687-4496-8544-2bc270e1b0da/default.conf 
+   72  cat /etc/snmp/snmpd.conf
+   73  cat .ssh/authorized_keys 
+   74  cd /openshift/
+   75  ls
+   76  ls zenoss-monitoring-zenoss4-mariadb-claim0-pvc-d439ce15-14d8-442b-903f-c75300d80a98/
+   77  ls -lhrt
+   78  rm -rf *
+   79  ls
+   80  vi /etc/rsyslog.conf 
+   81  systemctl restart rsyslogd
+   82  systemctl restart rsyslog
+   83  echo booyah| logger -p debug
+   84  tail /var/log/messages
+   85  echo booyah| logger -p debug
+   86  echo booyah| logger -p debug --server 10.0.130.203 -P 30514
+   87  echo booyah| logger -p emerg --server 10.0.130.203 -P 30514
+   88  echo booyah| logger -p emerg --server 10.0.130.203 -P 30514 -d
+   89  systemctl restart rsyslog
+   90  echo booyah| logger -p emerg --server 10.0.135.65 -P 30514 -d
+   91  vi /etc/rsyslog.conf 
+   92  grep 10\.0 /etc/rsyslog.
+   93  grep 10\.0 /etc/rsyslog.conf 
+   94  ssh core@10.0.189.85
+   95  echo booyah| logger -p emerg --server 10.0.135.65 -P 30514 -d
+   96  echo booyah| logger -p emerg --server 10.0.189.85 -P 30514 -d
+   97  systemctl restart rsyslog
+   98  df -h
+   99  ls
+  100  cd /openshift/
+  101  ls
+  102  ls -lhtr
+  103  ls -htrZ monitoring-zenoss4-rabbitmq-claim0-pvc-43d1adbd-24cd-433c-a989-ea8a2915ca1c/
+  104  ls -lhtr
+  105  ls -lhtr monitoring-zenoss4-mariadb-claim1-pvc-0f022d46-3bdd-4554-84cc-62ba41abed8f/
+  106  chmod +x ./monitoring-zenoss4-mariadb-claim1-pvc-0f022d46-3bdd-4554-84cc-62ba41abed8f
+  107  ls -lhtr monitoring-zenoss4-mariadb-claim1-pvc-0f022d46-3bdd-4554-84cc-62ba41abed8f/
+  108  ls -lhtr
+  109  chmod 0777 ./monitoring-zenoss4-mariadb-claim1-pvc-0f022d46-3bdd-4554-84cc-62ba41abed8f
+  110  ls -lhtr
+  111  chmod 0777 ./monitoring-zenoss4-mariadb-claim0-pvc-86c5787a-85d2-46ee-8fcb-8585d070b181/
+  112  chmod 0777 ./monitoring-zenoss4-mariadb-claim2-pvc-6afbf24a-8d2f-42cd-99f5-6064d5ae3bbc
+  113  ls -lhtr
+  114  chmod 0777 ./monitoring-zenoss4-nginx-claim0-pvc-de0ccff8-e705-4e53-a0bf-2c0c60966759
+  115  chown -R nfsnobody.nfsnobody ./monitoring-zenoss4-mariadb-claim1-pvc-0f022d46-3bdd-4554-84cc-62ba41abed8f
+  116  chown -R nfsnobody.nfsnobody ./monitoring-zenoss4-mariadb-claim0-pvc-86c5787a-85d2-46ee-8fcb-8585d070b181/
+  117  chown -R nfsnobody.nfsnobody ./monitoring-zenoss4-mariadb-claim0-pvc-86c5787a-85d2-46ee-8fcb-8585d070b181
+  118  chown -R nfsnobody.nfsnobody ./monitoring-zenoss4-mariadb-claim2-pvc-6afbf24a-8d2f-42cd-99f5-6064d5ae3bbc
+  119  chown -R nfsnobody.nfsnobody ./monitoring-zenoss4-nginx-claim0-pvc-de0ccff8-e705-4e53-a0bf-2c0c60966759
+  120  systemctl nfs status
+  121  systemctl status nfs-server
+  122  systemctl status firewalld
+  123  systemctl status firewall
+  124  nfsstat 
+  125  history|grep start
+  126  history|grep enable
+  127  systemctl restart nfs-server
+  128  nfsstat 
+  129  nfsstat -v
+  130  ps ax
+  131  tail /var/log/messages
+  132  tail /var/log/secure
+  133  tail /var/log/messages
+  134  vi /var/log/messages
+  135  vi /var/log/secure
+  136  ls
+  137  netstat -antp
+  138  ip a
+  139  cd /openshift/
+  140  ls
+  141  ls -lhtr
+  142  exit
+  143  vi /etc/rsyslog.conf 
+  144  host ip-10-0-153-227.ec2.internal
+  145  systemctl restart rsyslog
+  146  vi /etc/rsyslog.conf 
+  147  systemctl restart rsyslog
+  148  vi /etc/rsyslog.conf 
+  149  systemctl restart rsyslog
+  150  vi /etc/rsyslog.conf 
+  151  vi /etc/rsyslog.d/listen.conf 
+  152  vi /etc/rsyslog.d/21-cloudinit.conf 
+  153  vi /etc/rsyslog.conf 
+  154  systemctl restart rsyslog
+  155  echo 'omg fault' | logger -p crit
+  156  vi /etc/rsyslog.conf 
+  157  systemctl restart rsyslog
+  158  echo 'omg fault' | logger -p crit
+  159  echo 'omg fault' | logger
+  160  vi /etc/rsyslog.conf 
+  161  systemctl restart rsyslog
+  162  ls /openshift/
+  163  ls /openshift/*
+  164  ls -lh /openshift/*
+  165  ls -lh /openshift
+  166  systemctl restart rsyslog
+  167  echo 'omg fault' | logger -p crit
+  168  vi /etc/rsyslog.conf 
+  169  ssh 10.0.153.227
+  170  ss 10.0.153.227
+  171  ss -4 10.0.153.227
+  172  tracepath 10.0.153.227
+  173  ssh 10.0.153.227
+  174  man logger
+  175  cat /etc/snmp/snmpd.conf
+  176  history|less
+  177  ls /openshift/
+  178  rm -rf /openshift/*
+  179  ls /openshift/
+  180  subscription-manager config
+  181  subscription-manager status
+  182  curl -k --data "host_config_key=reconfig" https://11.22.33.77:443/api/v2/job_templates/44/callback/
+  183  history
+  184  cat /etc/exports
+  185  top -c
+  186  ls /etc/insights-client/
+  187  yum install insights-client
+  188  yum info insights-client
+  189  ls /etc/insights-client/
+  190  ls -a /etc/insights-client/
+  191  insights-client --register
+  192  ls -a /etc/insights-client/
+  193  which insights-client
+  194  cat .ssh/authorized_keys 
+  195  vi /sbin/ifup-local 
+  196  /sbin/ifup-local 
+  197  vi /sbin/ifup-local 
+  198  ssh root@3.236.100.90
+  199  cd /opt
+  200  ls
+  201  history
+  rsyslog.conf:
+  # remote host is: name/ip:port, e.g. 192.168.0.1:514, port optional
+  *.* @10.0.153.227:514
+
