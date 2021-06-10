@@ -49,6 +49,10 @@
           path: /root/.setup/cockpit-rpms
           state: touch
           mode: 0440
+      rescue:
+      - name:
+        debug:
+          msg: "Welp, that didn't work"
   when:
   - initialsetup.stdout == "false"
   - ansible_local['awsroles'] is defined
