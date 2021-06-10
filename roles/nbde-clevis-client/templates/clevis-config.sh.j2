@@ -1,4 +1,6 @@
 #!/bin/bash
-cfg=$'{"t":{{ groups['tang-servers'] | length }},"pins":{"tang":[{% for host in groups['tang-servers'] %}{"url":"http://{{ host }}"},{% endfor %}'
+# this line requires all of the tang servers to be available, the next requires only 1
+#cfg=$'{"t":{{ groups['tang-servers'] | length }},"pins":{"tang":[{% for host in groups['tang-servers'] %}{"url":"http://{{ host }}"},{% endfor %}'
+cfg=$'{"t":1,"pins":{"tang":[{% for host in groups['tang-servers'] %}{"url":"http://{{ host }}"},{% endfor %}'
 export cfg=$(echo $cfg | sed -e "s/},$/}]}}/g")
 echo $cfg
