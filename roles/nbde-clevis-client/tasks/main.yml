@@ -141,7 +141,7 @@
 
 - name: "Configure clevis to talk to tang servers"
   ansible.builtin.expect:
-    command: /bin/bash -c "source /tmp/clevis-config.sh clevis luks bind -f -d /dev/nvme1n1p1 sss $cfg && touch /root/.setup/encryptedsetup"
+    command: /bin/bash -c /tmp/clevis-config.sh
     creates: /root/.setup/encryptedsetup
     responses:
       (?i)trust: "y"
