@@ -140,14 +140,24 @@
     state: started
 
 - name: "Configure clevis to talk to tang servers"
-  shell: |
-    source /tmp/clevis-config.sh
-    echo -n '{{ encrypted['passphrase'] }}' | clevis luks bind -f -k- -d /dev/{{ encrypted['device'] }}p1 sss "$cfg" && \
-    touch /root/.setup/encryptedsetup
-  register: output
-  args:
-    executable: /bin/bash
+  ansible.builtin.expect:
+    command: /bin/bash -c source /tmp/clevis-config.sh clevis luks bind -f -d /dev/nvme1n1p1 sss "$cfg" && touch /root/.setup/encryptedsetup
     creates: /root/.setup/encryptedsetup
+    responses:
+      (?i)trust: "y"
+      (?i)password: "{{ encrypted['passphrase'] }}"
+  no_log: true
+  register: output
+
+#- name: "Configure clevis to talk to tang servers"
+#  shell: |
+#    source /tmp/clevis-config.sh
+#    echo -n '{{ encrypted['passphrase'] }}' | clevis luks bind -f -k- -d /dev/{{ encrypted['device'] }}p1 sss "$cfg" && \
+#    touch /root/.setup/encryptedsetup
+#  register: output
+#  args:
+#    executable: /bin/bash
+#    creates: /root/.setup/encryptedsetup
 
 - name:  "output of last command"
   debug:
