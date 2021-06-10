@@ -226,11 +226,31 @@
     - name: "Import the ansible roles into Satellite"
       shell: |
         hammer ansible roles import --location-id {{ locid.stdout }} --organization-id 1 --proxy-id {{ proxyid.stdout }}
+      args:
+        creates: /root/.setup/oscap-ansible
       delegate_to: "{{ sat6_server }}"
       become: yes
 
     - name: "Import the ansible variables into Satellite"
       shell: |
         hammer ansible variables import --location-id {{ locid.stdout }} --organization-id 1 --proxy-id {{ proxyid.stdout }}
+      args:
+        creates: /root/.setup/oscap-ansible
       delegate_to: "{{ sat6_server }}"
       become: yes
+
+    - name: "Assign foreman_scap role to Hostgroups for reports"
+      shell: |
+        hammer hostgroup ansible-roles assign --ansible-role-ids=1 --id=1
+      args:
+        creates: /root/.setup/oscap-ansible
+      delegate_to: "{{ sat6_server }}"
+      become: yes
+      
+    - name: "ansible complete"
+      file:
+        path: /root/.setup/oscap-ansible
+        state: touch
+        mode: 0444
+      become: yes
+      delegate_to: "{{ sat6_server }}"

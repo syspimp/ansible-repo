@@ -89,3 +89,12 @@
       curl -k https://{{ sat6['lb_fqdn'] }}:9090/ssh/pubkey >> /root/.ssh/authorized_keys
       chmod 600 /root/.ssh/authorized_keys
     become: yes
+
+  - name: "Apply ansible roles defined in Satellite for oscap scanning"
+    shell: |
+      hammer hostgroup ansible-roles play --id 1
+    args:
+      creates: /root/.setup/oscap-ansible
+    delegate_to: "{{ sat6_server }}"
+    become: yes
+      
