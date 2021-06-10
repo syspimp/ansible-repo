@@ -146,7 +146,7 @@
     responses:
       (?i)trust: "y"
       (?i)password: "{{ encrypted['passphrase'] }}"
-  no_log: true
+  #no_log: true
   register: output
 
 #- name: "Configure clevis to talk to tang servers"
