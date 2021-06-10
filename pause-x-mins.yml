@@ -1,7 +1,10 @@
 - hosts: all
   gather_facts: no
   vars:
+   msg: "..."
    x: 45
   tasks:
+  - debug:
+      msg: "Please wait {{ x }} mins: {{ msg }}"
   - pause:
       minutes: "{{ x }}"
