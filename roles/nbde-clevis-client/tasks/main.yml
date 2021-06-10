@@ -29,11 +29,10 @@
   - name: check the disk
     shell: |
       parted -l | grep {{ encrypted['device'] }} 
-      touch /root/.setup/encrypt1
     register: command_result
-    #failed_when: "'unrecognised disk label' not in command_result.stderr"
+    failed_when: "'unrecognised disk label' not in command_result.stderr"
     args:
-      creates: /root/.setup/encrypt1
+      creates: /root/.setup/encrypt2
 
   - name: create the partition
     shell: parted /dev/{{ encrypted['device'] }}  mklabel msdos mkpart primary {{ encrypted['device_fs'] }} 1M {{ encrypted['device_size'] }}G && touch /root/.setup/encrypt2
