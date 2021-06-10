@@ -281,6 +281,7 @@
       shell:
         hammer capsule content add-lifecycle-environment --id {{ capsulelist.stdout | trim }} --organization {{ sat6['org'] }} --lifecycle-environment {{ item }}
       become: true
+      ignore_errors: yes
       delegate_to: "{{ sat6_server }}"
       loop:
       - "production"
