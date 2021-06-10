@@ -329,6 +329,17 @@
         state: latest
       become: true
 
+    - name: "Adding python2, pip and python expect"
+      shell: |
+        rpm -qa | grep epel || rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        yum-config-manager --disable epel
+        yum -y install --enablerepo=epel python2-pip
+        pip install pexpect
+      become: true
+      ignore_errors: yes
+      args:
+        creates: /opt/.firstboot
+
     - name: "Update dns entry"
       shell: "/sbin/ifup-local || true"
       become: true
