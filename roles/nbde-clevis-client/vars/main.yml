@@ -1,9 +1,8 @@
 encrypted:
   device: nvme1n1
   device_block: /dev/nvme1n1
-  device_lv: /dev/mapper/encryptedlv
   device_name: encrypteddisk
   device_mountpoint: /mnt/encrypted
-  device_fs: ext4
+  device_fs: xfs
   device_size: "{{ aws_volume2_size | default(10,true) }}"
   passphrase: supersecret

@@ -1,4 +1,4 @@
 #!/bin/bash
-cfg=$'{"t":{{ groups['tang-servers'] | length }},"pins":{tang:[{% for host in groups['tang-servers'] %}{"url":"http://{{ host }}"},{% endfor %}'
+cfg=$'{"t":{{ groups['tang-servers'] | length }},"pins":{"tang":[{% for host in groups['tang-servers'] %}{"url":"http://{{ host }}"},{% endfor %}'
 export cfg=$(echo $cfg | sed -e "s/},$/}]}}/g")
 echo $cfg
