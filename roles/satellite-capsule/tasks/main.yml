@@ -59,11 +59,6 @@
                            --enable=rhel-7-server-ansible-2.9-rpms 
       become: true
     
-    - name: "Clean out old yum metadata"
-      shell: |
-        yum clean all
-      become: true
-    
     - name: "Installing satellite-capsule rpms"
       yum:
         name: ['satellite-capsule','katello-agent']

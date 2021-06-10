@@ -65,11 +65,6 @@
                            --enable=rhel-7-server-ansible-2.9-rpms 
       become: true
     
-    - name: "Clean out old yum metadata"
-      shell: |
-        yum clean all
-      become: true
-    
     - name: "Turn on notify_only=0 in search-disabled-repos.conf"
       lineinfile:
         path: /etc/yum/pluginconf.d/search-disabled-repos.conf
