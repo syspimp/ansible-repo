@@ -79,7 +79,7 @@
     
     - name: "Installing satellite rpms"
       yum:
-        name: "satellite"
+        name: "{{ item }}"
         state: latest
       become: true
       loop:

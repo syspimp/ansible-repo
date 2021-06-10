@@ -1,0 +1,6 @@
+snmpd:
+  sysname: "{{ inventory_hostname }}"
+  sysdescr: "{{ ansible_local['awsroles']['role'] }}"
+  syscontact: "Powered by Ansible"
+  syslocation: "Somewhere ..."
+  rocommunity: "AWS_RTO"

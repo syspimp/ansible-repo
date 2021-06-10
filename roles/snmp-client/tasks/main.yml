@@ -1,0 +1,21 @@
+---
+- name: "Installing snmp related rpms"
+  yum:
+    name: "{{ item }}"
+    state: latest
+  become: true
+  loop:
+  - net-snmp
+  - net-snmp-devel
+
+- name: "Update /etc/snmp/snmpd.conf"
+  template:
+    content: snmpd.conf.j2
+    dest: /etc/snmp/snmpd.conf
+    mode: '0644'
+
+- name: "Enable and start snmpd service"
+  service:
+    name: snmpd
+    state: running
+    enabled: yes
