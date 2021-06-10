@@ -27,7 +27,8 @@
 
     - name: "[Cockpit] Installing rpms"
       yum:
-        name: ["cockpit","cockpit-dashboard"]
+        #name: ["cockpit","cockpit-dashboard"]
+        name: ["cockpit"]
         state: latest
       become: true
 
