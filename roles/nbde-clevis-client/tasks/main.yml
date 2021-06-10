@@ -30,7 +30,7 @@
     shell: |
       parted -l | grep {{ encrypted['device'] }} 
     register: command_result
-    failed_when: "'unrecognised disk label' not in command_result.stderr"
+    #failed_when: "'unrecognised disk label' not in command_result.stderr"
     args:
       creates: /root/.setup/encrypt2
 
