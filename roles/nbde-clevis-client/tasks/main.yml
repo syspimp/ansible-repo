@@ -91,6 +91,42 @@
     fail:
       msg:  "Could not make or mount filesystem"
 
+- name: "Find Group Inventory for 'tang-servers'"
+  uri:
+    url: "https://{{ tower_server }}/api/v2/groups/?search=tang-servers"
+    validate_certs: no
+    method: GET
+    user: "{{ tower_user }}"
+    password: "{{ tower_pass }}"
+    force_basic_auth: yes
+    status_code: [200,202,204]
+    body_format: json
+  register: groupidcheck
+
+- name: "Set the host_id fact"
+  set_fact:
+    tanggroup_host_id: "{{ groupidcheck.json.results[0].id }}"
+  
+- name: "Find the name of the tang servers"
+  uri:
+    url: "https://{{ tower_server }}/api/v2/groups/{{ tanggroup_host_id }}/hosts"
+    validate_certs: no
+    method: GET
+    user: "{{ tower_user }}"
+    password: "{{ tower_pass }}"
+    force_basic_auth: yes
+    status_code: [200,202,204]
+    body_format: json
+  register: hostidcheck
+  
+- name: "Set the host_id fact for non sat servers"
+  set_fact:
+    tang_servers: "{{ hostidcheck.json.results }}"
+
+- name: "Debug"
+  debug:
+    var: tang_servers
+
 - name: "Set the clevis config template file"
   template:
     src: clevis-config.sh.j2
