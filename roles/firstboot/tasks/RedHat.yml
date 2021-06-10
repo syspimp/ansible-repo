@@ -323,12 +323,6 @@
       args:
         creates: /opt/.firstboot
     
-    - name: "Perform a yum clean all"
-      shell:  yum clean all
-      become: true
-      args:
-        creates: /opt/.firstboot
-
     - name: "Installing base config rpms"
       yum:
         name: "{{ redhat_packages }}"
@@ -349,6 +343,12 @@
       become: true
       args:
         executable: /bin/bash
+        creates: /opt/.firstboot
+
+    - name: "Perform a yum clean all"
+      shell:  yum clean all
+      become: true
+      args:
         creates: /opt/.firstboot
 
     - name: "first boot complete"
