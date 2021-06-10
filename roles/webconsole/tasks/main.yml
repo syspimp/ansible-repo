@@ -24,30 +24,31 @@
                            --enable rhel-7-server-optional-rpms\
                            --enable rhel-7-server-extras-rpms
       become: true
-
-    - name: "[Cockpit] Installing rpms"
-      yum:
-        #name: ["cockpit","cockpit-dashboard"]
-        name: ["cockpit"]
-        state: latest
-      become: true
-
-    - name: "[Cockpit] Activate!"
-      shell:  systemctl enable --now cockpit.socket
-      become: true
-
-    - name: "[Cockpit] Fix firewall, if installed"
-      ignore_errors: yes
-      shell:  |
-        firewall-cmd --add-service=cockpit --permanent
-        firewall-cmd --reload
-      become: true
-
-    - name: "[Cockpit] update tracking dir"
-      file:
-        path: /root/.setup/cockpit-rpms
-        state: touch
-        mode: 0440
+    - name: wrapper for satellite failures
+      block:
+      - name: "[Cockpit] Installing rpms"
+        yum:
+          #name: ["cockpit","cockpit-dashboard"]
+          name: ["cockpit"]
+          state: latest
+        become: true
+  
+      - name: "[Cockpit] Activate!"
+        shell:  systemctl enable --now cockpit.socket
+        become: true
+  
+      - name: "[Cockpit] Fix firewall, if installed"
+        ignore_errors: yes
+        shell:  |
+          firewall-cmd --add-service=cockpit --permanent
+          firewall-cmd --reload
+        become: true
+  
+      - name: "[Cockpit] update tracking dir"
+        file:
+          path: /root/.setup/cockpit-rpms
+          state: touch
+          mode: 0440
   when:
   - initialsetup.stdout == "false"
   - ansible_local['awsroles'] is defined
