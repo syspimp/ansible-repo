@@ -17,11 +17,6 @@
     yum -y install python2-pip python-dev
   become: true
 
-- name: "Install pexpect for expect module"
-  shell: |
-   pip install pexpect
-  become: true
-
 - name: "Grab tower tarball"
   unarchive:
     src: "{{ tower_tarball_location }}"
