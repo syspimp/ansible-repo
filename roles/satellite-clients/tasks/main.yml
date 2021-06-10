@@ -82,7 +82,7 @@
   - name: "Re enable yum repos"
     ignore_errors: yes
     shell: subscription-manager repos --enable {{ item }}
-    loop: "{{ oldrepos.stdout | list }}"
+    loop: "{{ oldrepos.stdout.split('\n') }}"
 
   - name: "Save the satellite key for remote execution"
     shell: |
