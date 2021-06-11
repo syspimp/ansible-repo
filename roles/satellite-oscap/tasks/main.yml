@@ -233,7 +233,7 @@
 
     - name: "Import the ansible variables into Satellite"
       shell: |
-        hammer ansible variables import --location-id {{ locid.stdout }} --organization-id 1 --proxy-id {{ proxyid.stdout }} && touch root/.setup/oscap-ansible1
+        hammer ansible variables import --location-id {{ locid.stdout }} --organization-id 1 --proxy-id {{ proxyid.stdout }} && touch /root/.setup/oscap-ansible1
       args:
         creates: /root/.setup/oscap-ansible1
       delegate_to: "{{ sat6_server }}"
