@@ -7,4 +7,4 @@
     register: hammertasks
     retries: 120
     delay: 60
-    until: hammertasks.stdout.find("running") != 0
+    until: hammertasks.stdout.find("running") == -1
