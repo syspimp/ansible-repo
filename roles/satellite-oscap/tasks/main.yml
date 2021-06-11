@@ -239,18 +239,57 @@
       delegate_to: "{{ sat6_server }}"
       become: yes
 
+    - name: "Find the Hostgroups"
+      shell: |
+        hammer --output csv hostgroup list | grep -v "Id,"| cut -f1 -d,
+      register: hostgroupids
+      args:
+        creates: /root/.setup/oscap-ansible4
+      delegate_to: "{{ sat6_server }}"
+      become: yes
+
     - name: "Assign foreman_scap role to Hostgroups for reports"
       shell: |
-        hammer hostgroup ansible-roles assign --ansible-role-ids=1 --id=1 && touch root/.setup/oscap-ansible2
+        hammer hostgroup ansible-roles assign --ansible-role-ids=1 --id={{ item }}
+      loop: "{{ hostgroupids.stdout.split() }}"
       args:
         creates: /root/.setup/oscap-ansible2
       delegate_to: "{{ sat6_server }}"
       become: yes
       
+    - name: "Ansible step complete"
+      shell: touch /root/.setup/oscap-ansible2
+      args:
+        creates: /root/.setup/oscap-ansible2
+      delegate_to: "{{ sat6_server }}"
+
     - name: "Create Oscap RHEL7 DSS Policy"
       shell: |
-        hammer policy create --hostgroup-ids 1 --location-id 2 --organization-id 1 --period weekly --weekday friday --scap-content-id 4 --scap-content-profile-id 33 --deploy-by ansible --name "SCAP RHEL7 DSS Policy" && touch root/.setup/oscap-ansible3
+        hammer policy create --hostgroup-ids {{ item }} --location-id 2 --organization-id 1 --period weekly --weekday friday --scap-content-id 4 --scap-content-profile-id 33 --deploy-by ansible --name "SCAP RHEL7 DSS Policy"
+      loop: "{{ hostgroupids.stdout.split() }}"
       args:
         creates: /root/.setup/oscap-ansible3
       delegate_to: "{{ sat6_server }}"
       become: yes
+
+    - name: "Ansible step complete"
+      shell: touch /root/.setup/oscap-ansible3
+      args:
+        creates: /root/.setup/oscap-ansible3
+      delegate_to: "{{ sat6_server }}"
+
+    - name: "Add Oscap capsule to Hostgroups"
+      shell: |
+        hammer hostgroup update --id {{ item }} --openscap-proxy-id 1
+      loop: "{{ hostgroupids.stdout.split() }}"
+      args:
+        creates: /root/.setup/oscap-ansible4
+      delegate_to: "{{ sat6_server }}"
+      become: yes
+
+    - name: "Ansible step complete"
+      shell: touch /root/.setup/oscap-ansible4
+      args:
+        creates: /root/.setup/oscap-ansible4
+      delegate_to: "{{ sat6_server }}"
+
