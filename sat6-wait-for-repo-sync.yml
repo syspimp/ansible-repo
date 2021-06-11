@@ -1,6 +1,7 @@
 ---
 - name: wait for repo sync to complete
   hosts: satellite-server
+  gather_facts: no
   tasks:
   - name: Loop over hammer task command until no running sync tasks
     shell: hammer task list | grep "ynchronize repository"
