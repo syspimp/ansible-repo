@@ -10,9 +10,13 @@
 
 - name: "Update /etc/snmp/snmpd.conf"
   template:
-    content: snmpd.conf.j2
+    src: snmpd.conf.j2
     dest: /etc/snmp/snmpd.conf
     mode: '0644'
+
+- name: "Restore selinux context on  /etc/snmp/snmpd.conf"
+  shell: restorecon /etc/snmp/snmpd.conf
+  become: yes
 
 - name: "Enable and start snmpd service"
   service:
