@@ -149,16 +149,6 @@
   #no_log: true
   register: output
 
-#- name: "Configure clevis to talk to tang servers"
-#  shell: |
-#    source /tmp/clevis-config.sh
-#    echo -n '{{ encrypted['passphrase'] }}' | clevis luks bind -f -k- -d /dev/{{ encrypted['device'] }}p1 sss "$cfg" && \
-#    touch /root/.setup/encryptedsetup
-#  register: output
-#  args:
-#    executable: /bin/bash
-#    creates: /root/.setup/encryptedsetup
-
 - name:  "output of last command"
   debug:
     var: output

@@ -1,5 +1,5 @@
 #!/bin/bash
-# this line requires all of the tang servers to be available, the next requires only 1
+# this line requires 1 of the tang servers to be available
 cfg=$'{"t":1,"pins":{"tang":[{% for host in tang_servers %}{"url":"http://{{ host.name }}"},{% endfor %}'
 export cfg=$(echo $cfg | sed -e "s/},$/}]}}/g")
 echo "cmd: clevis luks bind -f -d /dev/nvme1n1p1 sss $cfg"
