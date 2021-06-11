@@ -225,7 +225,7 @@
 
     - name: "Import the ansible roles into Satellite"
       shell: |
-        hammer ansible roles import --location-id {{ locid.stdout }} --organization-id 1 --proxy-id {{ proxyid.stdout }} && touch root/.setup/oscap-ansible
+        hammer ansible roles import --location-id {{ locid.stdout }} --organization-id 1 --proxy-id {{ proxyid.stdout }} && touch /root/.setup/oscap-ansible
       args:
         creates: /root/.setup/oscap-ansible
       delegate_to: "{{ sat6_server }}"
