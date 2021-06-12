@@ -1,0 +1,13 @@
+---
+- name: wait for repo sync to complete
+  hosts: satellite-server
+  gather_facts: no
+  vars:
+    task: ynchronize repository 
+  tasks:
+  - name: Loop over hammer task command until no running sync tasks
+    shell: hammer task list | grep "{{ task }"
+    register: hammertasks
+    retries: 120
+    delay: 60
+    until: hammertasks.stdout.find("running") == -1
