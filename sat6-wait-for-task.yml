@@ -3,11 +3,13 @@
   hosts: satellite-server
   gather_facts: no
   vars:
-    task: ynchronize repository 
+    task: Synchronize repository 
+    attempts: 120
+    delay: 60
   tasks:
   - name: Loop over hammer task command until no running sync tasks
     shell: hammer task list | grep "{{ task }"
     register: hammertasks
-    retries: 120
-    delay: 60
+    retries: "{{ attempts }}"
+    delay: "{{ delay }}"
     until: hammertasks.stdout.find("running") == -1
