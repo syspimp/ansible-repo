@@ -99,6 +99,6 @@
       
   - name: "Start openscap scan from Satellite for host"
     shell: |
-      hammer job-invocation create --search-query {{ inventory_hostnamee }} --job-template "Run OpenSCAP scans" --async
+      hammer job-invocation create --search-query {{ inventory_hostname }} --job-template "Run OpenSCAP scans" --async
     delegate_to: "{{ sat6_server }}"
     become: yes
