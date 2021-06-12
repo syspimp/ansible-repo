@@ -1,26 +1,6 @@
 ---
 - name: "Register to the correct Satellite Server"
   block:
-  - name: "Check if we are registered"
-    shell: "subscription-manager status"
-
-  - name: "Make sure we are pointed to the correct satellite server"
-    shell:
-      subscription-manager config | grep "{{ sat6['lb_fqdn'] }}"
-    when:
-    - ansible_local['awsroles'] is defined
-    - ansible_local['awsroles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy']
-
-  rescue:
-  - name: "Save the enabled yum repos"
-    shell: subscription-manager repos --list-enabled | grep "Repo ID:" | awk '{print $3}'
-    register: oldrepos
-
-  - name: "Unregister from the redhat cdn"
-    ignore_errors: yes
-    shell:
-      subscription-manager clean
-
   - name: "Find Group Inventory for 'satellite-server'"
     uri:
       url: "https://{{ tower_server }}/api/v2/groups/?search=satellite-server"
@@ -52,6 +32,26 @@
   - name: "Set the sat6_server fact"
     set_fact:
       sat6_server: "{{ hostidcheck.json.results[0].name }}"
+
+  - name: "Check if we are registered"
+    shell: "subscription-manager status"
+
+  - name: "Make sure we are pointed to the correct satellite server"
+    shell:
+      subscription-manager config | grep "{{ sat6['lb_fqdn'] }}"
+    when:
+    - ansible_local['awsroles'] is defined
+    - ansible_local['awsroles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy']
+
+  rescue:
+  - name: "Save the enabled yum repos"
+    shell: subscription-manager repos --list-enabled | grep "Repo ID:" | awk '{print $3}'
+    register: oldrepos
+
+  - name: "Unregister from the redhat cdn"
+    ignore_errors: yes
+    shell:
+      subscription-manager clean
 
   - name: "Install the katello certificate"
     shell:
