@@ -95,6 +95,7 @@
     shell: |
       hammer hostgroup ansible-roles play --id 1
     delegate_to: "{{ sat6_server }}"
+    run_once: yes
     become: yes
       
   - name: "Start openscap scan from Satellite for host"
