@@ -25,6 +25,8 @@
   become: yes
 
 - name: start minikube with non root user
-  shell: minikube start && touch .minikube-installed
+  shell: |
+    #minikube config set driver podman
+    minikube start  --driver=podman --container-runtime=cri-o && touch .minikube-installed
   args:
     creates: .minikube-installed

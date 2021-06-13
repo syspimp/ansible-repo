@@ -325,6 +325,8 @@
       become: true
       args:
         creates: /opt/.firstboot
+      when:
+      - ansible_distribution_major_version == '7'
     
     - name: "Enabling needed repos"
       shell: "subscription-manager repos --enable={{ item }}"
@@ -332,12 +334,16 @@
       become: true
       args:
         creates: /opt/.firstboot
+      when:
+      - ansible_distribution_major_version == '7'
     
     - name: "Installing base config rpms"
       yum:
         name: "{{ redhat_packages }}"
         state: latest
       become: true
+      when:
+      - ansible_distribution_major_version == '7'
 
     - name: "Adding python2, pip and python expect for RHEL7"
       shell: |
@@ -349,6 +355,16 @@
       ignore_errors: yes
       args:
         creates: /opt/.firstboot
+      when:
+      - ansible_distribution_major_version == '7'
+
+    - name: "Installing base config rpms"
+      yum:
+        name: "{{ redhat8_packages }}"
+        state: latest
+      become: true
+      when:
+      - ansible_distribution_major_version == '8'
 
 #    - name: "Update dns entry"
 #      shell: "/sbin/ifup-local || true"
