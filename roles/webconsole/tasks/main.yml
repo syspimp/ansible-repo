@@ -25,7 +25,9 @@
                            --enable rhel-7-server-optional-rpms\
                            --enable rhel-7-server-extras-rpms
       become: true
-      when: ansible_distribution == "RedHat"
+      when:
+      - ansible_distribution == "RedHat"
+      - ansible_distribution_major_version == '7'
 
     - name: wrapper for satellite failures
       block:
