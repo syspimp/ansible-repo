@@ -8,7 +8,7 @@
 
 - name: create the monitoring namespace if not available [TODO] MAKE INTO A VARIABLE
   shell: kubectl create namespace monitoring
-  when: 'monitoring' not in namespaces.stdout
+  when: "'monitoring' not in namespaces.stdout"
 
 - name: create the zenoss volume claim objects
   shell: |
