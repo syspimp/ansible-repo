@@ -8,7 +8,7 @@
 - name: put in kubectl repo file
   template:
     src: kube.repo.j2
-    dest: /etc/yum.repos/kube.repo
+    dest: /etc/yum.repos.d/kube.repo
   become: yes
 
 - name: install minikube rpm
