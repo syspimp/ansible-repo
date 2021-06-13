@@ -26,3 +26,5 @@
 
 - name: start minikube with non root user
   shell: minikube start && touch .minikube-installed
+  args:
+    creates: .minikube-installed
