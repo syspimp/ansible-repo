@@ -10,12 +10,14 @@
       yum: 
         name: insights-client
         state: present
+      become: true
 
     - name: "Register to the Red Hat Access Insights Service"
       command: /usr/bin/insights-client --register
       args:
         creates: /etc/insights-client/.registered
       register: reg_insights
+      become: true
       ignore_errors: yes
       retries: 10
       until: reg_insights.rc == 0

@@ -157,6 +157,7 @@
       user: root
       state: present
       key: "{{ automation_user_pub_key }}"
+    become: true
   
   - name: "Enabling and restarting services {{ enabled_svcs }}"
     service:
@@ -182,6 +183,7 @@
       owner: root
       group: root
       mode: 0755
+    become: true
   
 #    - name: "put dns helper on tower server for aws hosts"
 #      template:
@@ -197,6 +199,7 @@
     shell: |
       /usr/sbin/ifup-local
     when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
+    become: true
 
 #    - name: "AWS: Tag the instance with DNS"
 #      ec2_tag:
@@ -216,11 +219,13 @@
       owner: root 
       group: root 
       mode: 0644
+    become: true
   
   - name: "Put the role in the MOTD"
     shell: |
       cat /etc/ansible/facts.d/awsroles.fact >> /etc/motd
       cat /etc/ansible/facts.d/awsroles.fact
+    become: true
   when: firstbootcheck.stdout == "false"
 
 - name: entitlement block
@@ -247,6 +252,7 @@
         url: "http://{{ sat6_fqdn }}/pub/bootstrap.py"
         dest: /opt/bootstrap.py
         mode: 0755
+      become: true
 
     - name: "Save the command to register to satellite server"
       template:
@@ -255,6 +261,7 @@
         owner: root
         group: root
         mode: 0755
+      become: true
       when:
       - sat6_fqdn != "None"
 
@@ -274,6 +281,7 @@
         path: /opt/.bootstrap
         state: touch
         mode: 0444
+      become: true
       when:
       - sat6_fqdn != "None"
     when:
@@ -309,6 +317,7 @@
         path: /opt/.bootstrap
         state: touch
         mode: 0444
+      become: true
     always:
     - name: "Disabling all repos"
       shell: "subscription-manager repos --disable={{ item }}"
@@ -353,12 +362,14 @@
         name: "firewalld"
         state: "stopped"
         enabled: no
+      become: true
 
     - name: "first boot complete"
       file:
         path: /opt/.firstboot
         state: touch
         mode: 0444
+      become: true
 
     - name: "Reboot."
       shell: |
