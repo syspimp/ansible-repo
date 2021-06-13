@@ -24,6 +24,8 @@
                            --enable rhel-7-server-optional-rpms\
                            --enable rhel-7-server-extras-rpms
       become: true
+      when: ansible_distribution == "RedHat"
+
     - name: wrapper for satellite failures
       block:
       - name: "[Cockpit] Installing rpms"
@@ -49,6 +51,7 @@
           path: /root/.setup/cockpit-rpms
           state: touch
           mode: 0440
+
       rescue:
       - name:
         debug:
