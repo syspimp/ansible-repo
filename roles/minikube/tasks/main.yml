@@ -17,8 +17,11 @@
 
 - name: install kubectl rpm
   yum:
-    name: kubectl
+    name: "{{ item }}"
     state: present
+  loop:
+  - podman
+  - kubectl
   become: yes
 
 - name: start minikube with non root user
