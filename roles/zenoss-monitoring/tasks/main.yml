@@ -26,6 +26,6 @@
   shell: |
     for i in openshift-zenoss4/objects/*service*yaml; do echo working on $i ; kubectl apply -n monitoring -f $i ; done ;
     
-- name: expose the service on port 80
-  shell: |
-    kubectl expose  -n monitoring svc/zenoss4-nginx
+#- name: expose the service on port 80
+#  shell: |
+#    kubectl expose  -n monitoring svc/zenoss4-nginx
