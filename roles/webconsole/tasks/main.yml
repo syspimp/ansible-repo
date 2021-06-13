@@ -17,6 +17,7 @@
         path: /root/.setup
         state: directory
         mode: 0755
+      become: true
 
     - name: "Enable cockpit repos"
       shell: |
@@ -51,6 +52,7 @@
           path: /root/.setup/cockpit-rpms
           state: touch
           mode: 0440
+        become: true
 
       rescue:
       - name:
