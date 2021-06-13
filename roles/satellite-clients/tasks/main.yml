@@ -35,10 +35,12 @@
 
   - name: "Check if we are registered"
     shell: "subscription-manager status"
+    become: yes
 
   - name: "Make sure we are pointed to the correct satellite server"
     shell:
       subscription-manager config | grep "{{ sat6['lb_fqdn'] }}"
+    become: yes
     when:
     - ansible_local['awsroles'] is defined
     - ansible_local['awsroles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy']
@@ -46,21 +48,25 @@
   rescue:
   - name: "Save the enabled yum repos"
     shell: subscription-manager repos --list-enabled | grep "Repo ID:" | awk '{print $3}'
+    become: yes
     register: oldrepos
 
   - name: "Unregister from the redhat cdn"
     ignore_errors: yes
     shell:
       subscription-manager clean
+    become: yes
 
   - name: "Install the katello certificate"
     shell:
       rpm -Uvh --force http://{{ sat6_server }}/pub/katello-ca-consumer-latest.noarch.rpm
+    become: yes
 
   - name: "Get the bootstrap python script"
     get_url:
       url: "http://{{ sat6_server }}/pub/bootstrap.py"
       dest: /opt/bootstrap.py
+    become: yes
 
   - name: "Save the command to register to satellite server"
     template:
@@ -69,11 +75,13 @@
       owner: root
       group: root
       mode: 0755
+    become: yes
 
   - name: "Run the satellite bootstrap script, ignoring errors"
     ignore_errors: yes
     shell: |
       /opt/reg-to-satellite.sh
+    become: yes
 
   - name: dump the saved repos
     debug:
@@ -83,6 +91,7 @@
     ignore_errors: yes
     shell: subscription-manager repos --enable {{ item }}
     loop: "{{ oldrepos.stdout.split('\n') }}"
+    become: yes
 
   - name: "Save the satellite key for remote execution"
     shell: |
