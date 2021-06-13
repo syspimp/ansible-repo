@@ -1,0 +1,25 @@
+---
+- name: grab the rpm from google
+  get_url:
+    url: https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
+    dest: /tmp/minikube-latest.x86_64.rpm
+    mode: '0440'
+
+- name: put in kubectl repo file
+  template:
+    src: kube.repo.j2
+    dest: /etc/yum.repos/kube.repo
+  become: yes
+
+- name: install minikube rpm
+  shell: yum -y localinstall /tmp/minikube-latest.x86_64.rpm
+  become: yes
+
+- name: install kubectl rpm
+  yum:
+    name: kubectl
+    state: present
+  become: yes
+
+- name: start minikube with non root user
+  shell: minikube start

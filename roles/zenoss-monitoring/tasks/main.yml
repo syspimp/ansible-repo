@@ -1,0 +1,31 @@
+---
+- name: grab the github for zenoss for kube
+  shell: git clone https://github.com/syspimp/openshift-zenoss4
+
+- name: get the namespaces available
+  shell: kubectl get namespace
+  register: namespaces
+
+- name: create the monitoring namespace if not available [TODO] MAKE INTO A VARIABLE
+  shell: kubectl create namespace monitoring
+  when: 'monitoring' not in namespaces.stdout
+
+- name: create the zenoss volume claim objects
+  shell: |
+    for i in openshift-zenoss4/objects/*claim*yaml; do echo working on $i ; kubectl apply -n monitoring -f $i ; done ;
+    
+- name: create the zenoss configmap objects
+  shell: |
+    for i in openshift-zenoss4/objects/*configmap*yaml; do echo working on $i ; kubectl apply -n monitoring -f $i ; done ;
+    
+- name: create the zenoss deployment objects
+  shell: |
+    for i in openshift-zenoss4/objects/*deployment*yaml; do echo working on $i ; kubectl apply -n monitoring -f $i ; done ;
+    
+- name: create the zenoss services objects
+  shell: |
+    for i in openshift-zenoss4/objects/*service*yaml; do echo working on $i ; kubectl apply -n monitoring -f $i ; done ;
+    
+- name: expose the service on port 80
+  shell: |
+    kubectl expose  -n monitoring svc/zenoss4-nginx

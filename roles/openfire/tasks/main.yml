@@ -1,0 +1,12 @@
+---
+- name: install podman
+  yum:
+    name: podman
+    state: present
+  become: yes
+
+- name: pull the openfire container
+  shell:  podman pull docker.io/sameersbn/openfire
+
+- name: run the openfire container on specified port
+  shell: podman run -dit --name openfire -p {{ openfire_adminport }}:9090 openfire
