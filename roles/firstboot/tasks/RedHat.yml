@@ -228,6 +228,7 @@
   - name: "Fall back to RHSM, Check if we are registered"
     shell: "subscription-manager status | grep Current"
     register: rhsm_reg
+    become: yes
   rescue: 
   - name: "Bootstrap check"
     shell: |
