@@ -51,6 +51,21 @@
       #add satellite to tower group early
     - include: "tower.yml"
 
+    - name: "Run yum update to avoid a bug. Please wait. SSH to Host and tail /tmp/tower.output for status"
+      shell: |
+        exec &> >(tee -a /tmp/tower.output)
+        yum -y update
+      become: true
+      args:
+        executable: /bin/bash
+        creates: /opt/.firstboot
+
+    - name: "Perform a yum clean all"
+      shell:  yum clean all
+      become: true
+      args:
+        creates: /opt/.firstboot
+
     - name: "Disabling all repos"
       shell: "subscription-manager repos --disable='*'"
       become: true
