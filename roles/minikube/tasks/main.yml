@@ -25,4 +25,4 @@
   become: yes
 
 - name: start minikube with non root user
-  shell: minikube start && touch /root/.setup/minikube
+  shell: minikube start && touch .minikube-installed
