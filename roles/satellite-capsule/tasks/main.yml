@@ -41,6 +41,7 @@
         path: /root/.setup
         state: directory
         mode: 0755
+      become: true
   
     # add ourselves to the tower group early
     - include: "tower.yml"
@@ -104,12 +105,14 @@
         name: goferd
         enabled: yes
         state: started
+      become: true
 
     - name: "rpms complete"
       file:
         path: /root/.setup/capsule-rpms
         state: touch
         mode: 0444
+      become: true
 
   when: initialsetup.stdout == "false"
 
@@ -251,6 +254,7 @@
                     --enable-foreman-proxy-plugin-openscap && \
                     touch /opt/.sat-install-finished
 
+      become: true
       args:
         creates: /opt/.sat-install-finished
 
@@ -260,26 +264,31 @@
       shell:
         subscription-manager config | grep 'hostname = \[subscription.rhsm.redhat.com\]' || true
       register: bootstrap
+      become: true
       
     - name: "Unregister from the redhat cdn"
       shell:
         subscription-manager unregister && \
         subscription-manager clean
       when: "'subscription.rhsm.redhat.com' in bootstrap.stdout"
+      become: true
 
     - name: "Install the katello certificate"
       shell:
         rpm -Uvh --force http://{{ sat6_fqdn }}/pub/katello-ca-consumer-latest.noarch.rpm
       when: "'subscription.rhsm.redhat.com' in bootstrap.stdout"
+      become: true
 
     - name: "Re-run subscription-manager"
       shell:
         subscription-manager register --org="{{ sat6['org'] }}" --activationkey="{{ sat6['activation_key'] }}"
       when: "'subscription.rhsm.redhat.com' in bootstrap.stdout"
+      become: true
 
     - name: "Fix the selinux context for /opt"
       shell:
         restorecon -vR /opt/*
+      become: true
 
     - name: "Reboot."
       shell: |
@@ -326,4 +335,5 @@
         path: /root/.setup/capsule-configed
         state: touch
         mode: 0444
+      become: true
   when: capsulesetup.stdout == "false"
