@@ -33,6 +33,7 @@
     creates: /root/.setup/step25
 
 - name: "Compute Resources Complete"
+  become: true
   shell: touch /root/.setup/step25
   args:
     creates: /root/.setup/step25
