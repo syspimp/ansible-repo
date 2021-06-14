@@ -39,6 +39,7 @@
     owner: root
     group: root
     mode: 0644
+  become: true
 
 - name: "Block to perform initial setup"
   block:
@@ -47,6 +48,7 @@
         path: /root/.setup
         state: directory
         mode: 0755
+      become: true
   
       #add satellite to tower group early
     - include: "tower.yml"
@@ -103,12 +105,14 @@
         path: /etc/yum/pluginconf.d/search-disabled-repos.conf
         regexp: '^notify_only=*'
         line: 'notify_only=0'
+      become: true
     
     - name: "Modify ignore_repo in search-disabled-repos.conf"
       lineinfile:
         path: /etc/yum/pluginconf.d/search-disabled-repos.conf
         regexp: '^ignored_repos=*'
         line: 'ignored_repos=*debug-rpms *source-rpms'
+      become: true
     
     - name: "Installing satellite rpms"
       yum:
@@ -148,6 +152,7 @@
         path: /root/.hammer
         state: directory
         mode: 0755
+      become: true
   
     - name: "Configure hammer cli tool"
       template:
@@ -156,6 +161,7 @@
           owner: root
           group: root
           mode: 0644
+      become: true
   
     - name: "Setting hammer to use default org and locations"
       shell: |
@@ -173,9 +179,11 @@
           owner: foreman-proxy
           group: puppet
           mode: 0644
+      become: true
 
     - name: "Restart puppetmaster"
       shell: systemctl restart puppetserver
+      become: true
 
 
 #    - name: "Open firewall port for external access to Satellite at sat6.dev.maskedadmins.com:8448"
@@ -253,11 +261,13 @@
           hammer domain create --name "{{ item }}" || true
       with_items: "{{ sat6.domains }}"
       ignore_errors: yes
+      become: true
       args:
         creates: /root/.setup/step4
   
     - name: "Domain creation Complete"
       shell: touch /root/.setup/step4
+      become: true
       args:
         creates: /root/.setup/step4
   
@@ -272,6 +282,7 @@
           --dns-primary={{ item.dns }}
       with_items: "{{ sat6.subnets }}"
       when: item.gw is defined
+      become: true
       ignore_errors: yes
       args:
         creates: /root/.setup/step5
@@ -287,15 +298,18 @@
       with_items: "{{ sat6.subnets }}"
       when: item.prefix is defined
       ignore_errors: yes
+      become: true
       args:
         creates: /root/.setup/step5
 
     - name: "Subnet creation Complete"
       shell: touch /root/.setup/step5
+      become: true
       args:
         creates: /root/.setup/step5
   
     - name: "Adding Domains to Orgs and Locations"
+      become: true
       ignore_errors: yes
       shell: |
           domainid=$(hammer domain list  | grep "| {{ item.1 }}" | awk '{print $1}')
@@ -310,11 +324,13 @@
       shell: |
           domainid=$(hammer domain list  | grep "| {{ sat6_default_domain }}" | awk '{print $1}')
           hammer organization add-domain --domain-id=${domainid} --name '{{ sat6_default_org }}'
+      become: true
       args:
         creates: /root/.setup/step6
 
     - name: "Subnet creation Complete"
       shell: touch /root/.setup/step6
+      become: true
       args:
         creates: /root/.setup/step6
   
@@ -322,6 +338,7 @@
       shell: |
           subnetid=$(hammer subnet list  | grep {{ item.1 }} | awk '{print $1}')
           hammer organization add-subnet --subnet-id=${subnetid} --name '{{ item.0.name }}'
+      become: true
       with_subelements:
         - "{{ sat6.orgs }}"
         - subnets
@@ -332,11 +349,13 @@
       shell: |
           subnetid=$(hammer subnet list  | grep {{ sat6_default_subnet }} | awk '{print $1}')
           hammer organization add-subnet --subnet-id=${subnetid} --name '{{ sat6_default_org }}'
+      become: true
       args:
         creates: /root/.setup/step7
 
     - name: "Add subnet to org Complete"
       shell: touch /root/.setup/step7
+      become: true
       args:
         creates: /root/.setup/step7
   
@@ -344,6 +363,7 @@
       shell: |
           domainid=$(hammer domain list  | grep "| {{ item.domain }}" | awk '{print $1}')
           hammer location add-domain --domain-id=${domainid} --name '{{ item.location }}'
+      become: true
       with_items: "{{ sat6.subnets }}"
       args:
         creates: /root/.setup/step8
@@ -352,6 +372,7 @@
       shell: |
           domainid=$(hammer domain list  | grep "| {{ sat6_default_domain }}" | awk '{print $1}')
           hammer location add-domain --domain-id=${domainid} --name '{{ sat6_default_location }}'
+      become: true
       args:
         creates: /root/.setup/step8
 
@@ -364,6 +385,7 @@
 
     - name: "Add Domains to location Complete"
       shell: touch /root/.setup/step8
+      become: true
       args:
         creates: /root/.setup/step8
   
@@ -371,6 +393,7 @@
       shell: |
           subnetid=$(hammer subnet list  | grep {{ item.name }} | awk '{print $1}')
           hammer location add-subnet --subnet-id=${subnetid} --name '{{ item.location }}'
+      become: true
       with_items: "{{ sat6.subnets }}"
       args:
         creates: /root/.setup/step9
@@ -387,11 +410,13 @@
       shell: |
           subnetid=$(hammer subnet list  | grep {{ sat6_default_subnet }} | awk '{print $1}')
           hammer location add-subnet --subnet-id=${subnetid} --name '{{ sat6_default_location }}'
+      become: true
       args:
         creates: /root/.setup/step9
   
     - name: "Add Subnets to location Complete"
       shell: touch /root/.setup/step9
+      become: true
       args:
         creates: /root/.setup/step9
   when: subnetstep.stdout == "false"
@@ -409,12 +434,14 @@
       owner: root
       group: root
       mode: 0644
+  become: true
 
 - name: "Provisioning Satellite 6 - upload and refresh manifest"
   shell: |
       hammer subscription upload --file /tmp/manifest.zip --organization "{{ sat6_default_org }}" && \
       hammer subscription refresh-manifest --organization "{{ sat6_default_org }}" && \
       touch /root/.setup/step10
+  become: true
   args:
     creates: /root/.setup/step10
 
@@ -424,6 +451,7 @@
       --name "{{ item.name }}" \
       --releasever "7Server" --basearch "x86_64" \
       --product "{{ item.product }}" --organization "{{ sat6_default_org }}"
+  become: true
   with_items: "{{ sat6_enabled_repos }}"
   ignore_errors: yes
   args:
@@ -433,6 +461,7 @@
   shell: touch /root/.setup/step11a
   args:
     creates: /root/.setup/step11a
+  become: true
 
 - name: "Provisioning Satellite 6 - Tools repos without a releaseversion"
   ignore_errors: yes
@@ -441,6 +470,7 @@
       --name "{{ item.name }}" \
       --basearch "x86_64" \
       --product "{{ item.product }}" --organization "{{ sat6_default_org }}"
+  become: true
   with_items:
     - "{{ sat6_enabled_repos_tools }}"
   args:
@@ -448,6 +478,7 @@
 
 - name: "Repo config Complete"
   shell: touch /root/.setup/step11b
+  become: true
   args:
     creates: /root/.setup/step11b
 
@@ -463,6 +494,7 @@
 
 - name: "Repo config Complete"
   shell: touch /root/.setup/step11c
+  become: true
   args:
     creates: /root/.setup/step11c
 
@@ -479,6 +511,7 @@
 - name: "Repo config Complete"
   shell: |
     touch /root/.setup/step11d
+  become: true
   args:
     creates: /root/.setup/step11d
 
@@ -488,6 +521,7 @@
       hammer product synchronize --name "{{ item }}" \
       --organization "{{ sat6_default_org }}" --async
       #--organization "{{ sat6_default_org }}"
+  become: true
   with_items:
     - "{{ sat6_enabled_products }}"
   args:
@@ -496,6 +530,7 @@
 - name: "Product Sync Complete"
   shell: |
     touch /root/.setup/step12
+  become: true
   args:
     creates: /root/.setup/step12
 
@@ -503,6 +538,7 @@
   shell: |
       hammer host-collection create --name={{ sat6_default_hostcollection }} --organization "{{ sat6_default_org }}" && \
       touch /root/.setup/step13
+  become: true
   args:
     creates: /root/.setup/step13
 
@@ -511,6 +547,7 @@
       hammer lifecycle-environment create --name "{{ item.name }}" \
       --description "Environment for {{ sat6_default_org }}'s {{ item.name }} Team" \
       --prior "{{ item.prior }}" --organization "{{ sat6_default_org }}"
+  become: true
   with_items: "{{ sat6.environments }}"
   args:
     creates: /root/.setup/step14
@@ -523,6 +560,7 @@
 
 - name: "Provisionging Lifecycle Complete"
   shell: touch /root/.setup/step14
+  become: true
   args:
     creates: /root/.setup/step14
 
@@ -548,10 +586,12 @@
       --description "Initial content view for our operating system" \
       --organization "{{ sat6_default_org }}" && \
       touch /root/.setup/step15
+  become: true
   args:
     creates: /root/.setup/step15
 
 - name: "Promoting Environments {{ sat6.environments }}"
+  become: true
   shell: |
       hammer content-view version promote --content-view "Base" --version 1 \
       --to-lifecycle-environment "{{ item.name }}" --organization "{{ sat6_default_org }}"
@@ -561,6 +601,7 @@
 
 - name: "Promotion Complete"
   shell: touch /root/.setup/step16
+  become: true
   args:
     creates: /root/.setup/step16
 
@@ -570,12 +611,14 @@
     --unlimited-hosts --description "Example activation key for {{ item.name }}" \
     --lifecycle-environment "{{ item.name }}" --content-view "Base" \
     --organization "{{ sat6_default_org }}"
+  become: true
   with_items: "{{ sat6.environments }}"
   args:
     creates: /root/.setup/step17
 
 - name: "Activation keys Complete"
   shell: touch /root/.setup/step17
+  become: true
   args:
     creates: /root/.setup/step17
 
@@ -585,6 +628,7 @@
     hammer activation-key add-subscription --name "{{ sat6_default_org }}-{{ item[0]['name'] }}-key" \
     --subscription-id ${subid} \
     --organization "{{ sat6_default_org }}"
+  become: true
   with_nested:
     - "{{ sat6.environments }}"
     - "{{ sat6.subs_for_activationkeys }}"
@@ -593,6 +637,7 @@
 
 - name: "Adding subs to activation keys Complete"
   shell: touch /root/.setup/step18
+  become: true
   args:
     creates: /root/.setup/step18
 
@@ -601,18 +646,21 @@
     hammer activation-key content-override --name "{{ sat6_default_org }}-{{ item.name }}-key" \
     --content-label rhel-7-server-satellite-tools-{{ satellite_version }}-rpms \
     --value 1 --organization "{{ sat6_default_org }}"
+  become: true
   with_items: "{{ sat6.environments }}"
   args:
     creates: /root/.setup/step19
 
 - name: "Step Complete"
   shell: touch /root/.setup/step19
+  become: true
   args:
     creates: /root/.setup/step19
 
 - name: "Adding host collection to activation keys"
   shell: |
     hammer activation-key add-host-collection --name={{ sat6_default_org }}-{{ item.name }}-key --host-collection={{ sat6_default_hostcollection }} --organization={{ sat6_default_org }}
+  become: true
   with_items: "{{ sat6.environments }}"
   args:
     creates: /root/.setup/step20
@@ -620,11 +668,13 @@
 
 - name: "Step Complete"
   shell: touch /root/.setup/step20
+  become: true
   args:
     creates: /root/.setup/step20
 
 - name: "Add all subscriptions to activation keys"
   ignore_errors: yes
+  become: true
   shell: |
     for i in $(hammer --csv activation-key list --organization={{ sat6_default_org }} | awk -F, {'print $1'} | grep -vi '^ID'); do \
     for j in $(hammer --csv subscription list --organization={{ sat6_default_org }}  | awk -F, {'print $1'} | grep -vi '^ID'); do \
@@ -634,6 +684,7 @@
     creates: /root/.setup/step21
 
 - name: "Add partition table to OS"
+  become: true
   shell: |
     PARTID=$(hammer --csv partition-table list | grep 'Kickstart default,' | awk -F, {'print $1'})
     for i in $(hammer --csv os list | awk -F, {'print $1'} | grep -vi '^ID')
@@ -645,6 +696,7 @@
     creates: /root/.setup/step22
 
 - name: "Clone the Default User Data Kickstart"
+  become: true
   shell: |
     hammer template clone --name 'Kickstart default user data' --new-name '{{ sat6_default_org }} User Data' && \
     touch /root/.setup/step23a
@@ -652,6 +704,7 @@
     creates: /root/.setup/step23a
 
 - name: "Update the new user data template"
+  become: true
   shell: |
     USERDATAID=$(hammer --csv template list | grep "{{ sat6_default_org }}" | awk -F, {'print $1'})
     hammer template update --file /var/tmp/user-data-template.txt --id ${USERDATAID} && \
@@ -660,6 +713,7 @@
     creates: /root/.setup/step23b
 
 - name: "Add kickstart pxe template to OS"
+  become: true
   shell: |
     PXEID=$(hammer --csv template list | grep 'Kickstart default PXELinux' | awk -F, {'print $1'})
     SATID=$(hammer --csv template list | grep ',Kickstart default,' | grep 'provision' | awk -F, {'print $1'})
@@ -698,6 +752,7 @@
 #    creates: /root/.setup/step23bb
 
 - name: "Add RHEL7 host group for each domain"
+  become: true
   shell: |
     #MEDID=$(hammer --csv medium list | grep 'Kickstart_x86_64_7Server' | awk -F, {'print $1'})
     PARTID=$(hammer --csv partition-table list | grep 'Kickstart default,' | awk -F, {'print $1'})
@@ -724,6 +779,7 @@
   with_items: "{{ sat6.subnets }}"
 
 - name: "Add RHEL7 host group for default domain"
+  become: true
   shell: |
     #MEDID=$(hammer --csv medium list | grep 'Kickstart_x86_64_7Server' | awk -F, {'print $1'})
     PARTID=$(hammer --csv partition-table list | grep 'Kickstart default,' | awk -F, {'print $1'})
@@ -748,6 +804,7 @@
     creates: /root/.setup/step24
 
 - name: "Add RHEL8 host group for default domain"
+  become: true
   shell: |
     #MEDID=$(hammer --csv medium list | grep 'Kickstart_x86_64_7Server' | awk -F, {'print $1'})
     PARTID=$(hammer --csv partition-table list | grep 'Kickstart default,' | awk -F, {'print $1'})
@@ -772,6 +829,7 @@
     creates: /root/.setup/step24
 
 - name: "Host groups to domain Complete"
+  become: true
   shell: touch /root/.setup/step24
   args:
     creates: /root/.setup/step24
@@ -786,6 +844,7 @@
     creates: /root/.setup/step28
 
 - name: "Set Capsule to proper location"
+  become: true
   shell: |
     hammer capsule update --id 1 --locations {{ sat6_default_location }} && \
     touch /root/.setup/step29
