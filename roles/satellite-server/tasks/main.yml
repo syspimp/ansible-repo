@@ -60,13 +60,10 @@
       become: true
       args:
         executable: /bin/bash
-        creates: /opt/.firstboot
 
     - name: "Perform a yum clean all"
       shell:  yum clean all
       become: true
-      args:
-        creates: /opt/.firstboot
 
     - name: "Reboot."
       shell: |
@@ -74,7 +71,6 @@
       become: true
       args:
         executable: /bin/bash
-        creates: /opt/.firstboot
 
     - name: "Wait 5 to 11 mins for host to reboot"
       wait_for:
