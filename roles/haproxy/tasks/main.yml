@@ -17,20 +17,20 @@
         path: /root/.setup
         state: directory
         mode: 0755
-    become: true
+      become: true
 
     - name: "Installing haproxy rpms"
       yum:
         name: ["haproxy","policycoreutils-python"]
         state: latest
-    become: true
+      become: true
 
     - name: "make setup tracking dir"
       file:
         path: /root/.setup/haproxy-rpms
         state: touch
         mode: 0440
-    become: true
+      become: true
   when: initialsetup.stdout == "false"
 
 - name: "Block to perform configure haproxy"
