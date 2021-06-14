@@ -48,4 +48,5 @@
         path: /root/.setup/tower-configed
         state: touch
         mode: 0444
+      become: yes
   when: towersetup.stdout == "false"
