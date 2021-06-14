@@ -831,6 +831,7 @@
     creates: /root/.setup/step24
 
 - name: "Set unattended_url to ip address"
+  become: true
   shell: |
     hammer settings set \
     --name unattended_url \
