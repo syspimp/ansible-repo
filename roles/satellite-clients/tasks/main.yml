@@ -50,7 +50,8 @@
     when:
     - ansible_local['awsroles'] is defined
     - ansible_local['awsroles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy']
-  when: "sat6_server is defined"
+  when:
+  - "(sat6_server is defined) and (sat6_server != 'None')"
 
   rescue:
   - name: "Save the enabled yum repos"
