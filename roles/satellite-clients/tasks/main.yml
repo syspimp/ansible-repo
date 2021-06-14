@@ -105,6 +105,7 @@
     shell: |
       curl -k https://{{ sat6['lb_fqdn'] }}:9090/ssh/pubkey >> /root/.ssh/authorized_keys
       chmod 600 /root/.ssh/authorized_keys
+    ignore_errors: yes
     become: yes
 
   always:
@@ -112,6 +113,7 @@
     shell: |
       hammer hostgroup ansible-roles play --id 1
     delegate_to: "{{ sat6_server }}"
+    ignore_errors: yes
     run_once: yes
     become: yes
       
@@ -119,4 +121,5 @@
     shell: |
       hammer job-invocation create --search-query {{ inventory_hostname }} --job-template "Run OpenSCAP scans" --async
     delegate_to: "{{ sat6_server }}"
+    ignore_errors: yes
     become: yes
