@@ -32,7 +32,13 @@
   - name: "Set the sat6_server fact"
     set_fact:
       sat6_server: "{{ hostidcheck.json.results[0].name }}"
+  rescue:
+  - name: There is no satellite server
+    debug:
+      msg: There is no satellite server
 
+- name: "Register to the correct Satellite Server"
+  block:
   - name: "Check if we are registered"
     shell: "subscription-manager status"
     become: yes
@@ -44,6 +50,7 @@
     when:
     - ansible_local['awsroles'] is defined
     - ansible_local['awsroles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy']
+  when: "sat6_server is defined"
 
   rescue:
   - name: "Save the enabled yum repos"
