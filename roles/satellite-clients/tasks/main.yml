@@ -99,6 +99,7 @@
     ignore_errors: yes
     shell: subscription-manager repos --enable {{ item }}
     loop: "{{ oldrepos.stdout.split('\n') }}"
+    when: "item != ''"
     become: yes
 
   - name: "Save the satellite key for remote execution"
