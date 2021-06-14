@@ -75,6 +75,7 @@
       url: "http://{{ sat6_server }}/pub/bootstrap.py"
       dest: /opt/bootstrap.py
     become: yes
+    when: "ansible_distribution == 'RedHat'"
 
   - name: "Save the command to register to satellite server"
     template:
@@ -84,22 +85,27 @@
       group: root
       mode: 0755
     become: yes
+    when: "ansible_distribution == 'RedHat'"
 
   - name: "Run the satellite bootstrap script, ignoring errors"
     ignore_errors: yes
     shell: |
       /opt/reg-to-satellite.sh
     become: yes
+    when: "ansible_distribution == 'RedHat'"
 
   - name: dump the saved repos
     debug:
       var: oldrepos.stdout
+    when: "ansible_distribution == 'RedHat'"
 
   - name: "Re enable yum repos"
     ignore_errors: yes
     shell: subscription-manager repos --enable {{ item }}
     loop: "{{ oldrepos.stdout.split('\n') }}"
-    when: "item != ''"
+    when:
+    - "item != ''"
+    - "ansible_distribution == 'RedHat'"
     become: yes
 
   - name: "Save the satellite key for remote execution"
