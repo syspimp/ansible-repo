@@ -52,7 +52,7 @@
   register: kubectltasks
   retries: "120"
   delay: "2"
-  until: kubectltasks.stdout.find("Running") == 0
+  until: "'Running' in kubectltasks.stdout"
 
 - name: expose the service on port 30080
   shell: |
