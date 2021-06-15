@@ -13,6 +13,7 @@
     src: snmpd.conf.j2
     dest: /etc/snmp/snmpd.conf
     mode: '0644'
+  become: true
 
 - name: "Restore selinux context on  /etc/snmp/snmpd.conf"
   shell: restorecon /etc/snmp/snmpd.conf
@@ -23,3 +24,4 @@
     name: snmpd
     state: running
     enabled: yes
+  become: true
