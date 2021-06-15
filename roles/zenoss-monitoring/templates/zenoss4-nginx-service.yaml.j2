@@ -15,8 +15,8 @@ spec:
     protocol: TCP
     port: 80
     nodePort: 30080
-	externalIPs:
-    - {{ ansible_default_ipv4['address'] }}
+  externalIPs:
+  - {{ ansible_default_ipv4['address'] }}
   selector:
     io.kompose.service: zenoss4-nginx
 status:
