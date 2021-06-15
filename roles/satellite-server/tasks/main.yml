@@ -799,10 +799,15 @@
   args:
     creates: /root/.setup/step24
 
+- name: "Host groups to domain Complete"
+  become: true
+  shell: touch /root/.setup/step24
+  args:
+    creates: /root/.setup/step24
+
 - name: "Add RHEL8 host group for default domain"
   become: true
   shell: |
-    #MEDID=$(hammer --csv medium list | grep 'Kickstart_x86_64_7Server' | awk -F, {'print $1'})
     PARTID=$(hammer --csv partition-table list | grep 'Kickstart default,' | awk -F, {'print $1'})
     OSID=$(hammer --csv os list | grep 'RedHat 8' | awk -F, {'print $1'})
     LCID=$(hammer lifecycle-environment list --organization {{ sat6_default_org }} | grep '{{ sat6_default_environment }} | Library' | awk -F\| {'print $1'})
@@ -812,7 +817,6 @@
     for os in $OSID
     do
       osname=$(hammer os info --id ${os} |grep Title:|sed -e 's/Title:              //g')
-      #hammer hostgroup create --environment {{ sat6_default_environment }} --architecture="x86_64" --domain="{{ sat6_default_domain }}" --content-source-id="${CSID}" --medium-id="${MEDID}" --locations="{{ sat6_default_location }}"
       hammer hostgroup create --environment {{ sat6_default_environment }} --architecture="x86_64" --domain="{{ sat6_default_domain }}" --content-source-id="${CSID}" --locations="{{ sat6_default_location }}" \
     --query-organization="{{ sat6_default_org }}" --name="{{ sat6_default_hostgroup_rhel8 }} for {{ sat6_default_domain }} ${osname}" --subnet="{{ sat6_default_subnet }}" --partition-table-id="${PARTID}" \
     --operatingsystem-id="${os}" --puppet-ca-proxy-id="${CAID}" --puppet-proxy-id="${PROXYID}" --content-view="Base" --lifecycle-environment-id="${LCID}"
@@ -822,13 +826,13 @@
       hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup_rhel8 }} for {{ sat6_default_domain }} ${osname}" --name "tower_jobid"  --value "{{ tower_jobid }}"
     done
   args:
-    creates: /root/.setup/step24
+    creates: /root/.setup/step24a
 
 - name: "Host groups to domain Complete"
   become: true
-  shell: touch /root/.setup/step24
+  shell: touch /root/.setup/step24a
   args:
-    creates: /root/.setup/step24
+    creates: /root/.setup/step24a
 
 - name: "Set unattended_url to ip address"
   become: true
