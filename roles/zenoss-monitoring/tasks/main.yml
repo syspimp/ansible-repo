@@ -60,3 +60,7 @@
   become: yes
   args:
     creates: /opt/.zenoss-configed
+
+- name: Visit the Zenoss home page
+  debug:
+    msg: "Visit the Zenoss home page at http://{{ ec2_ip_address }}:30080/dmd/zport"
