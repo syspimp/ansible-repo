@@ -265,13 +265,13 @@
       when:
       - sat6_fqdn != "None"
 
-    - name: "Fixing python for rhel 8"
-      shell: "alternatives --config python"
-      become: true
-      args:
-        creates: /opt/.firstboot
-      when:
-      - ansible_distribution_major_version == '8'
+#    - name: "Fixing python for rhel 8"
+#      shell: "alternatives --config python"
+#      become: true
+#      args:
+#        creates: /opt/.firstboot
+#      when:
+#      - ansible_distribution_major_version == '8'
     
     - name: "Run the satellite bootstrap script"
       shell: |
