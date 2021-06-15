@@ -44,7 +44,16 @@
     for i in openshift-zenoss4/objects/*service*yaml; do echo working on $i ; kubectl apply -n monitoring -f $i ; done ;
   args:
     creates: /opt/.zenoss-configed
-    
+
+- name: Loop over kubectl get pods until zenoss nginx pod is running
+  shell: kubectl get pods -n monitoring | grep zenoss4-nginx || true
+  args:
+    creates: /opt/.zenoss-configed
+  register: kubectltasks
+  retries: "120"
+  delay: "2"
+  until: kubectltasks.stdout.find("Running") == 0
+
 - name: expose the service on port 30080
   shell: |
     kubectl port-forward service/zenoss4-nginx --address 0.0.0.0 30080:80 -n monitoring &
