@@ -9,6 +9,7 @@
   yum:
     name: "{{ item }}"
     state: "present"
+  become: yes
   when: "'clevis' not in isclevisinstalled.stdout"
   loop:
     - clevis-luks
@@ -19,6 +20,7 @@
   block:
   - name: make sure the disk is present
     shell: lsblk | grep {{ encrypted['device'] }}
+    become: yes
   rescue:
   - name: Fail hard
     fail:
@@ -29,6 +31,7 @@
   - name: check the disk
     shell: |
       parted -l | grep {{ encrypted['device'] }} 
+    become: yes
     register: command_result
     #failed_when: "'unrecognised disk label' not in command_result.stderr"
     args:
@@ -36,6 +39,7 @@
 
   - name: create the partition
     shell: parted /dev/{{ encrypted['device'] }}  mklabel msdos mkpart primary {{ encrypted['device_fs'] }} 1M {{ encrypted['device_size'] }}G && touch /root/.setup/encrypt2
+    become: yes
     args:
       creates: /root/.setup/encrypt2
   rescue:
@@ -47,11 +51,13 @@
   block:
   - name: encrypt the partion
     shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksFormat /dev/{{ encrypted['device'] }}p1 --batch-mode -
+    become: yes
     args:
       creates: /root/.setup/encrypt3
 
   - name: name the encrypted partition
     shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksOpen /dev/{{ encrypted['device'] }}p1 {{ encrypted['device_name'] }} --batch-mode - && touch /root/.setup/encrypt3
+    become: yes
     args:
       creates: /root/.setup/encrypt3
   rescue:
@@ -63,6 +69,7 @@
   block:
   - name: format the partion
     shell: mkfs.{{ encrypted['device_fs'] }} /dev/mapper/{{ encrypted['device_name'] }} && touch /root/.setup/encrypt4
+    become: yes
     args:
       creates: /root/.setup/encrypt4
 
@@ -71,9 +78,11 @@
       path: "{{ encrypted['device_mountpoint'] }}"
       state: directory
       mode: 0755
+    become: yes
   
   - name: test mounting the formatted, encrypted partition
     shell: mount -t {{ encrypted['device_fs'] }} /dev/mapper/{{ encrypted['device_name'] }} {{ encrypted['device_mountpoint'] }} && touch /root/.setup/encrypt5
+    become: yes
     args:
       creates: /root/.setup/encrypt5
 
@@ -81,11 +90,13 @@
     lineinfile:
       path: /etc/crypttab
       line: "{{ encrypted['device_name'] }}  /dev/{{ encrypted['device'] }}p1  none   _netdev"
+    become: yes
   
   - name: "Configure /etc/fstab"
     lineinfile:
       path: /etc/fstab
       line: "/dev/mapper/{{ encrypted['device_name'] }}  {{ encrypted['device_mountpoint'] }}  {{ encrypted['device_fs'] }}   _netdev   1 2"
+    become: yes
   rescue:
   - name: Fail hard
     fail:
@@ -138,6 +149,7 @@
     name: clevis-luks-askpass.path
     enabled: yes
     state: started
+  become: yes
 
 - name: "Configure clevis to talk to tang servers"
   ansible.builtin.expect:
@@ -147,6 +159,7 @@
       (?i)trust: "y"
       (?i)password: "{{ encrypted['passphrase'] }}"
   #no_log: true
+  become: yes
   register: output
 
 - name:  "output of last command"

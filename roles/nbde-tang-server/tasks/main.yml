@@ -9,6 +9,7 @@
   yum:
     name: "tang"
     state: "present"
+  become: yes
   when: '"tang" not in istanginstalled.stdout'
 
 - name: "Enable tang.socket"
@@ -16,6 +17,7 @@
     name: "tangd.socket"
     state: "started"
     enabled: yes
+  become: yes
 
 #- name: "Add firewall rules for tang"
 #  firewalld:
