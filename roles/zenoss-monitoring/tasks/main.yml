@@ -45,8 +45,8 @@
   args:
     creates: /opt/.zenoss-configed
 
-- name: Loop over kubectl get pods until zenoss nginx pod is running
-  shell: kubectl get pods -n monitoring | grep zenoss4-nginx || true
+- name: Loop over kubectl get pods until zenoss core pod is running
+  shell: kubectl get pods -n monitoring | grep zenoss4-core || true
   args:
     creates: /opt/.zenoss-configed
   register: kubectltasks
@@ -57,7 +57,9 @@
 - name: expose the service on port 30080
   shell: |
     kubectl port-forward service/zenoss4-nginx --address 0.0.0.0 30080:80 -n monitoring &
+    sleep 5
     disown
+    sleep 1
   args:
     creates: /opt/.zenoss-configed
     executable: /bin/bash
