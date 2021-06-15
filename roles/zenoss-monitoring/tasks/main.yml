@@ -20,8 +20,6 @@
   template:
     src: zenoss4-nginx-service.yaml.j2
     dest: openshift-zenoss4/objects/zenoss4-nginx-service.yaml
-  args:
-    creates: /opt/.zenoss-configed
 
 - name: create the zenoss volume claim objects
   shell: |
