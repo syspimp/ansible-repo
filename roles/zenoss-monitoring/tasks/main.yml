@@ -10,7 +10,7 @@
   shell: kubectl create namespace monitoring
   when: "'monitoring' not in namespaces.stdout"
 
-- name:
+- name: put the template in place
   template:
     src: zenoss4-nginx-service.yaml.j2
     dest: openshift-zenoss4/objects/zenoss4-nginx-service.yaml
