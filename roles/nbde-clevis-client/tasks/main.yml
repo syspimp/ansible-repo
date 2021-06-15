@@ -165,3 +165,6 @@
 - name:  "output of last command"
   debug:
     var: output
+
+# add host to the tang-servers tower group inventory
+- include: tower.yml
