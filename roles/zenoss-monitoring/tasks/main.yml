@@ -10,6 +10,11 @@
   shell: kubectl create namespace monitoring
   when: "'monitoring' not in namespaces.stdout"
 
+- name:
+  template:
+    src: zenoss4-nginx-service.yaml.j2
+    dest: openshift-zenoss4/objects/zenoss4-nginx-service.yaml
+
 - name: create the zenoss volume claim objects
   shell: |
     for i in openshift-zenoss4/objects/*claim*yaml; do echo working on $i ; kubectl apply -n monitoring -f $i ; done ;
