@@ -59,7 +59,7 @@
     kubectl get pods -n monitoring
     sleep 20
     kubectl get pods -n monitoring
-    kubectl port-forward service/zenoss4-nginx --address 0.0.0.0 30080:80 -n monitoring &
+    nohup kubectl port-forward service/zenoss4-nginx --address 0.0.0.0 30080:80 -n monitoring </dev/null >/dev/null 2>&1 &
     sleep 5
     disown
     sleep 1
