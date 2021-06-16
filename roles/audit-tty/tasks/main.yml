@@ -1,0 +1,49 @@
+---
+- name: backup the current pam config
+  shell: authconfig --savebackup=/root/pambackup
+  become: yes
+
+- name: create a file we manage to include the system authconfig files
+  template:
+    src: "{{ item }}-auth-ansible.j2"
+    dest: "/etc/authconfig/{{ item }}-auth-ansible"
+    owner: root
+    group: root
+  become: yes
+  loop:
+  - system
+  - password
+
+#- name: backup the actual files
+#  ansible.builtin.copy:
+#    src: "/etc/authconfig/{{ item }}-auth-ac"
+#    dest: "/etc/authconfig/{{ item }}-auth-ansible"
+#    owner: root
+#    group: root
+#    remote_src: yes
+#  become: yes
+#  loop:
+#  - system
+#  - password
+
+- name: Update symbolic links to our managed files
+  ansible.builtin.file:
+    src: "/etc/authconfig/{{ item }}-auth-ansible"
+    dest: "/etc/authconfig/{{ item }}-auth"
+    owner: root
+    group: root
+    state: link
+  become: yes
+  loop:
+  - system
+  - password
+
+- name: add in the tty monitoring line to our file
+  lineinfile:
+    path: "/etc/authconfig/{{ item }}-auth-ansible"
+    line: "session    required     pam_tty_audit.so disable=* enable={{ tty_user }}"
+    insertafter: EOF
+  become: yes
+  loop:
+  - system
+  - password
