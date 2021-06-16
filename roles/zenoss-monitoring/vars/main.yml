@@ -145,3 +145,10 @@ cloud_user_private_key: !vault |
           37623364303036643732366236613238373362393430653662353364333463343663623164303831
           30393636613263633537
 
+tower_groups:
+- clevis-clients
+- capsules
+- satellite-server
+- capsule-lb
+- tang-servers
+- tower-servers
