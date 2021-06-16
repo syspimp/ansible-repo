@@ -78,7 +78,8 @@
     when: "ansible_distribution == 'RedHat'"
 
   - name: "Fixing bootstrap for RHEL 8 and python3"
-    shell: "sed -i -e 's/usr\/bin\/python /usr\/bin\/python3 /g' /opt/bootstrap.py"
+    shell: |
+    sed -i -e 's/usr\/bin\/python /usr\/bin\/python3 /g' /opt/bootstrap.py
     ignore_errors: yes
     become: true
     when:
