@@ -1,6 +1,7 @@
 ---
 - name: grab the github for zenoss for kube
   shell: git clone https://github.com/syspimp/openshift-zenoss4
+  ignore_errors: yes
   args:
     creates: /opt/.zenoss-configed
 
