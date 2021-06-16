@@ -68,12 +68,18 @@
   args:
     creates: /opt/.zenoss-configed2
 
+- name: copy the key up to the host
+  copy:
+    src: "{{ zenoss_sshkeypath }}/{{ zenoss_sshkey }}"
+    dest: "openshift-zenoss4/{{ zenoss_sshkey }}"
+    mode: '0600'
+
 - name: copy the ssh key to zenoss pod
   shell: |
     kubectl exec -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} -- mkdir -p /home/zenoss/.ssh
     kubectl exec -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} -- chown zenoss.zenoss /home/zenoss/.ssh
     kubectl exec -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} -- chmod 700 /home/zenoss/.ssh
-    kubectl cp -n {{ zenoss_namespace }} {{ zenoss_sshkeypath }}/{{ zenoss_sshkey }} {{ zenoss_pod.stdout }}:/home/zenoss/.ssh/{{ zenoss_sshkey }}
+    kubectl cp -n {{ zenoss_namespace }} openshift-zenoss4/{{ zenoss_sshkey }} {{ zenoss_pod.stdout }}:/home/zenoss/.ssh/{{ zenoss_sshkey }}
     kubectl exec -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} -- chmod 600 /home/zenoss/.ssh/{{ zenoss_sshkey }}
     kubectl exec -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} -- chown zenoss.zenoss /home/zenoss/.ssh/{{ zenoss_sshkey }}
   args:
