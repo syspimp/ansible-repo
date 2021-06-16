@@ -54,8 +54,8 @@
 
 - name: Loop over kubectl get pods until zenoss core pod is running
   shell: kubectl get pods -n {{ zenoss_namespace }} | grep zenoss4-core || true
-  args:
-    creates: /opt/.zenoss-configed2
+  #args:
+  #  creates: /opt/.zenoss-configed2
   register: kubectltasks
   retries: "120"
   delay: "2"
@@ -65,8 +65,8 @@
   shell: |
     kubectl -n {{ zenoss_namespace }} get pods | grep zenoss4-core | awk '{print $1}'
   register: zenoss_pod
-  args:
-    creates: /opt/.zenoss-configed2
+  #args:
+  #  creates: /opt/.zenoss-configed2
 
 - name: "installing private key to accesss managed hosts"
   template:
@@ -121,6 +121,7 @@
     msg: "Visit the Zenoss home page at http://{{ ec2_ip_address }}:30080/zport/dmd/"
 
 - name: Create Org Nodes in Zenoss
+  ignore_errors: yes
   uri:
     url: "{{ zrouter }}"
     user: "{{ usingthis }}"
@@ -143,6 +144,7 @@
   loop: "{{ zenossorgs }}"
 
 - name: Create Properties on Hosts in Zenoss
+  ignore_errors: yes
   uri:
     url: "{{ zrouter }}"
     user: "{{ usingthis }}"
@@ -175,6 +177,7 @@
     value: core
 
 - name: Create a Host in Zenoss from Yaml
+  ignore_errors: yes
   uri:
     url: "{{ zrouter }}"
     user: "{{ usingthis }}"
