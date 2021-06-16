@@ -77,6 +77,14 @@
     become: yes
     when: "ansible_distribution == 'RedHat'"
 
+  - name: "Fixing bootstrap for RHEL 8 and python3"
+    shell: "sed -i -e 's/usr\/bin\/python /usr\/bin\/python3 /g' /opt/bootstrap.py"
+    ignore_errors: yes
+    become: true
+    when:
+    - "ansible_distribution == 'RedHat'"
+    - "ansible_distribution_major_version == '8'"
+
   - name: "Save the command to register to satellite server"
     template:
       src: reg-to-satellite.sh.j2
