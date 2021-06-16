@@ -56,6 +56,9 @@
 
 - name: expose the service on port 30080
   shell: |
+    kubectl get pods -n monitoring
+    sleep 20
+    kubectl get pods -n monitoring
     kubectl port-forward service/zenoss4-nginx --address 0.0.0.0 30080:80 -n monitoring &
     sleep 5
     disown
@@ -72,4 +75,4 @@
 
 - name: Visit the Zenoss home page
   debug:
-    msg: "Visit the Zenoss home page at http://{{ ec2_ip_address }}:30080/dmd/zport"
+    msg: "Visit the Zenoss home page at http://{{ ec2_ip_address }}:30080/zport/dmd/"
