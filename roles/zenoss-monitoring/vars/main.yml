@@ -29,6 +29,9 @@ zenossorgs:
   - name: Workers
     org: Linux/Ansible Tower
     desc: Ansible Tower Workers
+  - name: Inventory Groups
+    org: Linux/Ansible Tower
+    desc: Ansible Tower Inventory Groups
   - name: NFS Servers
     org: Linux
     desc: NFS Server for Openshift
@@ -146,9 +149,9 @@ cloud_user_private_key: !vault |
           30393636613263633537
 
 tower_groups:
-- clevis-clients
-- capsules
-- satellite-server
-- capsule-lb
-- tang-servers
-- tower-servers
+  - clevis-clients
+  - capsules
+  - satellite-server
+  - capsule-lb
+  - tang-servers
+  - tower-servers
