@@ -1,0 +1,56 @@
+zenoss_namespace: monitoring
+# this is the private key used to access your servers
+# it should be unique to zenoss
+zenoss_sshkey: dtaylor-openstack.priv
+zenoss_sshkeypath: /home/dataylor/.ssh
+onhere: "http://zenoss4-nginx-{{ ocpproject }}.apps.{{ ocpclustername }}.{{ ocpbaseurl }}/zport/dmd/device_router"
+usingthis: admin
+andthis: zenoss
+rootorg: Server
+zenossorgs:
+  - name: Satellite
+    org: Linux
+    desc: Satellite Infra
+  - name: Server
+    org: Linux/Satellite
+    desc: Satellite Server
+  - name: Capsules
+    org: Linux/Satellite
+    desc: Satellite Capsules
+  - name: LBs
+    org: Linux/Satellite
+    desc: Satellite Load Balancers
+  - name: Ansible Tower
+    org: Linux
+    desc: Ansible Tower Infra
+  - name: Masters
+    org: Linux/Ansible Tower
+    desc: Ansible Tower Masters
+  - name: Workers
+    org: Linux/Ansible Tower
+    desc: Ansible Tower Workers
+  - name: NFS Servers
+    org: Linux
+    desc: NFS Server for Openshift
+  - name: Openshift
+    org: Linux
+    desc: Openshift Infra
+  - name: Masters
+    org: Linux/Openshift
+    desc: Openshift Masters
+  - name: Workers
+    org: Linux/Openshift
+    desc: Openshift Workers
+addme:
+- host: 11.22.33.234
+  org: Linux/Satellite/Capsules
+- host: 11.22.33.9
+  org: Linux/Satellite/LBs
+- host: 11.22.33.102 
+  org: Linux/Satellite/Server
+- host: 11.22.33.77
+  org: Linux/Ansible Tower/Masters
+- host: 11.22.33.170
+  org: Linux/NFS Servers
+
+tothis: '/Server/Linux'

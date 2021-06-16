@@ -11,9 +11,9 @@
   args:
     creates: /opt/.zenoss-configed
 
-- name: create the monitoring namespace if not available [TODO] MAKE INTO A VARIABLE
-  shell: kubectl create namespace monitoring
-  when: "'monitoring' not in namespaces.stdout"
+- name: create the {{ zenoss_namespace }} namespace if not available [TODO] MAKE INTO A VARIABLE
+  shell: kubectl create namespace {{ zenoss_namespace }}
+  when: "'{{ zenoss_namespace }}' not in namespaces.stdout"
   args:
     creates: /opt/.zenoss-configed
 
@@ -24,30 +24,30 @@
 
 - name: create the zenoss volume claim objects
   shell: |
-    for i in openshift-zenoss4/objects/*claim*yaml; do echo working on $i ; kubectl apply -n monitoring -f $i ; done ;
+    for i in openshift-zenoss4/objects/*claim*yaml; do echo working on $i ; kubectl apply -n {{ zenoss_namespace }} -f $i ; done ;
   args:
     creates: /opt/.zenoss-configed
     
 - name: create the zenoss configmap objects
   shell: |
-    for i in openshift-zenoss4/objects/*configmap*yaml; do echo working on $i ; kubectl apply -n monitoring -f $i ; done ;
+    for i in openshift-zenoss4/objects/*configmap*yaml; do echo working on $i ; kubectl apply -n {{ zenoss_namespace }} -f $i ; done ;
   args:
     creates: /opt/.zenoss-configed
     
 - name: create the zenoss deployment objects
   shell: |
-    for i in openshift-zenoss4/objects/*deployment*yaml; do echo working on $i ; kubectl apply -n monitoring -f $i ; done ;
+    for i in openshift-zenoss4/objects/*deployment*yaml; do echo working on $i ; kubectl apply -n {{ zenoss_namespace }} -f $i ; done ;
   args:
     creates: /opt/.zenoss-configed
     
 - name: create the zenoss services objects
   shell: |
-    for i in openshift-zenoss4/objects/*service*yaml; do echo working on $i ; kubectl apply -n monitoring -f $i ; done ;
+    for i in openshift-zenoss4/objects/*service*yaml; do echo working on $i ; kubectl apply -n {{ zenoss_namespace }} -f $i ; done ;
   args:
     creates: /opt/.zenoss-configed
 
 - name: Loop over kubectl get pods until zenoss core pod is running
-  shell: kubectl get pods -n monitoring | grep zenoss4-core || true
+  shell: kubectl get pods -n {{ zenoss_namespace }} | grep zenoss4-core || true
   args:
     creates: /opt/.zenoss-configed
   register: kubectltasks
@@ -55,12 +55,36 @@
   delay: "2"
   until: "'Running' in kubectltasks.stdout"
 
+- name: grab the zenoss-core pod name
+  shell: |
+    kubectl -n {{ zenoss_namespace }} get pods | grep zenoss4-core | awk '{print $1}'
+  register: zenoss_pod
+  args:
+    creates: /opt/.zenoss-configed
+
+- name: copy the ssh key to zenoss pod
+  shell: |
+    kubectl -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} exec -- mkdir -p /home/zenoss/.ssh
+    kubectl -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} exec -- chown zenoss.zenoss /home/zenoss/.ssh
+    kubectl -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} exec -- chmod 700 /home/zenoss/.ssh
+    kubectl-n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} cp {{ zenoss_sshkeypath }}/{{ zenoss_sshkey }} {{ zenoss_pod.stdout }}:/home/zenoss/.ssh/{{ zenoss_sshkey }}
+    kubectl -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} exec -- chmod 600 /home/zenoss/.ssh/{{ zenoss_sshkey }}
+    kubectl -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} exec -- chown zenoss.zenoss /home/zenoss/.ssh/{{ zenoss_sshkey }}
+  args:
+    creates: /opt/.zenoss-configed
+
+- name: fixing permissions on /opt/zenoss/perf
+  shell: |
+    kubectl -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} exec -- chown zenoss.zenoss /opt/zenoss/perf
+  args:
+    creates: /opt/.zenoss-configed
+
 - name: expose the service on port 30080
   shell: |
-    kubectl get pods -n monitoring
+    kubectl get pods -n {{ zenoss_namespace }}
     sleep 20
-    kubectl get pods -n monitoring
-    nohup kubectl port-forward service/zenoss4-nginx --address 0.0.0.0 30080:80 -n monitoring </dev/null >/dev/null 2>&1 &
+    kubectl get pods -n {{ zenoss_namespace }}
+    nohup kubectl port-forward service/zenoss4-nginx --address 0.0.0.0 30080:80 -n {{ zenoss_namespace }} </dev/null >/dev/null 2>&1 &
     sleep 5
     disown
     sleep 1
@@ -74,6 +98,99 @@
   args:
     creates: /opt/.zenoss-configed
 
+- name: Set the zenoss device router fact
+  set_fact:
+    zrouter: "http://{{ ec2_ip_address }}:30080/zport/dmd/device_router"
+
 - name: Visit the Zenoss home page
   debug:
     msg: "Visit the Zenoss home page at http://{{ ec2_ip_address }}:30080/zport/dmd/"
+
+  - name: Create Org Nodes in Zenoss
+    uri:
+      url: "{{ zrouter }}"
+      user: "{{ usingthis }}"
+      password: "{{ andthis }}"
+      method: POST
+#      body: "{"action":"DeviceRouter","method":"addNode","data":[{"id":"Openshift","description":"Openshift Cluster","type":"organizer","contextUid":"/zport/dmd/Devices/Server/Linux"}],"type":"rpc","tid":51}"
+      body:
+      - action: DeviceRouter
+        method: addNode
+        data:
+        - id: "{{ item.name }}"
+          description: "{{ item.desc }}"
+          type: organizer
+          contextUid: "/zport/dmd/Devices/{{ rootorg }}/{{ item.org }}"
+        tid: 51
+        type: rpc
+      force_basic_auth: yes
+      status_code: 200
+      body_format: json
+    loop: "{{ zenossorgs }}"
+
+  - name: Create Properties on Hosts in Zenoss
+    uri:
+      url: "{{ zrouter }}"
+      user: "{{ usingthis }}"
+      password: "{{ andthis }}"
+      method: POST
+#      body: {"action":"DeviceRouter","method":"setZenProperty","data":[{"uid":"/zport/dmd/Devices/Server/Linux","zProperty":"zCommandUsername","value":"root"}],"type":"rpc","tid":26}
+#      body: {"action":"DeviceRouter","method":"setZenProperty","data":[{"uid":"/zport/dmd/Devices/Server/Linux","zProperty":"zKeyPath","value":"~/.ssh/id_rsa"}],"type":"rpc","tid":35}
+#      body: {"action":"DeviceRouter","method":"setZenProperty","data":[{"uid":"/zport/dmd/Devices/Server/Linux/Openshift","zProperty":"zCommandUsername","value":"core"}],"type":"rpc","tid":51}
+      body:
+      - action: DeviceRouter
+        method: setZenProperty
+        data:
+        - uid: "{{ item.uid }}"
+          zProperty: "{{ item.property }}"
+          value: "{{ item.value }}"
+        tid: 51
+        type: rpc
+      force_basic_auth: yes
+      status_code: 200
+      body_format: json
+    loop:
+    - uid: /zport/dmd/Devices/Server/Linux
+      property: zCommandUsername
+      value: root
+    - uid: /zport/dmd/Devices/Server/Linux
+      property: zKeyPath
+      value: "~/.ssh/id_rsa"
+    - uid: /zport/dmd/Devices/Server/Linux/Openshift
+      property: zCommandUsername
+      value: core
+
+  - name: Create a Host in Zenoss from Yaml
+    uri:
+      url: "{{ zrouter }}"
+      user: "{{ usingthis }}"
+      password: "{{ andthis }}"
+      method: POST
+#      body: "{\"action\":\"DeviceRouter\",\"method\":\"addDevice\",\"data\":[{{ data }}], \"tid\":1}"
+      body:
+      - action: DeviceRouter
+        method: addDevice
+        data:
+        - deviceName: "{{ item.host }}"
+          deviceClass: "/{{ rootorg }}/{{ item.org }}"
+          collector: localhost
+          model: true
+          title: ""
+          productionState: 1000
+          priority: 3
+          snmpCommunity: RTO
+          snmpPort: 161
+          tag: ""
+          rackSlot: "aws"
+          serialNumber: "0"
+          hwManufacturer: "aws"
+          hwProductName: "aws"
+          osManufacturer: "Redhat"
+          osProductName: "Redhat"
+          comments: "added by ansible"
+        tid: 1
+      force_basic_auth: yes
+      status_code: 200
+      body_format: json
+    loop: "{{ addme }}"
+
