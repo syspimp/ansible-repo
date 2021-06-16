@@ -1,0 +1,42 @@
+---
+- name: Backup Satellite 6
+  vars:
+    backup_mount: /tmp/sat6backup
+    full_backup: "{{ backup_mount }}/somedate"
+  hosts: satellite-server:capsules
+  tasks:
+  - name: find backup server from tower inventories
+    uri: ...
+  - name: set fact for backup server
+    backup_server: ...
+  - name: make sure directory exists
+    file:
+      path: "{{ backup_mount }}"
+      directory: yes
+      mode: 0777
+  - name: mount backup server to directory
+    mount: ..
+  - name: make hostname directory
+    file:
+      path: "{{ backup_mount }}/{{ inventory_hostname }}"
+      directory: yes
+  - name: run online full backup
+    shell: satellite-maintain backup online -y --features all {{ backup_mount }}/{{ inventory_hostname }}/
+    when: backup_type == 'online'
+  - name: run online backup but skip pulp data
+    shell: satellite-maintain backup online -y --skip-pulp-content --features all {{ backup_mount }}/{{ inventory_hostname }}/
+    when: backup_type == 'online_skip_pulp'
+  - name: run offline full backup
+    shell: satellite-maintain backup offline -y --features all {{ backup_mount }}/{{ inventory_hostname }}/
+    when: backup_type == 'offline'
+  - name: run offline backup but skip pulp data
+    shell: satellite-maintain backup offline -y --skip-pulp-content --features all {{ backup_mount }}/{{ inventory_hostname }}/
+    when: backup_type == 'offline_skip_pulp'
+  - name: run offline backup incremental, needs full backup directory variable set
+    shell: satellite-maintain backup offline -y --incremental --features all {{ fullbackup_dir }} {{ backup_mount }}/{{ inventory_hostname }}/
+    when: backup_type == 'offline_incremental'
+  - name: run lvm snapshot backup
+    shell: satellite-maintain backup snapshot -y --incremental --features all {{ backup_mount }}/{{ inventory_hostname }}/
+    when: backup_type == 'lvm_snapshot'
+  - name: unmount backup server
+    mount: ..
