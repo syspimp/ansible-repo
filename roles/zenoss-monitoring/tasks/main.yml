@@ -64,18 +64,18 @@
 
 - name: copy the ssh key to zenoss pod
   shell: |
-    kubectl -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} exec -- mkdir -p /home/zenoss/.ssh
-    kubectl -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} exec -- chown zenoss.zenoss /home/zenoss/.ssh
-    kubectl -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} exec -- chmod 700 /home/zenoss/.ssh
-    kubectl-n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} cp {{ zenoss_sshkeypath }}/{{ zenoss_sshkey }} {{ zenoss_pod.stdout }}:/home/zenoss/.ssh/{{ zenoss_sshkey }}
-    kubectl -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} exec -- chmod 600 /home/zenoss/.ssh/{{ zenoss_sshkey }}
-    kubectl -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} exec -- chown zenoss.zenoss /home/zenoss/.ssh/{{ zenoss_sshkey }}
+    kubectl exec -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} -- mkdir -p /home/zenoss/.ssh
+    kubectl exec -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} -- chown zenoss.zenoss /home/zenoss/.ssh
+    kubectl exec -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} -- chmod 700 /home/zenoss/.ssh
+    kubectl cp -n {{ zenoss_namespace }} {{ zenoss_sshkeypath }}/{{ zenoss_sshkey }} {{ zenoss_pod.stdout }}:/home/zenoss/.ssh/{{ zenoss_sshkey }}
+    kubectl exec -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} -- chmod 600 /home/zenoss/.ssh/{{ zenoss_sshkey }}
+    kubectl exec -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} -- chown zenoss.zenoss /home/zenoss/.ssh/{{ zenoss_sshkey }}
   args:
     creates: /opt/.zenoss-configed
 
 - name: fixing permissions on /opt/zenoss/perf
   shell: |
-    kubectl -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} exec -- chown zenoss.zenoss /opt/zenoss/perf
+    kubectl exec -n {{ zenoss_namespace }} {{ zenoss_pod.stdout }} -- chown zenoss.zenoss /opt/zenoss/perf
   args:
     creates: /opt/.zenoss-configed
 
