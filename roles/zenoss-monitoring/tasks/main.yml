@@ -68,11 +68,13 @@
   args:
     creates: /opt/.zenoss-configed2
 
-- name: copy the key up to the host
-  copy:
-    src: "{{ zenoss_sshkeypath }}/{{ zenoss_sshkey }}"
+- name: "installing private key to accesss managed hosts"
+  template:
+    src: blank.key.j2
     dest: "openshift-zenoss4/{{ zenoss_sshkey }}"
-    mode: '0600'
+    owner: cloud-user
+    group: cloud-user
+    mode: 0600
 
 - name: copy the ssh key to zenoss pod
   shell: |
