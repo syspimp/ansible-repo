@@ -129,6 +129,14 @@
             from_port: 1
             to_port: 65535
             cidr_ip: "{{ aws_security_group_allow_cidr }}"
+          - proto: udp
+            from_port: 161
+            to_port: 161
+            cidr_ip: "{{ aws_security_group_allow_cidr }}"
+          - proto: udp
+            from_port: 30514
+            to_port: 30514
+            cidr_ip: "{{ aws_security_group_allow_cidr }}"
       register: security_group
 
     - name: launch an ec2 instance in a vpc subnet with second volume
