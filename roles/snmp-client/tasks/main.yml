@@ -22,6 +22,6 @@
 - name: "Enable and start snmpd service"
   service:
     name: snmpd
-    state: running
+    state: started
     enabled: yes
   become: true
