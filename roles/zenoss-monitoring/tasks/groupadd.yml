@@ -52,7 +52,7 @@
       - id: "{{ towergroup }}"
         description: "{{ towergroup }} Tower Inventory Group"
         type: organizer
-        contextUid: "/zport/dmd/Devices/{{ rootorg }}/Linux/Ansible Tower/Inventory Groups/{{ towergroup }}"
+        contextUid: "/zport/dmd/Devices/{{ rootorg }}/Linux/Ansible Tower/Inventory Groups"
       tid: 51
       type: rpc
     force_basic_auth: yes
