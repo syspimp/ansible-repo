@@ -213,6 +213,6 @@
 
 - name: monitor hosts in tower groups
   include_tasks: groupadd.yml
-  loop: tower_groups
+  loop: "{{ tower_groups }}"
   loop_control:
     loop_var: towergroup
