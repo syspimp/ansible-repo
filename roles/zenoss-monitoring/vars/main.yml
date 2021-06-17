@@ -45,16 +45,16 @@ zenossorgs:
     org: Linux/Openshift
     desc: Openshift Workers
 addme:
-- host: 11.22.33.234
-  org: Linux/Satellite/Capsules
-- host: 11.22.33.9
-  org: Linux/Satellite/LBs
-- host: 11.22.33.102 
-  org: Linux/Satellite/Server
-- host: 11.22.33.77
-  org: Linux/Ansible Tower/Masters
-- host: 11.22.33.170
-  org: Linux/NFS Servers
+#- host: 11.22.33.234
+#  org: Linux/Satellite/Capsules
+#- host: 11.22.33.9
+#  org: Linux/Satellite/LBs
+#- host: 11.22.33.102 
+#  org: Linux/Satellite/Server
+#- host: 11.22.33.77
+#  org: Linux/Ansible Tower/Masters
+#- host: 11.22.33.170
+#  org: Linux/NFS Servers
 
 tothis: '/Server/Linux'
 cloud_user_private_key: !vault |
