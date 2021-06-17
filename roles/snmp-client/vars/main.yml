@@ -3,4 +3,4 @@ snmpd:
   sysdescr: "{{ ansible_local['awsroles']['default']['role'] }}"
   syscontact: "Powered by Ansible"
   syslocation: "Somewhere ..."
-  rocommunity: "AWS_RTO"
+  rocommunity: "RTO"

@@ -8,6 +8,7 @@
   roles:
     - firstboot
     - satellite-clients
+    - snmp-client
     - webconsole
     - insights
     - awsroles
