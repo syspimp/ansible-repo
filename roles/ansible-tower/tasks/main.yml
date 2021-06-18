@@ -74,13 +74,23 @@
     ansible-tower-service restart
   become: true
 
-- name: "Install tower-cli"
+- name: "Install tower-cli repo"
   shell: |
     yum-config-manager --add-repo https://releases.ansible.com/ansible-tower/cli/ansible-tower-cli-el7.repo
     yum -y install ansible-tower-cli
-    tower-cli config host localhost
-    tower-cli config username {{ tower_user }}
-    tower-cli config password {{ tower_pass }}
+  become: true
+
+- name: "install tower-cli"
+  yum:
+    name: ansible-tower-cli
+    state: present
+  become: true
+
+- name: "Config tower-cli"
+  shell: |
+    awx config host localhost
+    awx config username {{ tower_user }}
+    awx config password {{ tower_pass }}
   become: true
 
 - name: "Copy over backup file {{ backup_file_src }}"
