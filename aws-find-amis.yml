@@ -27,4 +27,4 @@
 
   - debug:
       msg:  "Image {{ item.name }} is using AMI {{ item.ami }}"
-    loop: images
+    loop: "{{ images }}"
