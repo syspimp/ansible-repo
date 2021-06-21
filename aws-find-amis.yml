@@ -13,8 +13,15 @@
 
   - set_fact:
       vars:
-        name: "{{ item.tags.Name }}"
-        ami: "{{item.image_id }}"
+        key: "name"
+        value: "{{item.tags.Name }}"
+      images: "{{ images | combine( { key: value } ) }}"
+    loop: "{{ results.instances }}"
+
+  - set_fact:
+      vars:
+        key: "ami"
+        value: "{{item.image_id }}"
       images: "{{ images | combine( { key: value } ) }}"
     loop: "{{ results.instances }}"
 
