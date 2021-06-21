@@ -28,4 +28,4 @@
   - debug:
       msg:  "Image item.tags.Name }} is using AMI {{ item.image_id }}"
     loop: "{{ results.instances }}"
-    no_log: True
+    #no_log: True
