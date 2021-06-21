@@ -12,4 +12,4 @@
 
   - debug:
       msg: "{{ item.tags }} is using AMI {{ item.image_id }}"
-    loop: results.instances
+    loop: "{{ results.instances }}"
