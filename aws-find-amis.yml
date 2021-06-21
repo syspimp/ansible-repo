@@ -1,31 +1,39 @@
-- hosts: all
+- hosts: localhost
   vars:
-    images: []
+    region: us-east-1
   environment:
     AWS_ACCESS_KEY_ID: "{{ AWS_ACCESS_KEY_ID }}"
     AWS_SECRET_KEY: "{{ AWS_SECRET_KEY }}"
   tasks:
-  - ec2_instance_info:
-      #filters:
-      #  "tag:Name": dataylor
-      region: us-east-1
+  - name: Gather info on all the AWS accounts in a region
+    ec2_instance_info:
+      region: "{{ region }}"
     register: results
 
-#  - set_fact:
-#      images: "{{ images | combine( { key: value } ) }}"
-#    vars:
-#      key: "name"
-#      value: "{{item.tags.Name }}"
-#    loop: "{{ results.instances }}"
-#
-#  - set_fact:
-#      images: "{{ images | combine( { key: value } ) }}"
-#    vars:
-#      key: "ami"
-#      value: "{{item.image_id }}"
-#    loop: "{{ results.instances }}"
+  - name: Get the info on the AMIs
+    ec2_ami_info:
+      image_ids: "{{ item }}"
+    register: amiinfo
+    loop: "{{ results.instances | map(attribute='image_id') | list | unique }}"
 
-  - debug:
-      msg:  "Image item.tags.Name }} is using AMI {{ item.image_id }}"
-    loop: "{{ results.instances }}"
-    #no_log: True
+  - name: Generate the csv file in /tmp/amis.csv
+    template:
+      src:  "amis.csv.j2"
+      dest: /tmp/amis.csv
+
+  - name: Generate the csv file in /tmp/amiinfo.csv
+    template:
+      src:  "amiinfo.csv.j2"
+      dest: /tmp/amiinfo.csv
+
+  - name: get the contents of the files
+    shell: |
+      echo "amsi.csv ============="
+      cat /tmp/amis.csv
+      echo "amiinfo.csv =========="
+      cat /tmp/amiinfo.csv
+    register: output
+
+  - name: show the contents of the files
+    debug:
+      var: output.stdout
