@@ -5,8 +5,8 @@
     AWS_SECRET_KEY: "{{ AWS_SECRET_KEY }}"
   tasks:
   - ec2_instance_info:
-      filters:
-        "tag:Name": dataylor
+      #filters:
+      #  "tag:Name": dataylor
       region: us-east-1
     register: results
 
