@@ -11,4 +11,4 @@
     register: results
 
   - debug:
-      var: results
+      msg: "{{ results.instances.tags }} is using AMI {{ results.instances.image_id }}"
