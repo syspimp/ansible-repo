@@ -11,4 +11,5 @@
     register: results
 
   - debug:
-      msg: "{{ results.instances.tags }} is using AMI {{ results.instances.image_id }}"
+      msg: "{{ item.tags }} is using AMI {{ item.image_id }}"
+    loop: results.instances
