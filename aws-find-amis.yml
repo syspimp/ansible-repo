@@ -11,20 +11,21 @@
       region: us-east-1
     register: results
 
-  - set_fact:
-      images: "{{ images | combine( { key: value } ) }}"
-    vars:
-      key: "name"
-      value: "{{item.tags.Name }}"
-    loop: "{{ results.instances }}"
-
-  - set_fact:
-      images: "{{ images | combine( { key: value } ) }}"
-    vars:
-      key: "ami"
-      value: "{{item.image_id }}"
-    loop: "{{ results.instances }}"
+#  - set_fact:
+#      images: "{{ images | combine( { key: value } ) }}"
+#    vars:
+#      key: "name"
+#      value: "{{item.tags.Name }}"
+#    loop: "{{ results.instances }}"
+#
+#  - set_fact:
+#      images: "{{ images | combine( { key: value } ) }}"
+#    vars:
+#      key: "ami"
+#      value: "{{item.image_id }}"
+#    loop: "{{ results.instances }}"
 
   - debug:
-      msg:  "Image {{ item.name }} is using AMI {{ item.ami }}"
-    loop: "{{ images }}"
+      msg:  "Image item.tags.Name }} is using AMI {{ item.image_id }}"
+    loop: "{{ results.instances }}"
+    no_log: True
