@@ -1,0 +1,5 @@
+- hosts: all
+  tasks:
+  - ec2_instance_facts:
+      filters:
+        "tag:Name": dataylor
