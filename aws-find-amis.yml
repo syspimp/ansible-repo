@@ -19,10 +19,10 @@
     loop: "{{ results.instances }}"
 
   - set_fact:
-      vars:
-        key: "ami"
-        value: "{{item.image_id }}"
       images: "{{ images | combine( { key: value } ) }}"
+    vars:
+      key: "ami"
+      value: "{{item.image_id }}"
     loop: "{{ results.instances }}"
 
   - debug:
