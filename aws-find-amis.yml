@@ -1,6 +1,7 @@
 - hosts: all
+  vars:
+    images: []
   environment:
-    # these can be ansible tower/awx credentials
     AWS_ACCESS_KEY_ID: "{{ AWS_ACCESS_KEY_ID }}"
     AWS_SECRET_KEY: "{{ AWS_SECRET_KEY }}"
   tasks:
@@ -10,6 +11,13 @@
       region: us-east-1
     register: results
 
-  - debug:
-      msg: "{{ item.tags }} is using AMI {{ item.image_id }}"
+  - set_fact:
+      vars:
+        name: "{{ item.tags.Name }}"
+        ami: "{{item.image_id }}"
+      images: "{{ images | combine( { key: value } ) }}"
     loop: "{{ results.instances }}"
+
+  - debug:
+      msg:  "Image {{ item.name }} is using AMI {{ item.ami }}"
+    loop: images
