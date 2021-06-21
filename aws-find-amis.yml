@@ -12,10 +12,10 @@
     register: results
 
   - set_fact:
-      vars:
-        key: "name"
-        value: "{{item.tags.Name }}"
       images: "{{ images | combine( { key: value } ) }}"
+    vars:
+      key: "name"
+      value: "{{item.tags.Name }}"
     loop: "{{ results.instances }}"
 
   - set_fact:
