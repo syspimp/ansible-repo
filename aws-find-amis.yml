@@ -3,6 +3,7 @@
   - ec2_instance_facts:
       filters:
         "tag:Name": dataylor
+        availability-zone: us-east-1
     register: results
 
   - debug:
