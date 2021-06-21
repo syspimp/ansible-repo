@@ -3,3 +3,7 @@
   - ec2_instance_facts:
       filters:
         "tag:Name": dataylor
+    register: results
+
+  - debug:
+      var: results.instances.image_id
