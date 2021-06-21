@@ -11,4 +11,4 @@
     register: results
 
   - debug:
-      var: results.instances.image_id
+      var: results
