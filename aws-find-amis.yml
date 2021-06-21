@@ -13,6 +13,7 @@
   - name: Get the info on the AMIs
     ec2_ami_info:
       image_ids: "{{ item }}"
+      region: "{{ region }}"
     register: amiinfo
     loop: "{{ results.instances | map(attribute='image_id') | list | unique }}"
 
