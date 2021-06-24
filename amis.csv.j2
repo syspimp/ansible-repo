@@ -1,0 +1,4 @@
+AWS Name tag,AMI ID,AWS SSH Key
+{% for row in results.instances %}
+{{ row.tags.Name }},{{ row.image_id }}, {{ row.key_name | default('None',true) }}
+{% endfor %}
