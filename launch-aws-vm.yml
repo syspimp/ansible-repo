@@ -36,8 +36,10 @@
     aws_security_group_allow_cidr: "0.0.0.0/0"
     aws_region: us-east-1
     aws_number_of_vms: 1
-    #aws_vpc_id: vpc-0494b7798600fd4de
-    aws_vpc_id: vpc-030130353f09b2b95
+    # TFOUND
+    aws_vpc_id: vpc-0494b7798600fd4de
+    # RTO
+    #aws_vpc_id: vpc-030130353f09b2b95
     # CentOS 7
     centos7_ami_id: ami-0affd4508a5d2481b
     # RHEL 7 old and busted
