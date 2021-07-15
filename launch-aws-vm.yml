@@ -8,7 +8,10 @@
   hosts: localhost
   gather_facts: no
   vars:
-    aws_vpc_subnet_id: subnet-03960a62ece2d78dc
+    # RTO
+    #aws_vpc_subnet_id: subnet-03960a62ece2d78dc
+    # TFOUND
+    aws_vpc_subnet_id: subnet-00dcd796d8781819a
     aws_location: TFOUND
     # this fact will be used later to include role in the callback
     # - name: "Include roles for AWS servers"
