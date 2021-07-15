@@ -68,6 +68,7 @@
     # update the tower/awx inventory after launching
     tower_inventory_ids:
       - 35
+      - 29
   environment:
     # these can be ansible tower/awx credentials
     #AWS_ACCESS_KEY_ID: "{{ AWS_ACCESS_KEY_ID }}"
