@@ -8,7 +8,8 @@
   hosts: localhost
   gather_facts: no
   vars:
-    aws_location: RTO
+    aws_vpc_subnet_id: subnet-03960a62ece2d78dc
+    aws_location: TFOUND
     # this fact will be used later to include role in the callback
     # - name: "Include roles for AWS servers"
     #   include_role:
@@ -16,15 +17,16 @@
     #   when: ansible_local['awsroles'] is defined
     aws_role: ansible-tower
     aws_secondary_role: 'None'
-    sdlc_environment: development
-    dns_domain: dev.maskedadmins.com
-    aws_location: TFOUND
+    sdlc_environment: production
+    dns_domain: prod.maskedadmins.com
+    #aws_location: TFOUND
     # the public key for cloud-user user
     #automation_user_pub_key: "rsa ..."
     # the root user password
     root_password: "redhat123"
     # aws specific configuration
-    aws_vmname: testvm
+    aws_ostype: rhel7
+    aws_vmname: tower
     aws_assign_public_ip: yes
     aws_volume_size: 150
     aws_multivolumes: no
@@ -63,8 +65,10 @@
       - 35
   environment:
     # these can be ansible tower/awx credentials
-    AWS_ACCESS_KEY_ID: "{{ AWS_ACCESS_KEY_ID }}"
-    AWS_SECRET_KEY: "{{ AWS_SECRET_KEY }}"
+    #AWS_ACCESS_KEY_ID: "{{ AWS_ACCESS_KEY_ID }}"
+    #AWS_SECRET_KEY: "{{ AWS_SECRET_KEY }}"
+    AWS_ACCESS_KEY_ID: "{{ TFOUND_AWS_ACCESS_KEY_ID }}"
+    AWS_SECRET_KEY: "{{ TFOUND_AWS_SECRET_KEY }}"
   tasks:
     #use this if you forget your encrypted aws creds
     #- name: "AWS_ACCESS_KEY_ID"
@@ -335,19 +339,20 @@
            # this is post configuration job template
            - /tmp/firstboot.sh
 
-    - name: Update the AWS Inventory
-      uri:
-        url: https://{{ tower_server }}/api/v2/inventory_sources/{{ item }}/update/
-        validate_certs: no
-        method: POST
-        user: "{{ tower_user }}"
-        password: "{{ tower_pass }}"
-        force_basic_auth: yes
-        status_code: [201,202]
-        body_format: json
-      with_items:
-        - "{{ tower_inventory_ids }}"
-
+#    - name: Update the AWS Inventory
+#      ignore_errors: yes
+#      uri:
+#        url: https://{{ tower_server }}/api/v2/inventory_sources/{{ item }}/update/
+#        validate_certs: no
+#        method: POST
+#        user: "{{ tower_user }}"
+#        password: "{{ tower_pass }}"
+#        force_basic_auth: yes
+#        status_code: [201,202]
+#        body_format: json
+#      with_items:
+#        - "{{ tower_inventory_ids }}"
+#
 #    - name: launch an ec2 instance in a public vpc
 #      when: aws_vpc_subnet_publicid is defined
 #      ignore_errors: yes
