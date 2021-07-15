@@ -5,7 +5,8 @@ sat6_default_location: "AWS_RTO"
 sat6_default_org: "Redhat_Lab"
 capsules_inventory_group: 81
 satellite_inventory_group: 710
-tower_server: 11.22.33.77
+#tower_server: 11.22.33.77
+tower_server: 10.0.0.50
 tower_user: admin
 tower_pass: !vault |
           $ANSIBLE_VAULT;1.1;AES256
