@@ -534,23 +534,39 @@
   args:
     creates: /root/.setup/step14
 
+- name: "Get the ids of all the repos"
+  shell: |
+    hammer --csv repository list --organization-id 1 --fields id | grep -v 'Id'
+  become: true
+  register: availrepoids
+  args:
+    creates: /root/.setup/step15
+
+- name: "Set the available repos fact"
+  set_fact:
+    availablerepos: "{{ availrepoids.stdout.split() | join(',') }}"
+
+- name: "debug the repos fact"
+  debug: var=availablerepos
+
 - name: "Creating Base Content View"
   shell: |
-      set -x
-      sattoolsid=$(hammer repository list --organization {{ sat6_default_org }} | grep "Satellite Tools {{ satellite_version }}" | awk '{print $1}')
-      rhelrepoid=$(hammer repository list --organization {{ sat6_default_org }} | grep "Linux 7 Server RPMs x86_64 7Server" | awk '{print $1}')
-      ksid=$(hammer repository list --organization {{ sat6_default_org }} | grep "Linux 7 Server Kickstart x86_64 7Server" | awk '{print $1}')
-      commonid=$(hammer repository list --organization {{ sat6_default_org }} | grep "Common" | awk '{print $1}')
-      extraid=$(hammer repository list --organization {{ sat6_default_org }} | grep "Extras" | awk '{print $1}')
-      optionalid=$(hammer repository list --organization {{ sat6_default_org }} | grep "Optional" | awk '{print $1}')
+      #set -x
+      #sattoolsid=$(hammer repository list --organization {{ sat6_default_org }} | grep "Satellite Tools {{ satellite_version }}" | awk '{print $1}')
+      #rhelrepoid=$(hammer repository list --organization {{ sat6_default_org }} | grep "Linux 7 Server RPMs x86_64 7Server" | awk '{print $1}')
+      #ksid=$(hammer repository list --organization {{ sat6_default_org }} | grep "Linux 7 Server Kickstart x86_64 7Server" | awk '{print $1}')
+      #commonid=$(hammer repository list --organization {{ sat6_default_org }} | grep "Common" | awk '{print $1}')
+      #extraid=$(hammer repository list --organization {{ sat6_default_org }} | grep "Extras" | awk '{print $1}')
+      #optionalid=$(hammer repository list --organization {{ sat6_default_org }} | grep "Optional" | awk '{print $1}')
       #fastdataid=$(hammer repository list --organization {{ sat6_default_org }} | grep "Fast Datapath" | awk '{print $1}')
       #openstackid=$(hammer repository list --organization {{ sat6_default_org }} | grep "OpenStack Platform {{ openstack_version }} for RHEL 7" | awk '{print $1}')
       #openstackdevid=$(hammer repository list --organization {{ sat6_default_org }} | grep "OpenStack Platform {{ openstack_version }} Developer Tools" | awk '{print $1}')
       #openshiftid=$(hammer repository list --organization {{ sat6_default_org }} | grep "Red Hat OpenShift Container Platform" | awk '{print $1}')
       #--repository-ids "${extraid},${ksid},${rhelrepoid},${sattoolsid},${commonid},${optionalid},${fastdataid},${openstackid},${openstackdevid},${openshiftid}"
+      #--repository-ids "${extraid},${ksid},${rhelrepoid},${sattoolsid},${commonid},${optionalid}" \
       hammer content-view create --name "Base" \
       --description "Base operating system" \
-      --repository-ids "${extraid},${ksid},${rhelrepoid},${sattoolsid},${commonid},${optionalid}" \
+      --repository-ids "{{ availablerepos }}" \
       --organization "{{ sat6_default_org }}"
       hammer content-view publish --name "Base" \
       --description "Initial content view for our operating system" \

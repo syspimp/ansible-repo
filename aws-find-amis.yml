@@ -37,4 +37,4 @@
 
   - name: show the contents of the files
     debug:
-      var: output.stdout
+      var: output.stdout_lines
