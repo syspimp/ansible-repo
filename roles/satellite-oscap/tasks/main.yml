@@ -273,6 +273,7 @@
         #delegate_to: "{{ sat6_server }}"
   
       - name: "Create Oscap RHEL7 DSS Policy"
+        ignore_errors: true
         shell: |
           hammer policy create --hostgroup-ids {{ item }} --location-id 2 --organization-id 1 --period weekly --weekday friday --scap-content-id 4 --scap-content-profile-id 33 --deploy-by ansible --name "SCAP RHEL7 DSS Policy"
         loop: "{{ hostgroupids.stdout.split() }}"
