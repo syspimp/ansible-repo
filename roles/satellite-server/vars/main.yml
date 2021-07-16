@@ -209,34 +209,34 @@ sat6_product_repomap:
   productid: 249
   repoids:
   - name: "Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server"
-      releasever: "7Server"
-      basearch: "x86_64"
-      id: 2808
-  - name: "Red Hat Ansible Engine"
-    productid: 208
-    repoids:
-    - name: "Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server"
-      releasever: "7Server"
-      basearch: "x86_64"
-      id: 9318
-    - name: "Red Hat Ansible Engine 2.9 for RHEL 8 x86_64 (RPMs)"
-      releasever: "8"
-      basearch: "x86_64"
-      id: 9330
-  - name: "Red Hat Satellite"
-    productid: 50
-    repoids:
-    - name: "Red Hat Satellite {{ satellite_version }} (for RHEL 7 Server) (RPMs)"
-      releasever: "7Server"
-      basearch: "x86_64"
-      id: 11455
-  - name: "Red Hat Satellite Capsule"
-    productid: 87
-    repoids:
-    - name: "Red Hat Satellite Capsule {{ satellite_version }} (for RHEL 7 Server) (RPMs)"
-      releasever: "7Server"
-      basearch: "x86_64"
-      id: 11459
+    releasever: "7Server"
+    basearch: "x86_64"
+    id: 2808
+- name: "Red Hat Ansible Engine"
+  productid: 208
+  repoids:
+  - name: "Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server"
+    releasever: "7Server"
+    basearch: "x86_64"
+    id: 9318
+  - name: "Red Hat Ansible Engine 2.9 for RHEL 8 x86_64 (RPMs)"
+    releasever: "8"
+    basearch: "x86_64"
+    id: 9330
+- name: "Red Hat Satellite"
+  productid: 50
+  repoids:
+  - name: "Red Hat Satellite {{ satellite_version }} (for RHEL 7 Server) (RPMs)"
+    releasever: "7Server"
+    basearch: "x86_64"
+    id: 11455
+- name: "Red Hat Satellite Capsule"
+  productid: 87
+  repoids:
+  - name: "Red Hat Satellite Capsule {{ satellite_version }} (for RHEL 7 Server) (RPMs)"
+    releasever: "7Server"
+    basearch: "x86_64"
+    id: 11459
 
 
 #sat6_enabled_repos:
