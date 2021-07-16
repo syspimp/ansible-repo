@@ -704,7 +704,7 @@
   shell: |
     hammer os list | grep {{ item }} || \
     hammer os create --name {{ item.split()[0] }} --major {{ item.split()[1] }}
-  loop: {{ sat6_managed_systems }}
+  loop: "{{ sat6_managed_systems }}"
   args:
     creates: /root/.setup/step23aa
 
