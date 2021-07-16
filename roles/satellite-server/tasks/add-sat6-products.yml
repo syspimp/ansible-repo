@@ -1,0 +1,12 @@
+---
+- name: "Provisioning Satellite 6 - base repositories"
+  shell: |
+      hammer repository-set enable \
+      --id "{{ item.id }}" \
+      --releasever "{{ item.releasever }}" --basearch "{{ item.basearch }}" \
+      --product-id "{{ product.productid }}" --organization-id "{{ sat6_default_org_id }}"
+  become: true
+  with_items: "{{ product.repoids }}"
+  ignore_errors: yes
+  args:
+    creates: /root/.setup/step11a

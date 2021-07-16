@@ -441,85 +441,58 @@
   args:
     creates: /root/.setup/step10
 
-- name: "Provisioning Satellite 6 - base repositories"
-  shell: |
-      hammer repository-set enable \
-      --name "{{ item.name }}" \
-      --releasever "7Server" --basearch "x86_64" \
-      --product "{{ item.product }}" --organization "{{ sat6_default_org }}"
-  become: true
-  with_items: "{{ sat6_enabled_repos }}"
-  ignore_errors: yes
-  args:
-    creates: /root/.setup/step11a
+- name: loop through products, add repos
+  include: add-sat6-products.yml
+  loop: "{{ sat6_product_repomap }}"
+  loop_control:
+    loop_var: product
 
-- name: "Repo config Complete"
-  shell: touch /root/.setup/step11a
-  args:
-    creates: /root/.setup/step11a
-  become: true
-
-- name: "Provisioning Satellite 6 - Tools repos without a releaseversion"
-  ignore_errors: yes
-  shell: |
-      hammer repository-set enable \
-      --name "{{ item.name }}" \
-      --basearch "x86_64" \
-      --product "{{ item.product }}" --organization "{{ sat6_default_org }}"
-  become: true
-  with_items:
-    - "{{ sat6_enabled_repos_tools }}"
-  args:
-    creates: /root/.setup/step11b
-
-- name: "Repo config Complete"
-  shell: touch /root/.setup/step11b
-  become: true
-  args:
-    creates: /root/.setup/step11b
-
-#- name: "Provisioning Satellite 6 - configure Openstack repositories"
+#- name: "Provisioning Satellite 6 - base repositories"
 #  shell: |
 #      hammer repository-set enable \
 #      --name "{{ item.name }}" \
 #      --releasever "7Server" --basearch "x86_64" \
 #      --product "{{ item.product }}" --organization "{{ sat6_default_org }}"
-#  with_items: "{{ sat6_enabled_repos_openstack }}"
+#  become: true
+#  with_items: "{{ sat6_enabled_repos }}"
+#  ignore_errors: yes
 #  args:
-#    creates: /root/.setup/step11c
-
-- name: "Repo config Complete"
-  shell: touch /root/.setup/step11c
-  become: true
+#    creates: /root/.setup/step11a
+#
+- name: "Provisiong base repos complete"
+  shell: touch /root/.setup/step11a
   args:
-    creates: /root/.setup/step11c
+    creates: /root/.setup/step11a
+  become: true
 
-#- name: "Provisioning Satellite 6 - configure Openshift repositories without releaseversion"
+#- name: "Provisioning Satellite 6 - Tools repos without a releaseversion"
+#  ignore_errors: yes
 #  shell: |
 #      hammer repository-set enable \
 #      --name "{{ item.name }}" \
 #      --basearch "x86_64" \
 #      --product "{{ item.product }}" --organization "{{ sat6_default_org }}"
-#  with_items: "{{ sat6_enabled_repos_openshift }}"
+#  become: true
+#  with_items:
+#    - "{{ sat6_enabled_repos_tools }}"
 #  args:
-#    creates: /root/.setup/step11d
+#    creates: /root/.setup/step11b
+#
+#- name: "Repo config Complete"
+#  shell: touch /root/.setup/step11b
+#  become: true
+#  args:
+#    creates: /root/.setup/step11b
 
-- name: "Repo config Complete"
-  shell: |
-    touch /root/.setup/step11d
-  become: true
-  args:
-    creates: /root/.setup/step11d
 
 - name: "Provisioning Satellite 6 - Syncing RHEL Product Content. This takes 100+ mins with all the repos to sync..."
   ignore_errors: yes
   shell: |
-      hammer product synchronize --name "{{ item }}" \
+      hammer product synchronize --name "{{ item.name }}" \
       --organization "{{ sat6_default_org }}" --async
-      #--organization "{{ sat6_default_org }}"
   become: true
   with_items:
-    - "{{ sat6_enabled_products }}"
+    - "{{ sat6_product_repomap }}"
   args:
     creates: /root/.setup/step12
 
