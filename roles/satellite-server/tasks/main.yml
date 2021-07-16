@@ -96,19 +96,19 @@
                            --enable=rhel-7-server-ansible-2.9-rpms 
       become: true
     
-    - name: "Turn on notify_only=0 in search-disabled-repos.conf"
-      lineinfile:
-        path: /etc/yum/pluginconf.d/search-disabled-repos.conf
-        regexp: '^notify_only=*'
-        line: 'notify_only=0'
-      become: true
-    
-    - name: "Modify ignore_repo in search-disabled-repos.conf"
-      lineinfile:
-        path: /etc/yum/pluginconf.d/search-disabled-repos.conf
-        regexp: '^ignored_repos=*'
-        line: 'ignored_repos=*debug-rpms *source-rpms'
-      become: true
+#    - name: "Turn on notify_only=0 in search-disabled-repos.conf"
+#      lineinfile:
+#        path: /etc/yum/pluginconf.d/search-disabled-repos.conf
+#        regexp: '^notify_only=*'
+#        line: 'notify_only=0'
+#      become: true
+#    
+#    - name: "Modify ignore_repo in search-disabled-repos.conf"
+#      lineinfile:
+#        path: /etc/yum/pluginconf.d/search-disabled-repos.conf
+#        regexp: '^ignored_repos=*'
+#        line: 'ignored_repos=*debug-rpms *source-rpms'
+#      become: true
     
     - name: "Installing satellite rpms"
       yum:
