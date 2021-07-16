@@ -700,14 +700,20 @@
   args:
     creates: /root/.setup/step23
 
-#- name: "Update Medium Location"
-#  shell: |
-#    MEDID=$(hammer --csv medium list | grep 'Kickstart_x86_64_7Server' | awk -F, {'print $1'})
-#    hammer medium update --id ${MEDID} --locations {{ sat6_default_location }} && \
-#    touch /root/.setup/setup23aa
-#  args:
-#    creates: /root/.setup/step23aa
-#
+- name: "Add operating systems"
+  shell: |
+    hammer os list | grep {{ item }} || \
+    hammer os create --name {{ item.split()[0] }} --major {{ item.split()[1] }}
+  loop: {{ sat6_managed_systems }}
+  args:
+    creates: /root/.setup/step23aa
+
+- name: "Adding os done"
+  become: true
+  shell: touch /root/.setup/step23aa
+  args:
+    creates: /root/.setup/step23aa
+
 #- name: "Update OS with medium"
 #  shell: |
 #    MEDID=$(hammer --csv medium list | grep 'Kickstart_x86_64_7Server' | awk -F, {'print $1'})

@@ -139,73 +139,76 @@ sat6_pool_ids: !vault |
 
 
 sat6_default_org_id: 1
+sat6_managed_systems:
+- "RedHat 7"
+- "RedHat 8"
 sat6_product_repomap:
-  - name: "Red Hat Enterprise Linux Server"
-    productid: 129
-    repoids:
-    - name: "Red Hat Enterprise Linux 7 Server (RPMs)"
-      releasever: "7Server"
-      basearch: "x86_64"
-      id: 2456
-    - name: "Red Hat Enterprise Linux 7 Server (Kickstart)"
-      releasever: "7Server"
-      basearch: "x86_64"
-      id: 2455
-    - name: "Red Hat Enterprise Linux 7 Server - RH Common (RPMs)"
-      releasever: "7Server"
-      basearch: "x86_64"
-      id: 2472
-    - name: "Red Hat Enterprise Linux 7 Server - Optional (RPMs)"
-      releasever: "7Server"
-      basearch: "x86_64"
-      id: 2463
-    - name: "Red Hat Satellite Tools 6.9 (for RHEL 7 Server) (RPMs)"
-      releasever: "7Server"
-      basearch: "x86_64"
-      id: 11502
-    - name: "Red Hat Enterprise Linux 7 Server - Supplementary (RPMs)"
-      releasever: "7Server"
-      basearch: "x86_64"
-      id: 2476
-    - name: "Red Hat Satellite Maintenance 6 (for RHEL 7 Server) (RPMs)"
-      releasever: "7Server"
-      basearch: "x86_64"
-      id: 5996
-    - name: "Red Hat Enterprise Linux 7 Server - Extras (RPMs)"
-      releasever: "7Server"
-      basearch: "x86_64"
-      id: 3030
-  - name: "Red Hat Enterprise Linux for x86_64"
-    productid: 21
-    repoids:
-    - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)"
-      releasever: "8"
-      basearch: "x86_64"
-      id: 7421
-    - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
-      releasever: "8"
-      basearch: "x86_64"
-      id: 7441
-    - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
-      releasever: "8"
-      basearch: "x86_64"
-      id: 7416
-    - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)"
-      releasever: "8"
-      basearch: "x86_64"
-      id: 7446
-    - name: "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
-      releasever: "8"
-      basearch: "x86_64"
-      id: 7932
-    - name: "Red Hat Satellite Tools {{ satellite_version }} for RHEL 8 x86_64 (RPMs)"
-      releasever: "8"
-      basearch: "x86_64"
-      id: 11462
-  - name: "Red Hat Software Collections (for RHEL Server)"
-    productid: 249
-    repoids:
-    - name: "Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server"
+- name: "Red Hat Enterprise Linux Server"
+  productid: 129
+  repoids:
+  - name: "Red Hat Enterprise Linux 7 Server (RPMs)"
+    releasever: "7Server"
+    basearch: "x86_64"
+    id: 2456
+  - name: "Red Hat Enterprise Linux 7 Server (Kickstart)"
+    releasever: "7Server"
+    basearch: "x86_64"
+    id: 2455
+  - name: "Red Hat Enterprise Linux 7 Server - RH Common (RPMs)"
+    releasever: "7Server"
+    basearch: "x86_64"
+    id: 2472
+  - name: "Red Hat Enterprise Linux 7 Server - Optional (RPMs)"
+    releasever: "7Server"
+    basearch: "x86_64"
+    id: 2463
+  - name: "Red Hat Satellite Tools 6.9 (for RHEL 7 Server) (RPMs)"
+    releasever: "7Server"
+    basearch: "x86_64"
+    id: 11502
+  - name: "Red Hat Enterprise Linux 7 Server - Supplementary (RPMs)"
+    releasever: "7Server"
+    basearch: "x86_64"
+    id: 2476
+  - name: "Red Hat Satellite Maintenance 6 (for RHEL 7 Server) (RPMs)"
+    releasever: "7Server"
+    basearch: "x86_64"
+    id: 5996
+  - name: "Red Hat Enterprise Linux 7 Server - Extras (RPMs)"
+    releasever: "7Server"
+    basearch: "x86_64"
+    id: 3030
+- name: "Red Hat Enterprise Linux for x86_64"
+  productid: 21
+  repoids:
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)"
+    releasever: "8"
+    basearch: "x86_64"
+    id: 7421
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
+    releasever: "8"
+    basearch: "x86_64"
+    id: 7441
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
+    releasever: "8"
+    basearch: "x86_64"
+    id: 7416
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)"
+    releasever: "8"
+    basearch: "x86_64"
+    id: 7446
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
+    releasever: "8"
+    basearch: "x86_64"
+    id: 7932
+  - name: "Red Hat Satellite Tools {{ satellite_version }} for RHEL 8 x86_64 (RPMs)"
+    releasever: "8"
+    basearch: "x86_64"
+    id: 11462
+- name: "Red Hat Software Collections (for RHEL Server)"
+  productid: 249
+  repoids:
+  - name: "Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server"
       releasever: "7Server"
       basearch: "x86_64"
       id: 2808
