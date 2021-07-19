@@ -155,3 +155,4 @@ tower_groups:
   - capsule-lb
   - tang-servers
   - tower-servers
+  - us-east-1
