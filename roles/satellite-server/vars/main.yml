@@ -35,6 +35,13 @@ compute_resources:
     region: us-east-1
     location_id: 3
     organization_id: 1
+  - name: 'AWS_TFOUND'
+    description: 'AWS_TFOUND'
+    user: "{{ TFOUND_AWS_ACCESS_KEY }}"
+    pass: "{{ TFOUND_AWS_SECRET_KEY }}"
+    region: us-east-1
+    location_id: 3
+    organization_id: 1
 sat6:
   subs_for_activationkeys:
     - "Employee SKU"
@@ -46,7 +53,7 @@ sat6:
 #    - name: 'production'
 #      prior: 'testing'
   locations:
-#    - "Private_Cloud"
+    - "AWS_TFOUND"
     - "AWS_RTO"
   domains:
 #    - "maskedadmins.com"
@@ -61,6 +68,14 @@ sat6:
       mask: "255.255.255.0"
       domain: "prod.maskedadmins.com"
       location: "AWS_RTO"
+      org: "Redhat_Lab"
+      activation_key: "Redhat_Lab-production-key"
+    - name: "AWS_TFOUND"
+      prefix: "24"
+      network: "10.0.0.0"
+      mask: "255.255.255.0"
+      domain: "prod.maskedadmins.com"
+      location: "AWS_TFOUND"
       org: "Redhat_Lab"
       activation_key: "Redhat_Lab-production-key"
 #    - name: "Prov_102"
@@ -95,7 +110,7 @@ sat6:
       label: "redhatlab"
       description: "Our example sub organization for managing content."
       locations:
-#        - 'Private_Cloud'
+        - 'AWS_TFOUND'
         - "AWS_RTO"
       domains:
 #        - "maskedadmins.com"
@@ -108,15 +123,16 @@ sat6:
 #        - "Dev_103"
 #        - "Test_104"
         - "AWS_RTO"
+        - "AWS_TFOUND"
 tower_key: firstboot
 tower_jobid: 14
 sat6_default_org: Redhat_Lab
-sat6_default_location: AWS_RTO
+sat6_default_location: AWS_TFOUND
 sat6_default_hostcollection: RHEL_7_x86_64
 sat6_default_hostgroup: "RHEL_7_x86_64_Hostgroup"
 sat6_default_hostgroup_rhel8: "RHEL_8_x86_64_Hostgroup"
 sat6_default_domain: "prod.maskedadmins.com"
-sat6_default_subnet: "AWS_RTO"
+sat6_default_subnet: "AWS_TFOUND"
 sat6_default_environment: "production"
 #sat6_manifest: "manifest_sat6_20210204T140357Z.zip"
 sat6_manifest: "manifest_sat6_20210526T193331Z.zip"
