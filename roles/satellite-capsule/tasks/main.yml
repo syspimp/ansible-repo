@@ -287,6 +287,10 @@
       shell:
         subscription-manager register --org="{{ sat6['org'] }}" --activationkey="{{ sat6['activation_key'] }}"
       when: "'subscription.rhsm.redhat.com' in bootstrap.stdout"
+      register: subscribed
+      retries: 10
+      until: subscribed.rc == 0
+      delay: 60
       become: true
 
     - name: "Fix the selinux context for /opt"
