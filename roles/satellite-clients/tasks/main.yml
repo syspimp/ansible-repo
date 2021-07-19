@@ -58,24 +58,32 @@
     shell: subscription-manager repos --list-enabled | grep "Repo ID:" | awk '{print $3}'
     become: yes
     register: oldrepos
+    when:
+    - "(sat6_server is defined) and (sat6_server != 'None')"
 
   - name: "Unregister from the redhat cdn"
     ignore_errors: yes
     shell:
       subscription-manager clean
     become: yes
+    when:
+    - "(sat6_server is defined) and (sat6_server != 'None')"
 
   - name: "Install the katello certificate"
     shell:
       rpm -Uvh --force http://{{ sat6_server }}/pub/katello-ca-consumer-latest.noarch.rpm
     become: yes
+    when:
+    - "(sat6_server is defined) and (sat6_server != 'None')"
 
   - name: "Get the bootstrap python script"
     get_url:
       url: "http://{{ sat6_server }}/pub/bootstrap.py"
       dest: /opt/bootstrap.py
     become: yes
-    when: "ansible_distribution == 'RedHat'"
+    when:
+    - "(sat6_server is defined) and (sat6_server != 'None')"
+    - "ansible_distribution == 'RedHat'"
 
   - name: "Fixing bootstrap for RHEL 8 and python3"
     raw: |
@@ -85,6 +93,7 @@
     when:
     - "ansible_distribution == 'RedHat'"
     - "ansible_distribution_major_version == '8'"
+    - "(sat6_server is defined) and (sat6_server != 'None')"
 
   - name: "Save the command to register to satellite server"
     template:
@@ -94,19 +103,25 @@
       group: root
       mode: 0755
     become: yes
-    when: "ansible_distribution == 'RedHat'"
+    when:
+    - "ansible_distribution == 'RedHat'"
+    - "(sat6_server is defined) and (sat6_server != 'None')"
 
   - name: "Run the satellite bootstrap script, ignoring errors"
     ignore_errors: yes
     shell: |
       /opt/reg-to-satellite.sh
     become: yes
-    when: "ansible_distribution == 'RedHat'"
+    when:
+    - "ansible_distribution == 'RedHat'"
+    - "(sat6_server is defined) and (sat6_server != 'None')"
 
   - name: dump the saved repos
     debug:
       var: oldrepos.stdout
-    when: "ansible_distribution == 'RedHat'"
+    when:
+    - "ansible_distribution == 'RedHat'"
+    - "(sat6_server is defined) and (sat6_server != 'None')"
 
   - name: "Re enable yum repos"
     ignore_errors: yes
@@ -115,6 +130,7 @@
     when:
     - "item != ''"
     - "ansible_distribution == 'RedHat'"
+    - "(sat6_server is defined) and (sat6_server != 'None')"
     become: yes
 
   - name: "Save the satellite key for remote execution"
@@ -123,6 +139,8 @@
       chmod 600 /root/.ssh/authorized_keys
     ignore_errors: yes
     become: yes
+    when:
+    - "(sat6_server is defined) and (sat6_server != 'None')"
 
   always:
   - name: "Apply ansible roles defined in Satellite for oscap scanning"
@@ -132,6 +150,8 @@
     ignore_errors: yes
     run_once: yes
     become: yes
+    when:
+    - "(sat6_server is defined) and (sat6_server != 'None')"
       
   - name: "Start openscap scan from Satellite for host"
     shell: |
@@ -139,3 +159,5 @@
     delegate_to: "{{ sat6_server }}"
     ignore_errors: yes
     become: yes
+    when:
+    - "(sat6_server is defined) and (sat6_server != 'None')"
