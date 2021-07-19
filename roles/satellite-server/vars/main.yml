@@ -54,7 +54,7 @@ sat6:
 #      prior: 'testing'
   locations:
     - "AWS_TFOUND"
-    - "AWS_RTO"
+#    - "AWS_RTO"
   domains:
 #    - "maskedadmins.com"
 #    - "dev.maskedadmins.com"
@@ -62,14 +62,14 @@ sat6:
     - "prod.maskedadmins.com"
 #    - "strg.maskedadmins.com"
   subnets:
-    - name: "AWS_RTO"
-      prefix: "24"
-      network: "11.22.33.0"
-      mask: "255.255.255.0"
-      domain: "prod.maskedadmins.com"
-      location: "AWS_RTO"
-      org: "Redhat_Lab"
-      activation_key: "Redhat_Lab-production-key"
+#    - name: "AWS_RTO"
+#      prefix: "24"
+#      network: "11.22.33.0"
+#      mask: "255.255.255.0"
+#      domain: "prod.maskedadmins.com"
+#      location: "AWS_RTO"
+#      org: "Redhat_Lab"
+#      activation_key: "Redhat_Lab-production-key"
     - name: "AWS_TFOUND"
       prefix: "24"
       network: "10.0.0.0"
@@ -111,7 +111,7 @@ sat6:
       description: "Our example sub organization for managing content."
       locations:
         - 'AWS_TFOUND'
-        - "AWS_RTO"
+#        - "AWS_RTO"
       domains:
 #        - "maskedadmins.com"
 #        - "dev.maskedadmins.com"
@@ -122,7 +122,7 @@ sat6:
 #        - "Prov_102"
 #        - "Dev_103"
 #        - "Test_104"
-        - "AWS_RTO"
+#        - "AWS_RTO"
         - "AWS_TFOUND"
 tower_key: firstboot
 tower_jobid: 14
