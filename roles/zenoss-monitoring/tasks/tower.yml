@@ -1,0 +1,52 @@
+---
+- name: "Tower Inventory Setup check"
+  shell: |
+    if [ -e "/root/.setup/tower-configed" ]
+    then
+      echo "true"
+    else
+      echo "false"
+    fi
+  register: towersetup
+  become: true
+
+- name: "Block add to Ansible Tower inventory"
+  block:
+    - name: "Get host id to add to the 'tower-server' Group Inventory"
+      uri:
+        url: "https://{{ tower_server }}/api/v2/hosts/?name={{ inventory_hostname }}"
+        validate_certs: no
+        method: GET
+        user: "{{ tower_user }}"
+        password: "{{ tower_pass }}"
+        force_basic_auth: yes
+        status_code: [200,202,204]
+        body_format: json
+      register: hostidcheck
+
+    - name: "Set the host_id fact"
+      set_fact:
+        tower_host_id: "{{ hostidcheck.json.results[0].id }}"
+
+    - name: "Add host to the 'tower-server' Group Inventory"
+      uri:
+        url: "https://{{ tower_server }}/api/v2/groups/{{ tower_inventory_group }}/hosts/"
+        validate_certs: no
+        method: POST
+        body: >
+          {
+             "id": {{ tower_host_id }}
+          }
+        user: "{{ tower_user }}"
+        password: "{{ tower_pass }}"
+        force_basic_auth: yes
+        status_code: [201,202,204]
+        body_format: json
+
+    - name: "tower config complete"
+      file:
+        path: /root/.setup/tower-configed
+        state: touch
+        mode: 0444
+      become: yes
+  when: towersetup.stdout == "false"
