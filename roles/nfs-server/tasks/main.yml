@@ -59,7 +59,7 @@
 - name: "Enable and start nfs services"
   service:
     name: "{{ item }}"
-    state: running
+    state: restarted
     enabled: yes
   become: yes
   loop:
