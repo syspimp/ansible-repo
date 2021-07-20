@@ -30,19 +30,32 @@
     name: "{{ item }}"
     state: latest
   become: true
+  ignore_errors: yes
   when: '"policycoreutils-python" not in isnfsinstalled.stdout'
   loop:
   - policycoreutils-python-utils
   - policycoreutils-python
 
-- name: "Enable selinxux contexts/flags for nfs"
+- name: "Enable selinxux contexts/flags for nfs rw"
   shell: |
    setsebool -P nfs_export_all_rw 1
-   setsebool -P nfs_export_all_ro 1
-   semanage fcontext -a -t public_content_rw_t  "{{ nfs_mountpoint }}(/.*)?"
-   restorecon -R {{ nfs_mountpoint }}
   become: yes
 
+- name: "Enable selinxux contexts/flags for nfs ro"
+  shell: |
+   setsebool -P nfs_export_all_ro 1
+  become: yes
+ 
+- name: "Add selinxux contexts/flags for nfs mountpoint"
+  shell: |
+   semanage fcontext -a -t public_content_rw_t  "{{ nfs_mountpoint }}(/.*)?"
+  become: yes
+ 
+- name: "Set context for selinxux contexts/flags for nfs mountpoint"
+  shell: |
+   restorecon -R {{ nfs_mountpoint }}
+  become: yes
+ 
 - name: "Enable and start nfs services"
   service:
     name: "{{ item }}"
