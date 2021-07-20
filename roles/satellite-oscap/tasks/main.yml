@@ -171,6 +171,7 @@
 
     # org is hardcoded as an exercise for the reader to correct
     - name: "Upload the Openscap xml files to create the scans"
+      ignore_errors: yes
       shell: |
         hammer scap-content create --location-id {{ locid.stdout }} --organization-id 1 --title "{{ item.title }}" --scap-file {{ item.file }} && \
         touch /opt/.scapuploaded
