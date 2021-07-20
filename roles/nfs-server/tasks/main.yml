@@ -20,7 +20,7 @@
 
 - name: "Update /etc/exports"
   template:
-    content: exports.j2
+    src: exports.j2
     dest: /etc/exports
     mode: '0600'
   become: yes
