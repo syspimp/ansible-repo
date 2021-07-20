@@ -16,12 +16,14 @@
     path: "{{ nfs_mountpoint }}"
     mode: '0777'
     state: directory
+  become: yes
 
 - name: "Update /etc/exports"
   template:
     content: exports.j2
     dest: /etc/exports
     mode: '0600'
+  become: yes
 
 - name: "Installing selinux related rpms"
   yum:
@@ -46,6 +48,7 @@
     name: "{{ item }}"
     state: running
     enabled: yes
+  become: yes
   loop:
   - rpcbind
   - nfs-lock
