@@ -724,7 +724,7 @@
 - name: "Add operating systems"
   shell: |
     hammer os list | grep "{{ item }}" || \
-    hammer os create --name {{ item.split()[0] }} --major {{ item.split()[1] }} --architecture="x86_64"
+    hammer os create --name {{ item.split()[0] }} --major {{ item.split()[1] }} --architectures="x86_64"
   loop: "{{ sat6_managed_systems }}"
   ignore_errors: yes
   args:
