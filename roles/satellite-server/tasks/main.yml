@@ -631,6 +631,16 @@
   args:
     creates: /root/.setup/step19
 
+- name: "Enabling rhel8 sat tools repo in the keys"
+  shell: |
+    hammer activation-key content-override --name "{{ sat6_default_org }}-{{ item.name }}-key" \
+    --content-label satellite-tools-{{ satellite_version }}-for-rhel-8-x86_64-rpms \
+    --value 1 --organization "{{ sat6_default_org }}"
+  become: true
+  with_items: "{{ sat6.environments }}"
+  args:
+    creates: /root/.setup/step19
+
 - name: "Step Complete"
   shell: touch /root/.setup/step19
   become: true
@@ -713,8 +723,8 @@
 
 - name: "Add operating systems"
   shell: |
-    hammer os list | grep {{ item }} || \
-    hammer os create --name {{ item.split()[0] }} --major {{ item.split()[1] }}
+    hammer os list | grep "{{ item }}" || \
+    hammer os create --name {{ item.split()[0] }} --major {{ item.split()[1] }} --architecture="x86_64"
   loop: "{{ sat6_managed_systems }}"
   ignore_errors: yes
   args:
@@ -752,14 +762,14 @@
     do
       osname=$(hammer os info --id ${os} |grep Title:|sed -e 's/Title:              //g')
       hammer hostgroup create --puppet-environment {{ sat6_default_environment }} --architecture="x86_64" --domain="{{ item.domain }}"  --content-source-id="${CSID}"  --locations="{{ item.location }}" \
-      --query-organization="{{ sat6_default_org }}" --name="{{ sat6_default_hostgroup }} for {{ item.domain }} ${osname}" --subnet="{{ item.name }}" --partition-table-id="${PARTID}" \
+      --query-organization="{{ sat6_default_org }}" --name="{{ sat6_default_hostgroup }} for {{ item.domain }}" --subnet="{{ item.name }}" --partition-table-id="${PARTID}" \
       --operatingsystem-id="${os}" --puppet-ca-proxy-id="${CAID}" --puppet-proxy-id="${PROXYID}" --content-view="Base" --lifecycle-environment-id="${LCID}"
-      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ item.domain }} ${osname}" --name "ssh_authorized_keys"  --value "{{ automation_user_pub_key }}"
-      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ item.domain }} ${osname}" --name "ansible_host_config_key"  --value "{{ tower_key }}"
-      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ item.domain }} ${osname}" --name "ansible_tower_fqdn"  --value "{{ tower_server }}"
-      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ item.domain }} ${osname}" --name "ansible_job_template_id"  --value "{{ tower_jobid }}"
-      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ item.domain }} ${osname}" --name "kt_activation_keys"  --value "{{ item.activation_key }}"
-      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ item.domain }} ${osname}" --name "ansible_tower_provisioning"  --value "true"
+      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ item.domain }}" --name "ssh_authorized_keys"  --value "{{ automation_user_pub_key }}"
+      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ item.domain }}" --name "ansible_host_config_key"  --value "{{ tower_key }}"
+      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ item.domain }}" --name "ansible_tower_fqdn"  --value "{{ tower_server }}"
+      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ item.domain }}" --name "ansible_job_template_id"  --value "{{ tower_jobid }}"
+      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ item.domain }}" --name "kt_activation_keys"  --value "{{ item.activation_key }}"
+      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ item.domain }}" --name "ansible_tower_provisioning"  --value "true"
     done
   args:
     creates: /root/.setup/step24
@@ -780,12 +790,12 @@
       osname=$(hammer os info --id ${os} |grep Title:|sed -e 's/Title:              //g')
       #hammer hostgroup create --environment {{ sat6_default_environment }} --architecture="x86_64" --domain="{{ sat6_default_domain }}" --content-source-id="${CSID}" --medium-id="${MEDID}" --locations="{{ sat6_default_location }}"
       hammer hostgroup create --environment {{ sat6_default_environment }} --architecture="x86_64" --domain="{{ sat6_default_domain }}" --content-source-id="${CSID}" --locations="{{ sat6_default_location }}" \
-    --query-organization="{{ sat6_default_org }}" --name="{{ sat6_default_hostgroup }} for {{ sat6_default_domain }} ${osname}" --subnet="{{ sat6_default_subnet }}" --partition-table-id="${PARTID}" \
+    --query-organization="{{ sat6_default_org }}" --name="{{ sat6_default_hostgroup }} for {{ sat6_default_domain }}" --subnet="{{ sat6_default_subnet }}" --partition-table-id="${PARTID}" \
     --operatingsystem-id="${os}" --puppet-ca-proxy-id="${CAID}" --puppet-proxy-id="${PROXYID}" --openscap-proxy-id=1 --content-view="Base" --lifecycle-environment-id="${LCID}"
-      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ sat6_default_domain }} ${osname}" --name "sshkey"  --value "{{ automation_user_pub_key }}"
-      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ sat6_default_domain }} ${osname}" --name "tower_key"  --value "{{ tower_key }}"
-      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ sat6_default_domain }} ${osname}" --name "tower_server"  --value "{{ tower_server }}"
-      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ sat6_default_domain }} ${osname}" --name "tower_jobid"  --value "{{ tower_jobid }}"
+      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ sat6_default_domain }}" --name "sshkey"  --value "{{ automation_user_pub_key }}"
+      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ sat6_default_domain }}" --name "tower_key"  --value "{{ tower_key }}"
+      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ sat6_default_domain }}" --name "tower_server"  --value "{{ tower_server }}"
+      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup }} for {{ sat6_default_domain }}" --name "tower_jobid"  --value "{{ tower_jobid }}"
     done
   args:
     creates: /root/.setup/step24
@@ -809,12 +819,12 @@
     do
       osname=$(hammer os info --id ${os} |grep Title:|sed -e 's/Title:              //g')
       hammer hostgroup create --environment {{ sat6_default_environment }} --architecture="x86_64" --domain="{{ sat6_default_domain }}" --content-source-id="${CSID}" --locations="{{ sat6_default_location }}" \
-    --query-organization="{{ sat6_default_org }}" --name="{{ sat6_default_hostgroup_rhel8 }} for {{ sat6_default_domain }} ${osname}" --subnet="{{ sat6_default_subnet }}" --partition-table-id="${PARTID}" \
+    --query-organization="{{ sat6_default_org }}" --name="{{ sat6_default_hostgroup_rhel8 }} for {{ sat6_default_domain }}" --subnet="{{ sat6_default_subnet }}" --partition-table-id="${PARTID}" \
     --operatingsystem-id="${os}" --puppet-ca-proxy-id="${CAID}" --puppet-proxy-id="${PROXYID}" --openscap-proxy-id=1 --content-view="Base" --lifecycle-environment-id="${LCID}"
-      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup_rhel8 }} for {{ sat6_default_domain }} ${osname}" --name "sshkey"  --value "{{ automation_user_pub_key }}"
-      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup_rhel8 }} for {{ sat6_default_domain }} ${osname}" --name "tower_key"  --value "{{ tower_key }}"
-      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup_rhel8 }} for {{ sat6_default_domain }} ${osname}" --name "tower_server"  --value "{{ tower_server }}"
-      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup_rhel8 }} for {{ sat6_default_domain }} ${osname}" --name "tower_jobid"  --value "{{ tower_jobid }}"
+      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup_rhel8 }} for {{ sat6_default_domain }}" --name "sshkey"  --value "{{ automation_user_pub_key }}"
+      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup_rhel8 }} for {{ sat6_default_domain }}" --name "tower_key"  --value "{{ tower_key }}"
+      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup_rhel8 }} for {{ sat6_default_domain }}" --name "tower_server"  --value "{{ tower_server }}"
+      hammer hostgroup set-parameter --hostgroup "{{ sat6_default_hostgroup_rhel8 }} for {{ sat6_default_domain }}" --name "tower_jobid"  --value "{{ tower_jobid }}"
     done
   args:
     creates: /root/.setup/step24a
