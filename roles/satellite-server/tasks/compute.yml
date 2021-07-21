@@ -23,8 +23,8 @@
   shell: |
     hammer compute-resource create \
     --provider EC2 \
-    --user {{ AWS_ACCESS_KEY_ID }} \
-    --password {{ AWS_SECRET_KEY }} \
+    --user {{ TFOUND_AWS_ACCESS_KEY_ID }} \
+    --password {{ TFOUND_AWS_SECRET_KEY }} \
     --region us-east-1 \
     --locations "{{ sat6_default_location }}" \
     --organizations "{{ sat6_default_org }}" \
