@@ -63,4 +63,4 @@
   when:
   - initialsetup.stdout == "false"
   - ansible_local['awsroles'] is defined
-  - ansible_local['awsroles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy','openfire']
+  - ansible_local['awsroles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy','openfire','minikube']
