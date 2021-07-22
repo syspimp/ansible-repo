@@ -1,5 +1,6 @@
 - hosts: all
   gather_facts: no
+  # ignoreme
   tasks:
   - pause:
       minutes: 45
