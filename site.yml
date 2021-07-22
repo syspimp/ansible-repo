@@ -12,6 +12,7 @@
     - webconsole
     - insights
     - awsroles
+    - leapp-upgrade
 
 - name: Install Jboss Standalone
   hosts: jboss*

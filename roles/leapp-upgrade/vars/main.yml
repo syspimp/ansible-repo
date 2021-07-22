@@ -1,0 +1,7 @@
+---
+leapp_repos:
+- rhel-7-server-rpms
+- rhel-7-server-extras-rpms
+leapp_rpms:
+- leapp
+- leapp-repository
