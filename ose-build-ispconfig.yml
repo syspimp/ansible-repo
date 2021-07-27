@@ -1,0 +1,98 @@
+---
+#- include: "ose-get-token.yml"
+- name: "Launch ISPconfig"
+  hosts: ose-cluster-master*
+  gather_facts: no
+  vars:
+    ose_project: "redhat-lab"
+    ose_user: "admin"
+    ose_pass: "redhat123"
+    github_url: "https://github.com/syspimp/docker-ispconfig.git"
+    ispconfig_container: "docker-ispconfig"
+    mntpoints:
+      - name: www
+        mnt: /copy/var/www
+      - name: mail
+        mnt: /copy/var/mail
+      - name: mysql
+        mnt: /copy/var/lib/mysql
+      - name: backup
+        mnt: /copy/var/backup
+      - name: data
+        mnt: /copy/usr/local/ispconfig
+      - name: log
+        mnt: /copy/var/log
+      - name: etc
+        mnt: /copy/etc
+  tasks:
+    - name: "create template for volume claims"
+      template:
+        src: ose/ispconfig-volume-claims.yml.j2
+        dest: /tmp/ispconfig-volume-claims.yml
+        mode: 0644
+        owner: root
+        group: root
+
+    - name: "create template for volume"
+      template:
+        src: ose/ispconfig-volumes.yml.j2
+        dest: /tmp/ispconfig-volumes.yml
+        mode: 0644
+        owner: root
+        group: root
+
+    - name: "Destroy old configurations"
+      ignore_errors: yes
+      shell: |
+        oc login -u {{ ose_user }} -p {{ ose_pass }}
+        oc project {{ ose_project }}
+        oc delete is {{ ispconfig_container }}
+        oc delete svc {{ ispconfig_container }}
+        oc delete bc {{ ispconfig_container }}
+        oc delete dc {{ ispconfig_container }}
+      become: true
+
+    - name: "Destroy old persistent volumes claims"
+      ignore_errors: yes
+      shell: |
+        oc login -u {{ ose_user }} -p {{ ose_pass }}
+        oc project {{ ose_project }}
+        oc delete pvc ispconfig-{{ item.name }}
+        # deleting the pv deletes the data in the volume
+        #oc delete pv ispconfig-{{ item.name }}
+      become: true
+      with_items: "{{ mntpoints }}"
+
+    - name: "Create persistent volume via oc binary"
+      shell: |
+        oc login -u {{ ose_user }} -p {{ ose_pass }}
+        oc project {{ ose_project }}
+        oc get pv | grep {{ item.name }} || sed -e 's/REPLACEME/{{ item.name }}/' /tmp/ispconfig-volumes.yml | oc create -f -
+      become: true
+      with_items: "{{ mntpoints }}"
+
+    - name: "Create volume claims via oc binary"
+      shell: |
+        oc login -u {{ ose_user }} -p {{ ose_pass }}
+        oc project {{ ose_project }}
+        sed -e 's/REPLACEME/{{ item.name }}/' /tmp/ispconfig-volume-claims.yml | oc create -f -
+      become: true
+      with_items: "{{ mntpoints }}"
+
+    - name: "Have openshift create the application pods"
+      shell: |
+        oc login -u {{ ose_user }} -p {{ ose_pass }}
+        oc project {{ ose_project }}
+        oc new-app {{ github_url }}
+      become: true
+
+    - name: "Add volumes to the generated deploy config"
+      shell: |
+        oc login -u {{ ose_user }} -p {{ ose_pass }}
+        oc project {{ ose_project }}
+        oc volume dc/{{ ispconfig_container }} --add --name=ispconfig-{{ item.name }} \
+        --type=persistentVolumeClaim \
+        --claim-name=ispconfig-{{ item.name }} \
+        --mount-path={{ item.mnt }}
+      become: true
+      with_items: "{{ mntpoints }}"
