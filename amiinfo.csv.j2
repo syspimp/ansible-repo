@@ -1,4 +1,4 @@
 AMI ID,Name,Location,Details,Public
 {% for ami in amiinfo.results %}
-{{ ami.images[0].image_id }},{{ ami.images[0].name }},{{ ami.images[0].platform_details }},{{ ami.images[0].image_location }},{{ ami.images[0].public }}
+{{ ami.images[0].image_id }},{{ ami.images[0].name }},{{ ami.images[0].description }},{{ ami.images[0].image_location }},{{ ami.images[0].public }}
 {% endfor %}
