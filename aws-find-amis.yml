@@ -17,6 +17,10 @@
     register: amiinfo
     loop: "{{ results.instances | map(attribute='image_id') | list | unique }}"
 
+  - name: dump the results
+    debug:
+      var: amiinfo
+
   - name: Generate the csv file in /tmp/amis.csv
     template:
       src:  "amis.csv.j2"
