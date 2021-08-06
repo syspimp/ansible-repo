@@ -43,6 +43,8 @@
     aws_vpc_id: vpc-0494b7798600fd4de
     # RTO
     #aws_vpc_id: vpc-030130353f09b2b95
+    #RHEL 6 AMI
+    rhel6_ami_id: ami-1643ff7e
     # CentOS 7
     centos7_ami_id: ami-0affd4508a5d2481b
     # RHEL 7 old and busted
@@ -97,6 +99,11 @@
       set_fact:
         aws_image_ami: "{{ centos7_ami_id }}"
       when: "'centos7' in aws_ostype"
+
+    - name: Set the AMI to RHEL6
+      set_fact:
+        aws_image_ami: "{{ rhel6_ami_id }}"
+      when: "'rhel6' in aws_ostype"
 
     - name: Set the AMI to RHEL7
       set_fact:
