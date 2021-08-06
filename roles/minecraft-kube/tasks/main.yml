@@ -19,7 +19,7 @@
 
 - name: put the templates in place
   template:
-    src: " {{ item }}.j2"
+    src: "{{ item }}.j2"
     dest: "docker-minecraft-bedrock-server/examples/{{ item }}"
   loop:
   - kubernetes-backup-to-s3.yaml
