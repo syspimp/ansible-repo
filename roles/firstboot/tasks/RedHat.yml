@@ -235,6 +235,19 @@
       name: "{{ redhat8_packages }}"
       state: latest
     become: true
+
+  - name: "Run yum update to avoid a bug. Please wait. SSH to Host and tail /tmp/tower.output for status"
+    shell: |
+      exec &> >(tee -a /tmp/tower.output)
+      yum -y update
+    become: true
+    args:
+      executable: /bin/bash
+
+  - name: "Perform a yum clean all"
+    shell:  yum clean all
+    become: true
+
   when:
   - ansible_distribution_major_version == '8'
   rescue:
