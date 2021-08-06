@@ -1,0 +1,226 @@
+---
+- name: grab the github for minecraft for kube
+  shell: git clone https://github.com/itzg/docker-minecraft-bedrock-server.git
+  ignore_errors: yes
+  args:
+    creates: /opt/.minecraft-configed
+
+- name: get the namespaces available
+  shell: kubectl get namespace
+  register: namespaces
+  args:
+    creates: /opt/.minecraft-configed
+
+- name: create the {{ minecraft_namespace }} namespace if not available
+  shell: kubectl create namespace {{ minecraft_namespace }}
+  when: "'{{ minecraft_namespace }}' not in namespaces.stdout"
+  args:
+    creates: /opt/.minecraft-configed
+
+- name: put the templates in place
+  template:
+    src: " {{ item }}.j2"
+    dest: "docker-minecraft-bedrock-server/examples/{{ item }}"
+  loop:
+  - kubernetes-backup-to-s3.yaml
+  - kubernetes-restore-to-s3.yaml
+  - kubernetes.yaml
+
+- name: create the minecraft server pods
+  shell: |
+    kubectl apply -n {{ minecraft_namespace }} -f docker-minecraft-bedrock-server/examples/kubernetes.yaml
+  args:
+    creates: /opt/.minecraft-configed
+    
+#- name: create the zenoss configmap objects
+#  shell: |
+#    for i in openshift-zenoss4/objects/*configmap*yaml; do echo working on $i ; kubectl apply -n {{ minecraft_namespace }} -f $i ; done ;
+#  args:
+#    creates: /opt/.minecraft-configed
+#    
+#- name: create the zenoss deployment objects
+#  shell: |
+#    for i in openshift-zenoss4/objects/*deployment*yaml; do echo working on $i ; kubectl apply -n {{ minecraft_namespace }} -f $i ; done ;
+#  args:
+#    creates: /opt/.minecraft-configed
+#    
+#- name: create the zenoss services objects
+#  shell: |
+#    for i in openshift-zenoss4/objects/*service*yaml; do echo working on $i ; kubectl apply -n {{ minecraft_namespace }} -f $i ; done ;
+#  args:
+#    creates: /opt/.minecraft-configed
+#
+- name: touch a file to remain idempotent
+  command: touch /opt/.minecraft-configed
+  become: yes
+  args:
+    creates: /opt/.minecraft-configed
+
+- name: expose the service on port 19132
+  shell: |
+    kubectl get pods -n {{ minecraft_namespace }}
+    sleep 20
+    kubectl get pods -n {{ minecraft_namespace }}
+    nohup kubectl port-forward service/bds --address 0.0.0.0 19132:19132 -n {{ minecraft_namespace }} </dev/null >/dev/null 2>&1 &
+    sleep 5
+    disown
+    sleep 1
+  args:
+    creates: /opt/.minecraft-configed2
+    executable: /bin/bash
+
+- name: touch a file to remain idempotent
+  command: touch /opt/.minecraft-configed2
+  become: yes
+  args:
+    creates: /opt/.minecraft-configed2
+
+#- name: Loop over kubectl get pods until minecraft pod is running
+#  shell: kubectl get pods -n {{ minecraft_namespace }} | grep zenoss4-core || true
+#  #args:
+#  #  creates: /opt/.minecraft-configed2
+#  register: kubectltasks
+#  retries: "120"
+#  delay: "2"
+#  until: "'Running' in kubectltasks.stdout"
+#
+#- name: grab the zenoss-core pod name
+#  shell: |
+#    kubectl -n {{ minecraft_namespace }} get pods | grep zenoss4-core | awk '{print $1}'
+#  register: zenoss_pod
+#  #args:
+#  #  creates: /opt/.minecraft-configed2
+#
+#- name: "installing private key to accesss managed hosts"
+#  template:
+#    src: blank.key.j2
+#    dest: "openshift-zenoss4/{{ zenoss_sshkey }}"
+#    owner: cloud-user
+#    group: cloud-user
+#    mode: 0600
+#
+#- name: copy the ssh key to zenoss pod
+#  shell: |
+#    kubectl exec -n {{ minecraft_namespace }} {{ zenoss_pod.stdout }} -- mkdir -p /home/zenoss/.ssh
+#    kubectl exec -n {{ minecraft_namespace }} {{ zenoss_pod.stdout }} -- chown zenoss.zenoss /home/zenoss/.ssh
+#    kubectl exec -n {{ minecraft_namespace }} {{ zenoss_pod.stdout }} -- chmod 700 /home/zenoss/.ssh
+#    kubectl cp -n {{ minecraft_namespace }} openshift-zenoss4/{{ zenoss_sshkey }} {{ zenoss_pod.stdout }}:/home/zenoss/.ssh/{{ zenoss_sshkey }}
+#    kubectl exec -n {{ minecraft_namespace }} {{ zenoss_pod.stdout }} -- chmod 600 /home/zenoss/.ssh/{{ zenoss_sshkey }}
+#    kubectl exec -n {{ minecraft_namespace }} {{ zenoss_pod.stdout }} -- chown zenoss.zenoss /home/zenoss/.ssh/{{ zenoss_sshkey }}
+#  args:
+#    creates: /opt/.minecraft-configed2
+#
+#- name: fixing permissions on /opt/zenoss/perf
+#  shell: |
+#    kubectl exec -n {{ minecraft_namespace }} {{ zenoss_pod.stdout }} -- chown zenoss.zenoss /opt/zenoss/perf
+#  args:
+#    creates: /opt/.minecraft-configed2
+#
+#- name: Set the zenoss device router fact
+#  set_fact:
+#    zrouter: "http://{{ ec2_ip_address }}:30080/zport/dmd/device_router"
+#
+#- name: Visit the Zenoss home page
+#  debug:
+#    msg: "Visit the Zenoss home page at http://{{ ec2_ip_address }}:30080/zport/dmd/"
+#
+#- name: Create Org Nodes in Zenoss
+#  ignore_errors: yes
+#  uri:
+#    url: "{{ zrouter }}"
+#    user: "{{ usingthis }}"
+#    password: "{{ andthis }}"
+#    method: POST
+##      body: "{"action":"DeviceRouter","method":"addNode","data":[{"id":"Openshift","description":"Openshift Cluster","type":"organizer","contextUid":"/zport/dmd/Devices/Server/Linux"}],"type":"rpc","tid":51}"
+#    body:
+#    - action: DeviceRouter
+#      method: addNode
+#      data:
+#      - id: "{{ item.name }}"
+#        description: "{{ item.desc }}"
+#        type: organizer
+#        contextUid: "/zport/dmd/Devices/{{ rootorg }}/{{ item.org }}"
+#      tid: 51
+#      type: rpc
+#    force_basic_auth: yes
+#    status_code: 200
+#    body_format: json
+#  loop: "{{ zenossorgs }}"
+#
+#- name: Create Properties on Hosts in Zenoss
+#  ignore_errors: yes
+#  uri:
+#    url: "{{ zrouter }}"
+#    user: "{{ usingthis }}"
+#    password: "{{ andthis }}"
+#    method: POST
+##      body: {"action":"DeviceRouter","method":"setZenProperty","data":[{"uid":"/zport/dmd/Devices/Server/Linux","zProperty":"zCommandUsername","value":"root"}],"type":"rpc","tid":26}
+##      body: {"action":"DeviceRouter","method":"setZenProperty","data":[{"uid":"/zport/dmd/Devices/Server/Linux","zProperty":"zKeyPath","value":"~/.ssh/id_rsa"}],"type":"rpc","tid":35}
+##      body: {"action":"DeviceRouter","method":"setZenProperty","data":[{"uid":"/zport/dmd/Devices/Server/Linux/Openshift","zProperty":"zCommandUsername","value":"core"}],"type":"rpc","tid":51}
+#    body:
+#    - action: DeviceRouter
+#      method: setZenProperty
+#      data:
+#      - uid: "{{ item.uid }}"
+#        zProperty: "{{ item.property }}"
+#        value: "{{ item.value }}"
+#      tid: 51
+#      type: rpc
+#    force_basic_auth: yes
+#    status_code: 200
+#    body_format: json
+#  loop:
+#  - uid: /zport/dmd/Devices/Server/Linux
+#    property: zCommandUsername
+#    value: root
+#  - uid: /zport/dmd/Devices/Server/Linux
+#    property: zKeyPath
+#    value: "~/.ssh/id_rsa"
+#  - uid: /zport/dmd/Devices/Server/Linux/Openshift
+#    property: zCommandUsername
+#    value: core
+#
+#- name: Create a Host in Zenoss from Yaml
+#  ignore_errors: yes
+#  uri:
+#    url: "{{ zrouter }}"
+#    user: "{{ usingthis }}"
+#    password: "{{ andthis }}"
+#    method: POST
+##      body: "{\"action\":\"DeviceRouter\",\"method\":\"addDevice\",\"data\":[{{ data }}], \"tid\":1}"
+#    body:
+#    - action: DeviceRouter
+#      method: addDevice
+#      data:
+#      - deviceName: "{{ item.host }}"
+#        deviceClass: "/{{ rootorg }}/{{ item.org }}"
+#        collector: localhost
+#        model: true
+#        title: ""
+#        productionState: 1000
+#        priority: 3
+#        snmpCommunity: RTO
+#        snmpPort: 161
+#        tag: ""
+#        rackSlot: "aws"
+#        serialNumber: "0"
+#        hwManufacturer: "aws"
+#        hwProductName: "aws"
+#        osManufacturer: "Redhat"
+#        osProductName: "Redhat"
+#        comments: "added by ansible"
+#      tid: 1
+#    force_basic_auth: yes
+#    status_code: 200
+#    body_format: json
+#  loop: "{{ addme }}"
+#
+#- name: monitor hosts in tower groups
+#  include_tasks: groupadd.yml
+#  loop: "{{ tower_groups }}"
+#  loop_control:
+#    loop_var: towergroup
+#
+#- name: Visit the Zenoss home page
+#  debug:
+#    msg: "Visit the Zenoss home page at http://{{ ec2_ip_address }}:30080/zport/dmd"

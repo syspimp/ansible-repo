@@ -1,0 +1,94 @@
+---
+
+- name: "Add hosts to zenoss"
+  block:
+  - name: "Find Group Inventory for '{{ towergroup }}'"
+    uri:
+      url: "https://{{ tower_server }}/api/v2/groups/?search={{ towergroup }}"
+      validate_certs: no
+      method: GET
+      user: "{{ tower_user }}"
+      password: "{{ tower_pass }}"
+      force_basic_auth: yes
+      status_code: [200,202,204]
+      body_format: json
+    register: groupidcheck
+
+  - name: "Set the host_id fact"
+    set_fact:
+      hostgroup_host_id: "{{ groupidcheck.json.results[0].id }}"
+
+  - name: "Get the json object containing the servers in the group inventory"
+    uri:
+      url: "https://{{ tower_server }}/api/v2/groups/{{ hostgroup_host_id }}/hosts"
+      validate_certs: no
+      method: GET
+      user: "{{ tower_user }}"
+      password: "{{ tower_pass }}"
+      force_basic_auth: yes
+      status_code: [200,202,204]
+      body_format: json
+    register: hostidcheck
+
+  - name: "Set the target_servers fact"
+    set_fact:
+      target_servers: "{{ hostidcheck.json.results }}"
+  rescue:
+  - name: There are no servers in this tower group
+    debug:
+      msg: "There are no servers in {{ towergroup }} tower group"
+
+- name: Create Org Nodes in Zenoss
+  ignore_errors: yes
+  uri:
+    url: "{{ zrouter }}"
+    user: "{{ usingthis }}"
+    password: "{{ andthis }}"
+    method: POST
+    body:
+    - action: DeviceRouter
+      method: addNode
+      data:
+      - id: "{{ towergroup }}"
+        description: "{{ towergroup }} Tower Inventory Group"
+        type: organizer
+        contextUid: "/zport/dmd/Devices/{{ rootorg }}/Linux/Ansible Tower/Inventory Groups"
+      tid: 51
+      type: rpc
+    force_basic_auth: yes
+    status_code: 200
+    body_format: json
+
+- name: Create a Host in Zenoss from Yaml
+  ignore_errors: yes
+  uri:
+    url: "{{ zrouter }}"
+    user: "{{ usingthis }}"
+    password: "{{ andthis }}"
+    method: POST
+    body:
+    - action: DeviceRouter
+      method: addDevice
+      data:
+      - deviceName: "{{ item.name }}"
+        deviceClass: "/{{ rootorg }}/Linux/Ansible Tower/Inventory Groups/{{ towergroup }}"
+        collector: localhost
+        model: true
+        title: ""
+        productionState: 1000
+        priority: 3
+        snmpCommunity: RTO
+        snmpPort: 161
+        tag: ""
+        rackSlot: "aws"
+        serialNumber: "0"
+        hwManufacturer: "aws"
+        hwProductName: "aws"
+        osManufacturer: "Redhat"
+        osProductName: "Redhat"
+        comments: "added by ansible"
+      tid: 1
+    force_basic_auth: yes
+    status_code: 200
+    body_format: json
+  loop: "{{ target_servers }}"
