@@ -228,6 +228,20 @@
     become: true
   when: firstbootcheck.stdout == "false"
 
+- name: total hack for rhel8
+  block:
+  - name: "try to install python for rhel8 real quick"
+    yum:
+      name: "{{ redhat8_packages }}"
+      state: latest
+    become: true
+  when:
+  - ansible_distribution_major_version == '8'
+  rescue:
+  - name: "well that didn't work"
+    debug:
+      msg: "did it?"
+      
 - name: entitlement block
   block:
   - name: "Fall back to RHSM, Check if we are registered"
