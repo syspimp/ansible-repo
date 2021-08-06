@@ -28,7 +28,7 @@
 
 - name: create the minecraft server pods
   shell: |
-    kubectl apply -n {{ minecraft_namespace }} -f docker-minecraft-bedrock-server/examples/kubernetes.yaml
+    kubectl apply -n {{ minecraft_namespace }} -f docker-minecraft-bedrock-server/examples/kubernetes.yaml --validate=false
   args:
     creates: /opt/.minecraft-configed
     
