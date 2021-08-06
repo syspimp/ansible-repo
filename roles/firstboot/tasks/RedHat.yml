@@ -331,7 +331,7 @@
       register: rhsm_status
       #when: "'Current' not in rhsm_reg.stdout"
       #when: "'Current' not in rhsm_reg.stdout and ansible_virtualization_role == 'guest' "
-      retries: 10
+      retries: 3
       until: rhsm_status.msg.find("System successfully registered") != -1
       delay: 1
 
