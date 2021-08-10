@@ -78,7 +78,6 @@
     AWS_ACCESS_KEY_ID: "{{ TFOUND_AWS_ACCESS_KEY_ID }}"
     AWS_SECRET_KEY: "{{ TFOUND_AWS_SECRET_KEY }}"
   tasks:
-    use this if you forget your encrypted aws creds
     - name: "AWS_ACCESS_KEY_ID"
       debug: var=AWS_ACCESS_KEY_ID
     - name: "AWS_SECRET_KEY"
