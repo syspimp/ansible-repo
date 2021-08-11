@@ -79,9 +79,9 @@
     AWS_SECRET_KEY: "{{ TFOUND_AWS_SECRET_KEY }}"
   tasks:
     - name: "AWS_ACCESS_KEY_ID"
-      debug: var=AWS_ACCESS_KEY_ID
+      debug: var=TFOUND_AWS_ACCESS_KEY_ID
     - name: "AWS_SECRET_KEY"
-      debug: var=AWS_SECRET_KEY
+      debug: var=TFOUND_AWS_SECRET_KEY
     - name: Use the correct AWS location
       set_fact:
         environment:
