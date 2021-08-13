@@ -10,12 +10,12 @@
   loop: "{{ workshop_deps.rpms }}"
 
 - name: "list the installed pip dependencies"
-  shell: pip list
+  shell: pip3 list
   become: yes
   register: piplist
 
 - name: "install needed pip dependencies"
-  shell: pip install {{ item }}
+  shell: pip3 install {{ item }}
   become: yes
   when: item not in piplist.stdout
   loop: "{{ workshop_deps.pipmods }}"
@@ -74,7 +74,7 @@
   shell: |
     source /var/lib/awx/venv/ansible/bin/activate
     umask 0022
-    pip install --upgrade boto3
+    pip3 install --upgrade boto3
     deactivate
     touch /opt/.tower-setup2
   become: yes
@@ -90,7 +90,7 @@
 
 - name: Post manifest file
   uri:
-    url: https://localhost/api/v2/config/
+    url: https://{{ inventory_hostname }}/api/v2/config/
     method: POST
     user: admin
     password: "{{ tower_pass }}"
