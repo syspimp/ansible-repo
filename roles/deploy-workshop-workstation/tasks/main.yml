@@ -6,7 +6,7 @@
 - name: "install rpms if needed"
   shell: yum -y install {{ item }}
   become: yes
-  when: item not in rpmlist.stdout
+  #when: item not in rpmlist.stdout
   loop: "{{ workshop_deps.rpms }}"
 
 - name: "list the installed pip dependencies"
