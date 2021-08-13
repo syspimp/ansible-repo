@@ -112,7 +112,8 @@ workshop_deps:
   - pywinrm
   - requests
   - requests-credssp
-  - ansible-tower-cli
+#  - ansible-tower-cli
+  - https://releases.ansible.com/ansible-tower/cli/ansible-tower-cli-latest.tar.gz
   rpms:
   - git
   - ansible
