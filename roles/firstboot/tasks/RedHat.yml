@@ -236,9 +236,10 @@
   block:
   - name: "try to install python for rhel8 real quick"
     yum:
-      name: "{{ redhat8_packages }}"
+      name: "{{ item }}"
       state: latest
     when: item not in rpmlist.stdout
+    loop: "{{ redhat8_packages }}"
     become: true
 
   - name: "Run yum update to avoid a bug. Please wait. SSH to Host and tail /tmp/tower.output for status"
@@ -383,7 +384,7 @@
       when:
       - ansible_distribution_major_version == '7'
     
-    - name: "Enabling needed repos"
+    - name: "Enabling needed repos for rhel7"
       shell: "subscription-manager repos --enable={{ item }}"
       with_items: "{{ rh7_enabled_repos }}"
       become: true
@@ -392,6 +393,15 @@
       when:
       - ansible_distribution_major_version == '7'
     
+    - name: "Enabling needed repos for rhel8"
+      shell: "subscription-manager repos --enable={{ item }}"
+      with_items: "{{ rh8_enabled_repos }}"
+      become: true
+      args:
+        creates: /opt/.firstboot
+      when:
+      - ansible_distribution_major_version == '8'
+
     - name: "Installing base config rpms"
       yum:
         name: "{{ redhat_packages }}"
