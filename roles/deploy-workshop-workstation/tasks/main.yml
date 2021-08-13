@@ -21,9 +21,9 @@
   loop: "{{ workshop_deps.pipmods }}"
 
 - name: "install needed ansible collections"
-  shell: ansible-galaxy collection install -p /etc/ansible community.{{ item }}
+  shell: ansible-galaxy collection install -p /usr/share/ansible/collections community.{{ item }}
   args:
-    creates: /etc/ansible/ansible_collections/community/general
+    creates: "/usr/share/ansible/collections/ansible_collections/community/{{ item }}"
   become: yes
   loop:
   - general
@@ -37,7 +37,7 @@
 - name: "place the extra vars template"
   template:
     src: workshop.yml.j2
-    dest: "/home/cloud-user/workshops/provisioner/workshop-{{ workshop.name }}"
+    dest: "/home/cloud-user/workshops/provisioner/workshop-{{ workshop.name }}.yml"
 
 - name: "create aws directory to store creds"
   file:
