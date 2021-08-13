@@ -43,7 +43,7 @@
 
 - name: "copy the aws credential template"
   template:
-    content: aws-credentials.j2
+    src: aws-credentials.j2
     dest: /root/.aws/credentials
 
 - name: "copy up the entitlement manifest"
@@ -59,7 +59,7 @@
 
 - name: "update the tower setup inventory file"
   template:
-    content: tower-inventory.j2
+    src: tower-inventory.j2
     dest: /opt/ansible-tower-setup-3.8.3-2/inventory
 
 - name: "run the tower installer"
