@@ -109,7 +109,7 @@
     git clone https://github.com/ansible/workshops
     cp /home/cloud-user/workshops/provisioner/manifest.zip /var/lib/awx/projects/workshops/provisioner/
     chown -R awx.awx /var/lib/awx/projects/
-    restorcon -rV /var/lib/awx/projects/
+    restorecon -rV /var/lib/awx/projects/
     deactivate
     touch /opt/.tower-setup3
   become: yes
