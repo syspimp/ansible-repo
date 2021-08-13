@@ -6,14 +6,14 @@ localhost ansible_connection=local
 [database]
 
 [all:vars]
-admin_password='{{ tower_pass }}'
+admin_password='{{ workshop.default_password }}'
 
 pg_host=''
 pg_port=''
 
 pg_database='awx'
 pg_username='awx'
-pg_password='{{ tower_pass}}'
+pg_password='{{ workshop.default_password }}'
 pg_sslmode='prefer'  # set to 'verify-full' for client-side enforced SSL
 
 # Automation Hub Configuration
