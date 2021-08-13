@@ -147,7 +147,7 @@
 
 - name: "import the workshop objects"
   shell: |
-    $(TOWER_USERNAME=admin TOWER_PASSWORD=n0t1ck3t awx login -k -f human)
+    $(TOWER_USERNAME=admin TOWER_PASSWORD={{ workshop.admin_password }} awx login -k -f human)
     awx -k import < /opt/ansible-tower-setup-3.8.3-2/import-{{ item }}.json
   become: yes
   loop:
