@@ -68,9 +68,9 @@
   shell: |
     source /var/lib/awx/venv/ansible/bin/activate
     umask 0022
-    ansible-galaxy collection install community.{{ item }}
+    ansible-galaxy collection install -p /usr/share/ansible/collections community.{{ item }}
   args:
-    creates: /etc/ansible/ansible_collections/community/general
+    creates: /usr/share/ansible/collections/ansible_collections/community/general
   become: yes
   loop:
   - general
