@@ -49,12 +49,61 @@
     validate_certs: false
     force_basic_auth: true
 
+- name: "list the installed pip dependencies"
+  shell: |
+    source /var/lib/awx/venv/ansible/bin/activate
+    umask 0022
+    pip3 list
+  register: piplist
+
+- name: "install needed pip dependencies"
+  shell: |
+    source /var/lib/awx/venv/ansible/bin/activate
+    umask 0022
+    pip3 install {{ item }}
+  when: item not in piplist.stdout
+  loop: "{{ workshop_deps.pipmods }}"
+
+- name: "install needed ansible collections"
+  shell: |
+    source /var/lib/awx/venv/ansible/bin/activate
+    umask 0022
+    ansible-galaxy collection install community.{{ item }}
+  args:
+    creates: /etc/ansible/ansible_collections/community/general
+  become: yes
+  loop:
+  - general
+  - aws
+
+- name: "clone the github repo"
+  shell: |
+    source /var/lib/awx/venv/ansible/bin/activate
+    umask 0022
+    git clone https://github.com/ansible/workshops
+  args:
+    creates: /var/lib/awx/projects/workshops
+
+- name: "place the extra vars template"
+  template:
+    src: workshop.yml.j2
+    dest: "/var/lib/awx/projects/workshops/provisioner/workshop-{{ workshop.name }}"
+
+- name: "create aws directory to store creds"
+  file:
+    path: /var/lib/awx/.aws
+    state: directory
+
+- name: "copy the aws credential template"
+  template:
+    src: aws-credentials.j2
+    dest: /var/lib/awx/.aws/credentials
+
 - name: "add the workshop provisioner to awx projects and copy in manifest.zip"
   shell: |
     source /var/lib/awx/venv/ansible/bin/activate
     umask 0022
-    cd /var/lib/awx/projects
-    git clone https://github.com/ansible/workshops
+    cd /var/lib/awx/projects/workshops
     cp /home/cloud-user/workshops/provisioner/manifest.zip /var/lib/awx/projects/workshops/provisioner/
     chown -R awx.awx /var/lib/awx/projects/
     restorecon -rV /var/lib/awx/projects/
