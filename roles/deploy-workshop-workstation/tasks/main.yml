@@ -8,8 +8,6 @@
   become: yes
   when: item not in rpmlist.stdout
   loop: "{{ workshop_deps.rpms }}"
-  - git
-  - ansible
 
 - name: "list the installed pip dependencies"
   shell: pip list
