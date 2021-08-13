@@ -242,6 +242,11 @@
     loop: "{{ redhat8_packages }}"
     become: true
 
+  - name: "Enabling needed repos for rhel8"
+    shell: "subscription-manager repos --enable={{ item }}"
+    with_items: "{{ rh8_enabled_repos }}"
+    become: true
+
   - name: "Run yum update to avoid a bug. Please wait. SSH to Host and tail /tmp/tower.output for status"
     shell: |
       exec &> >(tee -a /tmp/tower.output)
@@ -393,15 +398,6 @@
       when:
       - ansible_distribution_major_version == '7'
     
-    - name: "Enabling needed repos for rhel8"
-      shell: "subscription-manager repos --enable={{ item }}"
-      with_items: "{{ rh8_enabled_repos }}"
-      become: true
-      args:
-        creates: /opt/.firstboot
-      when:
-      - ansible_distribution_major_version == '8'
-
     - name: "Installing base config rpms"
       yum:
         name: "{{ redhat_packages }}"
