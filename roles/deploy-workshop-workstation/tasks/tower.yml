@@ -31,12 +31,17 @@
   args:
     creates: /opt/.tower-setup2
 
+#- name: Load manifest into variable
+#  local_action:
+#    module: slurp
+#    src: "{{ playbook_dir }}/roles/deploy-workshop-workstation/files/manifest.zip"
+#  register: manifest_file
+#  become: false
+
 - name: Load manifest into variable
-  local_action:
-    module: slurp
-    src: "{{ playbook_dir }}/roles/deploy-workshop-workstation/files/manifest.zip"
+  slurp:
+    src: "/home/cloud-user/workshops/proivisioner/manifest.zip"
   register: manifest_file
-  become: false
 
 - name: Post manifest file
   uri:
