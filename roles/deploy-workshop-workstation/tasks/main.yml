@@ -86,7 +86,7 @@
 - name: Load manifest into variable
   local_action:
     module: slurp
-    src: "manifest.zip"
+    src: "{{ playbook_dir }}/roles/deploy-workshop-workstation/files/manifest.zip"
   register: manifest_file
   become: false
 
