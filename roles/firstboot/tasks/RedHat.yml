@@ -385,7 +385,7 @@
     
     - name: "Enabling needed repos"
       shell: "subscription-manager repos --enable={{ item }}"
-      with_items: "{{ rh_enabled_repos }}"
+      with_items: "{{ rh7_enabled_repos }}"
       become: true
       args:
         creates: /opt/.firstboot
