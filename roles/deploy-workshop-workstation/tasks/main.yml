@@ -55,6 +55,7 @@
   unarchive:
     src: https://releases.ansible.com/ansible-tower/setup/ansible-tower-setup-latest.tar.gz
     dest: /opt/
+    remote_src: yes
   become: yes
 
 - name: "update the tower setup inventory file"
