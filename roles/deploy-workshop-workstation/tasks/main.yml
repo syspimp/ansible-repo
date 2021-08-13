@@ -26,30 +26,28 @@
 
 - name: "clone the github repo"
   shell: git clone https://github.com/ansible/workshops
-  become: yes
   args:
-    creates: /root/workshops
+    creates: /home/cloud-user/workshops
 
 - name: "place the extra vars template"
   template:
     content: workshop.yml.j2
-    dest: "/root/workshops/provisioner/workshop-{{ workshop.name }}"
-  become: yes
+    dest: "/home/cloud-user/workshops/provisioner/workshop-{{ workshop.name }}"
 
 - name: "create aws directory to store creds"
   file:
-    path: /root/.aws
+    path: /home/cloud-user/.aws
     state: directory
 
 - name: "copy the aws credential template"
   template:
     src: aws-credentials.j2
-    dest: /root/.aws/credentials
+    dest: /home/cloud-user/.aws/credentials
 
 - name: "copy up the entitlement manifest"
   copy:
     src: manifest.zip
-    dest: /root/workshops/provisioner/manifest.zip
+    dest: /home/cloud-user/workshops/provisioner/manifest.zip
 
 - name: "grab the latest tower tarball"
   unarchive:
@@ -61,6 +59,7 @@
   template:
     src: tower-inventory.j2
     dest: /opt/ansible-tower-setup-3.8.3-2/inventory
+  become: yes
 
 - name: "run the tower installer"
   shell: |
