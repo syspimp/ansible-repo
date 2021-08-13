@@ -13,6 +13,10 @@
   shell: rpm -qa
   register: rpmlist
 
+- name: "list the rpms installed"
+  shell: yum repolist
+  register: repolist
+
 - name: "First boot configuration block"
   block:
   - name: "Grab Satellite information block"
@@ -245,6 +249,7 @@
   - name: "Enabling needed repos for rhel8"
     shell: "subscription-manager repos --enable={{ item }}"
     with_items: "{{ rh8_enabled_repos }}"
+    when: item not in repolist.stdout
     become: true
 
   - name: "Run yum update to avoid a bug. Please wait. SSH to Host and tail /tmp/tower.output for status"
