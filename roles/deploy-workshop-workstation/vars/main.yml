@@ -116,3 +116,4 @@ workshop_deps:
   rpms:
   - git
   - ansible
+  - python3-pip
