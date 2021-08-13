@@ -64,3 +64,35 @@
   args:
     creates: /opt/.tower-setup3
 
+#- name: "install the awx/tower cli"
+#  shell: |
+#    pip3 install https://releases.ansible.com/ansible-tower/cli/ansible-tower-cli-latest.tar.gz && \
+#    touch /opt/.tower-setup4
+#  become: yes
+#  args:
+#    creates: /opt/.tower-setup4
+
+- name: "create the workshop objects"
+  template:
+    src: "{{ item }}.json.j2"
+    dest: "/opt/ansible-tower-setup-3.8.3-2/import-{{ item }}.json"
+  become: yes
+  loop:
+  - projects
+  - credentials
+  - job_templates
+
+- name: "import the workshop objects"
+  shell: |
+    awx import < /opt/ansible-tower-setup-3.8.3-2/import-{{ item }}.json
+  become: yes
+  loop:
+  - projects
+  - credentials
+  - job_templates
+  args:
+    creates: /opt/.tower-setup6
+
+- name: "idempotency for workshop"
+  shell: touch /opt/.tower-setup6
+  become: yes

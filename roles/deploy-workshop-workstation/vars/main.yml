@@ -7,6 +7,8 @@ workshop:
   type: windows
   dns_zone: prod.maskedadmins.com
   default_password: ansible123
+  # do you want to install tower on the system?
+  towerinstall: yes
   # go to https://access.redhat.com/terms-based-registry/#/accounts to create a service account
   redhat_svc_account: !vault |
           $ANSIBLE_VAULT;1.1;AES256
