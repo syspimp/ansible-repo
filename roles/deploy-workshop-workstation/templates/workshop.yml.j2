@@ -23,7 +23,7 @@ ec2_region: us-east-1
 # creates 2 windows instances per student instead of default 1
 doubleup: false
 # password for Ansible control node, defaults to ansible
-admin_password: "{{ workshop.admin_password }}"
+admin_password: "{{ workshop.default_password }}"
 # adds a form that prompts for name and email to allocate student credentials
 attendance: true
 # automatically installs Tower to control node

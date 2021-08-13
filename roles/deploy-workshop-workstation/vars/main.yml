@@ -6,7 +6,7 @@ workshop:
   how_many_students: 2
   type: windows
   dns_zone: prod.maskedadmins.com
-  admin_password: ansible123
+  default_password: ansible123
   # go to https://access.redhat.com/terms-based-registry/#/accounts to create a service account
   redhat_svc_account: !vault |
           $ANSIBLE_VAULT;1.1;AES256
