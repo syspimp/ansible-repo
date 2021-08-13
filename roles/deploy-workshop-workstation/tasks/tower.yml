@@ -40,7 +40,7 @@
 
 - name: Load manifest into variable
   slurp:
-    src: "/home/cloud-user/workshops/proivisioner/manifest.zip"
+    src: "/home/cloud-user/workshops/provisioner/manifest.zip"
   register: manifest_file
 
 - name: Post manifest file
