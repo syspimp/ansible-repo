@@ -81,8 +81,13 @@
     source /var/lib/awx/venv/ansible/bin/activate
     umask 0022
     cd /var/lib/awx/projects/
-    [[ -e /var/lib/awx/projects/workshops ]] || git clone https://github.com/ansible/workshops
+    if [[ ! -e /var/lib/awx/projects/workshops ]]
+    then
+      git clone https://github.com/ansible/workshops
+    fi
+  become: yes
   args:
+    executable: /bin/bash
     creates: /var/lib/awx/projects/workshops
 
 - name: "place the extra vars template"
