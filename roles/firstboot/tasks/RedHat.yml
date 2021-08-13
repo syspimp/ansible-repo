@@ -9,6 +9,10 @@
     fi
   register: firstbootcheck
 
+- name: "list the rpms installed"
+  shell: rpm -qa
+  register: rpmlist
+
 - name: "First boot configuration block"
   block:
   - name: "Grab Satellite information block"
@@ -234,6 +238,7 @@
     yum:
       name: "{{ redhat8_packages }}"
       state: latest
+    when: item not in rpmlist.stdout
     become: true
 
   - name: "Run yum update to avoid a bug. Please wait. SSH to Host and tail /tmp/tower.output for status"
@@ -243,6 +248,7 @@
     become: true
     args:
       executable: /bin/bash
+      creates: /tmp/tower.output
 
   - name: "Perform a yum clean all"
     shell:  yum clean all
