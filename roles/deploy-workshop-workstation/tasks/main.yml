@@ -60,5 +60,5 @@
 
 - name: "Install Tower to deploy from GUI, if desired"
   include: "tower.yml"
-  when: workshop.towerinstall == "yes"
+  #when: workshop.towerinstall == "yes"
 
