@@ -43,7 +43,7 @@
     url: https://{{ inventory_hostname }}/api/v2/config/
     method: POST
     user: admin
-    password: "{{ workshop.admin_password }}"
+    password: "{{ workshop.default_password }}"
     body: '{ "eula_accepted": true, "manifest": "{{ manifest_file.content }}" }'
     body_format: json
     validate_certs: false
