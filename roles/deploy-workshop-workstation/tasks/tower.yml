@@ -149,7 +149,7 @@
   shell: |
     $(TOWER_USERNAME=admin TOWER_PASSWORD={{ workshop.default_password }} awx login -k -f human)
     awx -k import < /opt/ansible-tower-setup-3.8.3-2/import-{{ item }}.json
-  become: yes
+  #become: yes
   loop:
   - projects
   - credentials
