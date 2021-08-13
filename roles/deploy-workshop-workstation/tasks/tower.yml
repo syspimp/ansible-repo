@@ -64,17 +64,17 @@
   when: item not in piplist.stdout
   loop: "{{ workshop_deps.pipmods }}"
 
-- name: "install needed ansible collections"
-  shell: |
-    source /var/lib/awx/venv/ansible/bin/activate
-    umask 0022
-    ansible-galaxy collection install -p /usr/share/ansible/collections community.{{ item }}
-  args:
-    creates: /usr/share/ansible/collections/ansible_collections/community/general
-  become: yes
-  loop:
-  - general
-  - aws
+#- name: "install needed ansible collections"
+#  shell: |
+#    source /var/lib/awx/venv/ansible/bin/activate
+#    umask 0022
+#    ansible-galaxy collection install -p /usr/share/ansible/collections community.{{ item }}
+#  args:
+#    creates: /usr/share/ansible/collections/ansible_collections/community/general
+#  become: yes
+#  loop:
+#  - general
+#  - aws
 
 - name: "clone the github repo"
   shell: |
@@ -96,23 +96,23 @@
     dest: "/var/lib/awx/projects/workshops/provisioner/workshop-{{ workshop.name }}"
   become: yes
 
-- name: "create aws directory to store creds"
-  file:
-    path: /var/lib/awx/.aws
-    state: directory
-    owner: awx
-    group: awx
-  become: yes
-
-- name: "copy the aws credential template"
-  template:
-    src: aws-credentials.j2
-    dest: /var/lib/awx/.aws/credentials
-    owner: awx
-    group: awx
-    mode: '0400'
-  become: yes
-
+#- name: "create aws directory to store creds"
+#  file:
+#    path: /var/lib/awx/.aws
+#    state: directory
+#    owner: awx
+#    group: awx
+#  become: yes
+#
+#- name: "copy the aws credential template"
+#  template:
+#    src: aws-credentials.j2
+#    dest: /var/lib/awx/.aws/credentials
+#    owner: awx
+#    group: awx
+#    mode: '0400'
+#  become: yes
+#
 - name: "add the workshop provisioner to awx projects and copy in manifest.zip"
   shell: |
     source /var/lib/awx/venv/ansible/bin/activate
