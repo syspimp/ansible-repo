@@ -1,0 +1,66 @@
+---
+- name: "grab the latest tower tarball"
+  unarchive:
+    src: https://releases.ansible.com/ansible-tower/setup/ansible-tower-setup-latest.tar.gz
+    dest: /opt/
+    remote_src: yes
+  become: yes
+
+- name: "update the tower setup inventory file"
+  template:
+    src: tower-inventory.j2
+    dest: /opt/ansible-tower-setup-3.8.3-2/inventory
+  become: yes
+
+- name: "run the tower installer"
+  shell: |
+    cd /opt/ansible-tower-setup-*
+    ./setup.sh && touch /opt/.tower-setup
+  become: yes
+  args:
+    creates: /opt/.tower-setup
+
+- name: "upgrade boto3 for awx user for workshop deployments"
+  shell: |
+    source /var/lib/awx/venv/ansible/bin/activate
+    umask 0022
+    pip3 install --upgrade boto3
+    deactivate
+    touch /opt/.tower-setup2
+  become: yes
+  args:
+    creates: /opt/.tower-setup2
+
+- name: Load manifest into variable
+  local_action:
+    module: slurp
+    src: "{{ playbook_dir }}/roles/deploy-workshop-workstation/files/manifest.zip"
+  register: manifest_file
+  become: false
+
+- name: Post manifest file
+  uri:
+    url: https://{{ inventory_hostname }}/api/v2/config/
+    method: POST
+    user: admin
+    password: "{{ tower_pass }}"
+    body: '{ "eula_accepted": true, "manifest": "{{ manifest_file.content }}" }'
+    body_format: json
+    validate_certs: false
+    force_basic_auth: true
+
+- name: "add the workshop provisioner to awx projects and copy in manifest.zip"
+  shell: |
+    source /var/lib/awx/venv/ansible/bin/activate
+    umask 0022
+    cd /var/lib/awx/projects
+    git clone https://github.com/ansible/workshops
+    cp /home/cloud-user/workshops/provisioner/manifest.zip /var/lib/awx/projects/workshops/provisioner/
+    chown -R awx.awx /var/lib/awx/projects/
+    restorecon -rV /var/lib/awx/projects/
+    deactivate
+    touch /opt/.tower-setup3
+  become: yes
+  args:
+    creates: /opt/.tower-setup3
+
