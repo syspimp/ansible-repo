@@ -80,7 +80,8 @@
   shell: |
     source /var/lib/awx/venv/ansible/bin/activate
     umask 0022
-    git clone https://github.com/ansible/workshops
+    cd /var/lib/awx/projects/
+    [[ -e /var/lib/awx/projects/workshops ]] || git clone https://github.com/ansible/workshops
   args:
     creates: /var/lib/awx/projects/workshops
 
