@@ -94,16 +94,24 @@
   template:
     src: workshop.yml.j2
     dest: "/var/lib/awx/projects/workshops/provisioner/workshop-{{ workshop.name }}"
+  become: yes
 
 - name: "create aws directory to store creds"
   file:
     path: /var/lib/awx/.aws
     state: directory
+    owner: awx
+    group: awx
+  become: yes
 
 - name: "copy the aws credential template"
   template:
     src: aws-credentials.j2
     dest: /var/lib/awx/.aws/credentials
+    owner: awx
+    group: awx
+    mode: '0400'
+  become: yes
 
 - name: "add the workshop provisioner to awx projects and copy in manifest.zip"
   shell: |
@@ -139,7 +147,8 @@
 
 - name: "import the workshop objects"
   shell: |
-    awx import < /opt/ansible-tower-setup-3.8.3-2/import-{{ item }}.json
+    $(TOWER_USERNAME=admin TOWER_PASSWORD=n0t1ck3t awx login -k -f human)
+    awx -k import < /opt/ansible-tower-setup-3.8.3-2/import-{{ item }}.json
   become: yes
   loop:
   - projects
