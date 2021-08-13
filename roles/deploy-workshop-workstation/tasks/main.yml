@@ -22,6 +22,8 @@
 
 - name: "install needed ansible collections"
   shell: ansible-galaxy collection install -p /etc/ansible community.general
+  args:
+    creates: /etc/ansible/ansible_collections/community/general
   become: yes
 
 - name: "clone the github repo"
