@@ -246,7 +246,20 @@
     loop: "{{ redhat8_packages }}"
     become: true
 
+- name: entitlement block
+  block:
+  - name: "Fall back to RHSM, Check if we are registered"
+    shell: "subscription-manager status"
+    register: rhsm_reg
+    become: yes
+  when:
+  - ansible_distribution_major_version == '8'
 
+  rescue:
+  - name: "well that didn't work"
+    debug:
+      msg: "did it?"
+      
   - name: "subscribe to the cdn"
     shell: subscription-manager register --auto-attach --username "{{ rh_satellite_user }}" --password "{{ rh_satellite_pass }}"
     become: yes
@@ -279,13 +292,7 @@
     loop:
     - '.firstboot'
     - '.bootstrap'
-  when:
-  - ansible_distribution_major_version == '8'
-  rescue:
-  - name: "well that didn't work"
-    debug:
-      msg: "did it?"
-      
+
 - name: entitlement block
   block:
   - name: "Fall back to RHSM, Check if we are registered"
