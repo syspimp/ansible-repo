@@ -345,3 +345,8 @@
         mode: 0444
       become: true
   when: capsulesetup.stdout == "false"
+
+  rescue:
+  - name: "Failure"
+    debug:
+      msg: "There is no satellite server. Run again after setting up the Satellite Server"
