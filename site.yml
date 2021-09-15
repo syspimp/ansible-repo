@@ -7,7 +7,7 @@
     #AWS_SECRET_KEY: "{{ AWS_SECRET_KEY }}"
   roles:
     - firstboot
-    - satellite-clients
+#    - satellite-clients
     - snmp-client
     - webconsole
     - insights
