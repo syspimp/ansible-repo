@@ -7,19 +7,19 @@
   ignore_errors: yes
   register: rhsm_reg
     
-- name: "Try to Entitle to use Satellite 6"
-  block:
-    - name: "Add Satellite Entitlement to Server"
-      redhat_subscription:
-        state: present
-        username: "{{ rh_satellite_user }}"
-        password: "{{ rh_satellite_pass }}"
-        pool_ids: "{{ rh_satellite_pool_id }}"
-      become: true
-      register: rhsm_status
-      retries: 10
-      delay: 1
-  when: "'Red Hat Satellite' not in rhsm_reg.stdout"
+#- name: "Try to Entitle to use Satellite 6"
+#  block:
+#    - name: "Add Satellite Entitlement to Server"
+#      redhat_subscription:
+#        state: present
+#        username: "{{ rh_satellite_user }}"
+#        password: "{{ rh_satellite_pass }}"
+#        pool_ids: "{{ rh_satellite_pool_id }}"
+#      become: true
+#      register: rhsm_status
+#      retries: 10
+#      delay: 1
+#  when: "'Red Hat Satellite' not in rhsm_reg.stdout"
 
 - name: "Satellite Setup check"
   shell: |
