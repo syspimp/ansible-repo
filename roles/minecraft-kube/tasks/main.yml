@@ -75,12 +75,30 @@
     creates: /opt/.minecraft-configed2
     executable: /bin/bash
 
+- name: get the node port
+  shell: |
+    kubectl -n minecraft get svc | grep bds | awk '{print $5}' | sed -e 's/19132://g' | sed -e 's/\/UDP//g'
+  args:
+    executable: /bin/bash
+  register: getnodeport
+
+- name: get the public ip
+  shell: |
+    curl http://169.254.169.254/2021-03-23/meta-data/public-ipv4
+  args:
+    executable: /bin/bash
+  register: public_ip
+
+- name: display instructions
+  debug: msg="Add the the server {{ public_ip.stdout }} port {{ getnodeport.stdout }} to your Minecraft client"
+
 - name: touch a file to remain idempotent
   command: touch /opt/.minecraft-configed2
   become: yes
   args:
     creates: /opt/.minecraft-configed2
 
+- name: "
 #- name: Loop over kubectl get pods until minecraft pod is running
 #  shell: kubectl get pods -n {{ minecraft_namespace }} | grep zenoss4-core || true
 #  #args:
