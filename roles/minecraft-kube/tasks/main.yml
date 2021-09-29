@@ -62,18 +62,18 @@
   args:
     creates: /opt/.minecraft-configed
 
-- name: expose the service on port 19132
-  shell: |
-    kubectl get pods -n {{ minecraft_namespace }}
-    sleep 20
-    kubectl get pods -n {{ minecraft_namespace }}
-    nohup kubectl port-forward service/bds --address 0.0.0.0 19132:19132 -n {{ minecraft_namespace }} </dev/null >/dev/null 2>&1 &
-    sleep 5
-    disown
-    sleep 1
-  args:
-    creates: /opt/.minecraft-configed2
-    executable: /bin/bash
+#- name: expose the service on port 19132
+#  shell: |
+#    kubectl get pods -n {{ minecraft_namespace }}
+#    sleep 20
+#    kubectl get pods -n {{ minecraft_namespace }}
+#    nohup kubectl port-forward service/bds --address 0.0.0.0 19132:19132 -n {{ minecraft_namespace }} </dev/null >/dev/null 2>&1 &
+#    sleep 5
+#    disown
+#    sleep 1
+#  args:
+#    creates: /opt/.minecraft-configed2
+#    executable: /bin/bash
 
 - name: get the node port
   shell: |
@@ -81,6 +81,35 @@
   args:
     executable: /bin/bash
   register: getnodeport
+
+- name: add ingress controller
+  shell: |
+    minikube addons enable ingress
+  args:
+    creates: /opt/.minecraft-configed2
+    executable: /bin/bash
+
+- name: add udp-services for ingress controller
+  shell: |
+    kubectl patch configmap udp-services -n ingress-nginx --patch '{"data":{"19132":"minecraft/bds:{{ getnodeport.stdout }}"}}'
+  args:
+    creates: /opt/.minecraft-configed2
+    executable: /bin/bash
+
+- name: putting patch template in place
+  template:
+    src: nginx-patch.yml.j2
+    dest: nginx-patch.yml
+    owner: cloud-user
+    group: cloud-user
+    mode: 0600
+
+- name: patch ingress controller
+  shell: |
+    kubectl patch deployment nginx-ingress-controller --patch "$(cat nginx-patch.yml)" -n ingress-nginx
+  args:
+    creates: /opt/.minecraft-configed2
+    executable: /bin/bash
 
 - name: get the public ip
   shell: |
@@ -98,7 +127,7 @@
   args:
     creates: /opt/.minecraft-configed2
 
-- name: "
+#- name: "
 #- name: Loop over kubectl get pods until minecraft pod is running
 #  shell: kubectl get pods -n {{ minecraft_namespace }} | grep zenoss4-core || true
 #  #args:
