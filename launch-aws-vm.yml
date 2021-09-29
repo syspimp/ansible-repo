@@ -8,6 +8,7 @@
   hosts: localhost
   gather_facts: no
   vars:
+    dns_zone: maskedadmins.com
     # RTO
     #aws_vpc_subnet_id: subnet-03960a62ece2d78dc
     # TFOUND
@@ -152,6 +153,7 @@
       register: security_group
 
     - name: launch an ec2 instance in a vpc subnet with second volume
+      register: ec2results
       when:
       - aws_vpc_subnet_id is defined
       - aws_multivolumes == 'yes'
@@ -256,6 +258,7 @@
       - aws_vpc_subnet_id is defined
       - aws_multivolumes == 'no'
       ignore_errors: yes
+      register: ec2results
       ec2:
         key_name: "{{ aws_key_name }}"
         instance_type: "{{ aws_instance_type }}"
@@ -360,6 +363,42 @@
         body_format: json
       with_items:
         - "{{ tower_inventory_ids }}"
+
+
+    - name: create dns entry
+      block:
+      - name: "Get record if it exists already"
+        route53:
+            command: get
+            zone: "{{ dns_zone }}"
+            record: "{{ aws_vmname }}.{{ dns_zone }}"
+            type: "{{ type }}"
+        register: rec
+  
+      - name: "Delete record if it exists already"
+        route53:
+            command: delete
+            zone: "{{ dns_zone }}"
+            record: "{{ rec.set.record }}"
+            ttl: "{{ rec.set.ttl }}"
+            type: "{{ rec.set.type }}"
+            value: "{{ rec.set.value }}"
+        when: rec.set.record
+  
+      rescue:
+      - debug:
+          msg: "This is normal for records not to exist."
+  
+      always:
+      - route53:
+            command: create
+            zone: "{{ dns_zone }}"
+            record: "{{ aws_vmname }}.{{ dns_zone }}"
+            type: "{{ type }}"
+            ttl: "{{ ttl }}"
+            value: "{{ ec2results.instances[0].public_ip }}"
+            wait: yes
+
 #
 #    - name: launch an ec2 instance in a public vpc
 #      when: aws_vpc_subnet_publicid is defined
