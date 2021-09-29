@@ -5,7 +5,7 @@ spec:
       - name: nginx-ingress-controller
         image: k8s.gcr.io/ingress-nginx/controller
         ports:
-         - containerPort: {{ getnodeport.stdout }}
+         - containerPort: 19132
            hostPort: 19132
            protocol: UDP
 
