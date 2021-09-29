@@ -1,4 +1,10 @@
 ---
+- name: install git
+  yum:
+    name: git
+    state: installed
+  become: yes
+
 - name: grab the github for minecraft for kube
   shell: git clone https://github.com/itzg/docker-minecraft-bedrock-server.git
   ignore_errors: yes
