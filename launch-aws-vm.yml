@@ -9,6 +9,8 @@
   gather_facts: no
   vars:
     dns_zone: maskedadmins.com
+    ttl: "60"
+    type: "A"
     # RTO
     #aws_vpc_subnet_id: subnet-03960a62ece2d78dc
     # TFOUND
