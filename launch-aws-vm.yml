@@ -389,7 +389,7 @@
             ttl: "{{ rec.set.ttl }}"
             type: "{{ rec.set.type }}"
             value: "{{ rec.set.value }}"
-        when: rec.set.record
+        when: rec.set.record is defined
   
       rescue:
       - debug:
