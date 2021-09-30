@@ -3,7 +3,7 @@ spec:
     spec:
       containers:
       - name: nginx-ingress-controller
-        image: k8s.gcr.io/ingress-nginx/controller
+        image: k8s.gcr.io/ingress-nginx/controller:v1.0.0-beta.3@sha256:44a7a06b71187a4529b0a9edee5cc22bdf71b414470eff696c3869ea8d90a695
         ports:
          - containerPort: 19132
            hostPort: 19132
