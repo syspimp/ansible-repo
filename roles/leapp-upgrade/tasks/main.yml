@@ -32,7 +32,7 @@
   
   - name: "Extract the leapp dataset from https://access.redhat.com/articles/3664871"
     ansible.builtin.unarchive:
-      src: leapp-data14.tar.gz
+      src: leapp-data15.tar.gz
       dest: /etc/leapp/files/
       creates: /etc/leapp/files/pes-events.json
     become: yes
