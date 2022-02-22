@@ -3,6 +3,13 @@
   hosts: satellite-server
   gather_facts: no
   tasks:
+  - name: Loop until hammer is installed
+    shell: which hammer
+    register: hammertasks
+    retries: 120
+    delay: 60
+    until: hammertasks.stdout.find("command not found") == -1
+
   - name: Loop over hammer task command until no running sync tasks
     shell: hammer task list | grep "ynchronize repository"
     register: hammertasks
