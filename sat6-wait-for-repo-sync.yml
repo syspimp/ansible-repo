@@ -11,7 +11,7 @@
     until: hammertasks.stdout.find("command not found") == -1
 
   - name: Loop over hammer task command until no running sync tasks
-    shell: hammer task list | grep "ynchronize repository"
+    shell: hammer task list | grep "ynchronize repository" || /bin/true
     register: hammertasks
     retries: 120
     delay: 60
