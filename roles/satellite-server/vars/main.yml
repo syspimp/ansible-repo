@@ -135,7 +135,8 @@ sat6_default_domain: "prod.maskedadmins.com"
 sat6_default_subnet: "AWS_TFOUND"
 sat6_default_environment: "production"
 #sat6_manifest: "manifest_sat6_20210204T140357Z.zip"
-sat6_manifest: "manifest_sat6_20210526T193331Z.zip"
+#sat6_manifest: "manifest_sat6_20210526T193331Z.zip"
+sat6_manifest: "manifest_sat6.zip"
 sat6_pool_ids: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           37303861666631306262666162306133616361623137373735653234623232333436313238316239

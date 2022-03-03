@@ -117,7 +117,7 @@ sat6:
         - "Test_104"
         - "Storage_105"
         - "Prod_106"
-sat6_manifest: "manifest_569d1776-9ed2-4d09-8a3e-86e8f92b59e9.zip"
+sat6_manifest: "manifest_sat6.zip"
 sat6_pool_ids: ['']
 sat6_enabled_products:
   - "Red Hat Enterprise Linux Server"
