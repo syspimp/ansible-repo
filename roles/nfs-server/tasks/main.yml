@@ -50,6 +50,7 @@
 - name: "Add selinxux contexts/flags for nfs mountpoint"
   shell: |
    semanage fcontext -a -t public_content_rw_t  "{{ nfs_mountpoint }}(/.*)?"
+  ignore_errors: yes
   become: yes
  
 - name: "Set context for selinxux contexts/flags for nfs mountpoint"
@@ -65,6 +66,6 @@
   become: yes
   loop:
   - rpcbind
-  - nfs-lock
-  - nfs-idmap
+  - nfs-mountd
+  - nfs-idmapd
   - nfs-server
