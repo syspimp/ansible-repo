@@ -9,6 +9,7 @@
   yum:
     name: "nfs-utils"
     state: "present"
+  become: true
   when: '"nfs-utils" not in isnfsinstalled.stdout'
 
 - name: "Create the nfs mount point"
