@@ -374,7 +374,7 @@
     - name: create dns entry
       block:
       - name: "Get record if it exists already"
-        route53:
+        community.aws.route53:
             command: get
             zone: "{{ dns_zone }}"
             record: "{{ aws_vmname }}.{{ dns_zone }}"
@@ -382,7 +382,7 @@
         register: rec
   
       - name: "Delete record if it exists already"
-        route53:
+        community.aws.route53:
             command: delete
             zone: "{{ dns_zone }}"
             record: "{{ rec.set.record }}"
@@ -396,7 +396,7 @@
           msg: "This is normal for records not to exist."
   
       always:
-      - route53:
+      - community.aws.route53:
             command: create
             zone: "{{ dns_zone }}"
             record: "{{ aws_vmname }}.{{ dns_zone }}"
