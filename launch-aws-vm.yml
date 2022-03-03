@@ -14,7 +14,17 @@
     # RTO
     #aws_vpc_subnet_id: subnet-03960a62ece2d78dc
     # TFOUND
-    aws_vpc_subnet_id: subnet-00dcd796d8781819a
+    # 10.0.0.0/24
+    #aws_vpc_subnet_id: subnet-00dcd796d8781819a
+    # 11.22.33.0/24
+    aws_vpc_subnet_id: subnet-04a23acc3d34e2ccd
+    # TFOUND
+    # Redhat_Lab vpc
+    #aws_vpc_id: vpc-0494b7798600fd4de
+    # march workshop vpc
+    aws_vpc_id: vpc-0f14d6e67fcf43ed6
+    # RTO
+    #aws_vpc_id: vpc-030130353f09b2b95
     aws_location: TFOUND
     # this fact will be used later to include role in the callback
     # - name: "Include roles for AWS servers"
@@ -42,10 +52,6 @@
     aws_security_group_allow_cidr: "0.0.0.0/0"
     aws_region: us-east-1
     aws_number_of_vms: 1
-    # TFOUND
-    aws_vpc_id: vpc-0494b7798600fd4de
-    # RTO
-    #aws_vpc_id: vpc-030130353f09b2b95
     #RHEL 6 AMI
     rhel6_ami_id: ami-1643ff7e
     # CentOS 7
