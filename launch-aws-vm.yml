@@ -75,7 +75,7 @@
     # tower/awx callback config
     host_config_key: firstboot
     host_config_server: "{{ tower_server }}"
-    host_config_jobid: "14"
+    host_config_jobid: "22"
     # update the tower/awx inventory after launching
     tower_inventory_ids:
       - 35

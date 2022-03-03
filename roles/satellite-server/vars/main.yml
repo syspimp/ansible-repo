@@ -3,7 +3,7 @@ satellite_version: 6.9
 openstack_version: 14
 openshift_version: 3.11
 host_config_key: firstboot
-host_config_jobid: 14
+host_config_jobid: 22
 redhat_packages: ['nspr','redhat-access-insights','deltarpm','bash-completion','vim-enhanced','ntp','ntpdate','git','wget','bind-utils']
 dns_domain: "dev.maskedadmins.com"
 compute_resources:
@@ -125,7 +125,7 @@ sat6:
 #        - "AWS_RTO"
         - "AWS_TFOUND"
 tower_key: firstboot
-tower_jobid: 14
+tower_jobid: 22
 sat6_default_org: Redhat_Lab
 sat6_default_location: AWS_TFOUND
 sat6_default_hostcollection: RHEL_7_x86_64
