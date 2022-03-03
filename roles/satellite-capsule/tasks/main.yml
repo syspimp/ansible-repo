@@ -18,7 +18,7 @@
       ignore_errors: true
 
     - name: "Add Satellite Entitlement to Server"
-      redhat_subscription:
+      community.general.redhat_subscription:
         state: present
         username: "{{ rh_satellite_user }}"
         password: "{{ rh_satellite_pass }}"

@@ -6,7 +6,7 @@
 - name: "Try to Entitle to use Gluster"
   block:
     - name: "Add Gluster Storage Entitlement to Server"
-      redhat_subscription:
+      community.general.redhat_subscription:
         state: present
         pool_ids: "{{ rh_storage_pool_id }}"
       become: true
