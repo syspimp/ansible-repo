@@ -98,8 +98,8 @@
 
 - name: add udp-services for ingress controller
   shell: |
-    kubectl patch configmap udp-services -n ingress-nginx --patch '{"data":{"19132":"minecraft/bds:19132"}}'
-    #kubectl patch configmap udp-services -n ingress-nginx --patch '{"data":{"19132":"minecraft/bds:{{ getnodeport.stdout }}"}}'
+    #kubectl patch configmap udp-services -n ingress-nginx --patch '{"data":{"19132":"minecraft/bds:19132"}}'
+    kubectl patch configmap udp-services -n ingress-nginx --patch '{"data":{"19132":"minecraft/bds:{{ getnodeport.stdout }}"}}'
   args:
     creates: /opt/.minecraft-configed3
     executable: /bin/bash

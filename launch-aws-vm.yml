@@ -9,6 +9,7 @@
   gather_facts: no
   vars:
     dns_zone: maskedadmins.com
+    vm_requestor: "DevOps Team - dataylor"
     ttl: "60"
     type: "A"
     # RTO
@@ -378,15 +379,25 @@
 
     - name: create dns entry
       block:
-      - name: "Get record if it exists already"
+      - name: "Get A record if it exists already"
         community.aws.route53:
             command: get
             zone: "{{ dns_zone }}"
             record: "{{ aws_vmname }}.{{ dns_zone }}"
             type: "{{ type }}"
         register: rec
+        ignore_errors: yes
   
-      - name: "Delete record if it exists already"
+      - name: "Get TXT record if it exists already"
+        community.aws.route53:
+            command: get
+            zone: "{{ dns_zone }}"
+            record: "{{ aws_vmname }}.{{ dns_zone }}"
+            type: "TXT"
+        register: txtrec
+        ignore_errors: yes
+  
+      - name: "Delete all A records if it exists already"
         community.aws.route53:
             command: delete
             zone: "{{ dns_zone }}"
@@ -396,12 +407,23 @@
             value: "{{ rec.set.value }}"
         when: rec.set.record is defined
   
+      - name: "Delete all TXT records if it exists already"
+        community.aws.route53:
+            command: delete
+            zone: "{{ dns_zone }}"
+            record: "{{ txtrec.set.record }}"
+            ttl: "{{ txtrec.set.ttl }}"
+            type: "{{ txtrec.set.type }}"
+            value: "{{ txtrec.set.value }}"
+        when: txtrec.set.record is defined
+  
       rescue:
       - debug:
           msg: "This is normal for records not to exist."
   
       always:
-      - community.aws.route53:
+        - name: create A records
+          community.aws.route53:
             command: create
             zone: "{{ dns_zone }}"
             record: "{{ aws_vmname }}.{{ dns_zone }}"
@@ -410,139 +432,16 @@
             value: "{{ ec2results.instances[0].public_ip }}"
             wait: yes
 
-#
-#    - name: launch an ec2 instance in a public vpc
-#      when: aws_vpc_subnet_publicid is defined
-#      ignore_errors: yes
-#      ec2:
-#        key_name: "{{ aws_key_name }}"
-#        instance_type: "{{ aws_instance_type }}"
-#        image: "{{ aws_image_ami }}"
-#        wait: yes
-#        group_id: "{{ security_group.group_id }}"
-#        count: "{{ aws_number_of_vms }}"
-#        vpc_subnet_id:  "{{ aws_vpc_subnet_publicid }}"
-#        assign_public_ip: yes
-#        region: "{{ aws_region }}"
-#        instance_tags: "{{ aws_instance_public_tags }}"
-#        volumes:
-#          - device_name: /dev/sda1
-#            volume_type: gp2
-#            volume_size: "{{ aws_volume_size }}"
-#            delete_on_termination: true
-#        user_data: |
-#          #cloud-config
-#          # for reference:
-#          # http://cloudinit.readthedocs.org/en/latest/topics/examples.html
-#          # https://access.redhat.com/articles/rhel-atomic-cloud-init-faq
-#          preserve_hostname: false
-#          yum_repos:
-#            epel:
-#              mirrorlist: https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=x86_64
-#              enabled: true
-#              name: Extra Packages for Enterprise Linux 7 - x86_64
-#              gpgcheck: false
-#          system_info:
-#            default_user:
-#              name: cloud-user
-#          groups:
-#            - cloud-user
-#          users:
-#            - name: cloud-user
-#              primary-group: cloud-user
-#              groups: wheel
-#              se-linux-user: unconfined_u
-#              #ssh_pwauth: true
-#              lock-passwd: false
-#              sudo: ALL=(ALL) NOPASSWD:ALL
-#              ssh-authorized-keys:
-#                - "{{ automation_user_pub_key }}"
-#            - name: root
-#              ssh_pwauth: true
-#              lock-passwd: false
-#              expire: false
-#          ssh_pwauth: true
-#          chpasswd:
-#            list: |
-#              root:{{ root_password }}
-#          #    cloud-user:redhat123
-#          write_files:
-#          - path: /tmp/firstboot.sh
-#            permissions: '0755'
-#            owner: root:root
-#            content: |
-#              #!/bin/bash
-#              # managed by cloud-config
-#              # this exists to give aws networking time to come up before phoning home
-#              if [ -d /var/log/firstboot ]
-#              then
-#                 echo "*** firstboot.sh already run"
-#                 echo "*** firstboot.sh delete /var/log/firstboot to run again"
-#                 exit 0
-#              fi
-#              sleep 60
-#              #curl -k --data 'host_config_key={{ host_config_key }}' https://{{ host_config_server }}:443/api/v2/job_templates/{{ host_config_jobid }}/callback/
-#              while [[ ! -e /tmp/.success ]] ; do sleep 60; curl -s -k --data 'host_config_key={{ host_config_key }}' https://{{ host_config_server }}:443/api/v2/job_templates/{{ host_config_jobid }}/callback/| grep msg || touch /tmp/.success ; done 
-#          runcmd:
-#           # this is post configuration job template
-#           - /tmp/firstboot.sh
-#
-#    - name: launch an ec2 instance in a private network
-#      when: aws_vpc_subnet_privateid is defined
-#      ignore_errors: yes
-#      ec2:
-#        key_name: "{{ aws_key_name }}"
-#        instance_type: "{{ aws_instance_type }}"
-#        image: "{{ aws_image_ami }}"
-#        wait: yes
-#        group_id: "{{ security_group.group_id }}"
-#        count: "{{ aws_number_of_vms }}"
-#        vpc_subnet_id:  "{{ aws_vpc_subnet_privateid }}"
-#        #assign_public_ip: yes
-#        region: "{{ aws_region }}"
-#        instance_tags: "{{ aws_instance_private_tags }}"
-#        volumes:
-#          - device_name: /dev/sda1
-#            volume_type: gp2
-#            volume_size: "{{ aws_volume_size }}"
-#            delete_on_termination: true
-#        user_data: |
-#          #cloud-config
-#          # for reference:
-#          # http://cloudinit.readthedocs.org/en/latest/topics/examples.html
-#          # https://access.redhat.com/articles/rhel-atomic-cloud-init-faq
-#          preserve_hostname: false
-#          yum_repos:
-#            epel:
-#              mirrorlist: https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=x86_64
-#              enabled: true
-#              name: Extra Packages for Enterprise Linux 7 - x86_64
-#              gpgcheck: false
-#          system_info:
-#            default_user:
-#              name: cloud-user
-#          groups:
-#            - cloud-user
-#          users:
-#            - name: cloud-user
-#              primary-group: cloud-user
-#              groups: wheel
-#              se-linux-user: unconfined_u
-#              #ssh_pwauth: true
-#              lock-passwd: false
-#              sudo: ALL=(ALL) NOPASSWD:ALL
-#              ssh-authorized-keys:
-#                - "{{ automation_user_pub_key }}"
-#            - name: root
-#              ssh_pwauth: true
-#              lock-passwd: false
-#              expire: false
-#          ssh_pwauth: true
-#          chpasswd:
-#            list: |
-#              root:{{ root_password }}
-#          #    cloud-user:redhat123
-#          runcmd:
-#           # this is post configuration job template
-#           #- "curl -k --data 'host_config_key={{ host_config_key }}' https://{{ host_config_server }}:443/api/v2/job_templates/{{ host_config_jobid }}/callback/"
-#           - "while [[ ! -e /tmp/.success ]] ; do sleep 60; curl -s -k --data 'host_config_key={{ host_config_key }}' https://{{ host_config_server }}:443/api/v2/job_templates/{{ host_config_jobid }}/callback/| grep msg || touch /tmp/.success ; done "
+      - name: create txt records
+        community.aws.route53:
+            command: create
+            zone: "{{ dns_zone }}"
+            record: "{{ aws_vmname }}.{{ dns_zone }}"
+            type: "TXT"
+            ttl: "{{ ttl }}"
+            value: "{{ item }}"
+            wait: yes
+        loop:
+          - '"created_by:{{ vmrequestor }}"'
+          - '"role:{{ aws_role }}"'
+          - '"creation_date:{{ ansible_date_time.iso8601 }}"'
