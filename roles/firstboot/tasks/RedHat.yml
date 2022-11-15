@@ -124,10 +124,10 @@
     args:
       creates: /opt/.firstboot
   
-  - name: "Check if in aws"
-    shell: |
-      curl -s http://169.254.169.254/2019-10-01/meta-data/public-ipv4 || echo "html"
-    register: dc
+    #  - name: "Check if in aws"
+    #shell: |
+    #  curl -s http://169.254.169.254/2019-10-01/meta-data/public-ipv4 || echo "html"
+    #register: dc
     
   - name: "AWS: get instance id"
     shell: |
