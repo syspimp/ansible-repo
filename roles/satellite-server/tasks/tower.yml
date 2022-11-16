@@ -28,9 +28,25 @@
       set_fact:
         sat_host_id: "{{ hostidcheck.json.results[0].id }}"
 
+    - name: "Find Group Inventory for 'satellite-server'"
+      uri:
+        url: "https://{{ tower_server }}/api/v2/groups/?search=satellite-server"
+        validate_certs: no
+        method: GET
+        user: "{{ tower_user }}"
+        password: "{{ tower_pass }}"
+        force_basic_auth: yes
+        status_code: [200,202,204]
+        body_format: json
+      register: groupidcheck
+  
+    - name: "Set the host_id fact"
+      set_fact:
+        satgroup_host_id: "{{ groupidcheck.json.results[0].id }}"
+  
     - name: "Add host to the 'satellite-server' Group Inventory"
       uri:
-        url: "https://{{ tower_server }}/api/v2/groups/{{ satellite_inventory_group }}/hosts/"
+        url: "https://{{ tower_server }}/api/v2/groups/{{ satgroup_host_id }}/hosts/"
         validate_certs: no
         method: POST
         body: >
