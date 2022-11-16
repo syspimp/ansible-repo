@@ -120,7 +120,7 @@
     
     - name: "Enable dnf module for rhel 8"
       shell: |
-        dnf module enable satellite:el8
+        dnf module enable satellite:el8 -y
       become: true
 #    - name: "Turn on notify_only=0 in search-disabled-repos.conf"
 #      lineinfile:
