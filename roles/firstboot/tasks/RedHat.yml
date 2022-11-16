@@ -247,7 +247,9 @@
       cat /etc/ansible/facts.d/awsroles.fact >> /etc/motd
       cat /etc/ansible/facts.d/awsroles.fact
     become: true
-  when: firstbootcheck.stdout == "false"
+  when: 
+  - firstbootcheck.stdout == "false"
+  - "ansible_system_vendor | regex_search('EC2') "
 
 - name: total hack for rhel8
   block:
