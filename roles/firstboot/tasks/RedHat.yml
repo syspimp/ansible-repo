@@ -126,9 +126,9 @@
       hostnamectl set-hostname ${hostname}
       grep "{{ ansible_default_ipv4['address'] }}" /etc/hosts || echo "{{ ansible_default_ipv4['address'] }} ${hostname} ${shortname}" >> /etc/hosts
     become: true
-    args:
-      creates: /opt/.firstboot
-    when: "ansible_system_vendor == 'VMware, Inc.'"
+    #args:
+    #  creates: /opt/.firstboot
+    #when: "ansible_system_vendor == 'VMware, Inc.'"
   
   - name: "Set up /etc/hosts file and hostname for Satellite"
     shell: |
