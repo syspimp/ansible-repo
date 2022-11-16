@@ -6,13 +6,19 @@
     #AWS_ACCESS_KEY_ID: "{{ AWS_ACCESS_KEY_ID }}"
     #AWS_SECRET_KEY: "{{ AWS_SECRET_KEY }}"
   roles:
+    #- satellite-clients
     - firstboot
-#    - satellite-clients
+    - leapp-upgrade
     - snmp-client
+    - awsroles
+    - vmwareroles
+
+- name: Supporting roles
+  hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*
+  become: yes
+  roles:
     - webconsole
     - insights
-    - awsroles
-    - leapp-upgrade
 
 - name: Install Jboss Standalone
   hosts: jboss*

@@ -62,5 +62,5 @@
           msg: "Welp, that didn't work"
   when:
   - initialsetup.stdout == "false"
-  - ansible_local['awsroles'] is defined
-  - ansible_local['awsroles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy','openfire','minikube']
+  #- ansible_local['awsroles'] is defined
+  #- ansible_local['awsroles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy','openfire','minikube']

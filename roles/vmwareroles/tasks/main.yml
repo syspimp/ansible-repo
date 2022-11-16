@@ -1,0 +1,17 @@
+---
+- name: "Block for esxi vm config management"
+  block:
+  - name: "Set role fact for esxi vms"
+    shell: |
+      /usr/bin/vmware-rpctool "info-get guestinfo.role"
+    register: esxirole
+
+  - name: "Include roles for cloud servers"
+    include_role:
+      name: "{{ esxirole.stdout }}"
+  when: "ansible_system_vendor == 'VMware, Inc.'"
+
+  rescue:
+    - name:
+      debug:
+        msg: "No vmware role found for this host"

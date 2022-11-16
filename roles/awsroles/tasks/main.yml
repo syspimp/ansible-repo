@@ -1,21 +1,18 @@
 ---
-- name: "Include roles for AWS servers"
-  include_role:
-    name: "{{ ansible_local['awsroles']['default']['role'] }}"
-  when:
-  - ansible_local['awsroles'] is defined
-  - ansible_local['awsroles']['default']['role'] != 'None'
-
-- name: "Include secondary roles for AWS servers"
-  include_role:
-    name: "{{ ansible_local['awsroles']['secondary']['role'] }}"
+- name: "block for aws vm config management"
+  block:
+  - name: "Include roles for AWS servers"
+    include_role:
+      name: "{{ ansible_local['awsroles']['default']['role'] }}"
+  
+  - name: "Include secondary roles for AWS servers"
+    include_role:
+      name: "{{ ansible_local['awsroles']['secondary']['role'] }}"
   when:
   - ansible_local['awsroles']['secondary'] is defined
   - ansible_local['awsroles']['secondary']['role'] != 'None'
 
-#- name: "Include roles for AWS servers"
-#  include_role:
-#    name: "{{ item }}"
-#  loop: "{{ansible_local['awsroles'] }}"
-#  when: ansible_local['awsroles'] is defined
-
+  rescue:
+    - name:
+      debug:
+        msg: "No aws role found for this host"
