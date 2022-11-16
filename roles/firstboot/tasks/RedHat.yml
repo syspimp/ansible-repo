@@ -259,6 +259,7 @@
       state: latest
     loop: "{{ redhat8_packages }}"
     become: true
+  when: firstbootcheck.stdout == "false"
 
 - name: entitlement block
   block:
