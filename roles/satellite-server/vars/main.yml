@@ -1,5 +1,5 @@
 ---
-satellite_version: 6.10
+satellite_version: 6.11
 openstack_version: 14
 openshift_version: 3.11
 host_config_key: firstboot
@@ -54,7 +54,8 @@ sat6:
 #    - name: 'production'
 #      prior: 'testing'
   locations:
-    - "AWS_TFOUND"
+    - "ESXI_TFOUND"
+#    - "AWS_TFOUND"
 #    - "AWS_RTO"
   domains:
 #    - "maskedadmins.com"
@@ -71,14 +72,22 @@ sat6:
 #      location: "AWS_RTO"
 #      org: "Redhat_Lab"
 #      activation_key: "Redhat_Lab-production-key"
-    - name: "AWS_TFOUND"
+    - name: "ESXI_TFOUND"
       prefix: "24"
       network: "10.0.0.0"
       mask: "255.255.255.0"
       domain: "prod.maskedadmins.com"
-      location: "AWS_TFOUND"
+      location: "ESXI_TFOUND"
       org: "Redhat_Lab"
       activation_key: "Redhat_Lab-production-key"
+#    - name: "AWS_TFOUND"
+#      prefix: "24"
+#      network: "10.0.0.0"
+#      mask: "255.255.255.0"
+#      domain: "prod.maskedadmins.com"
+#      location: "AWS_TFOUND"
+#      org: "Redhat_Lab"
+#      activation_key: "Redhat_Lab-production-key"
 #    - name: "Prov_102"
 #      gw: "10.55.102.1"
 #      network: "10.55.102.0"
@@ -111,7 +120,8 @@ sat6:
       label: "redhatlab"
       description: "Our example sub organization for managing content."
       locations:
-        - 'AWS_TFOUND'
+        - 'ESXI_TFOUND'
+#        - 'AWS_TFOUND'
 #        - "AWS_RTO"
       domains:
 #        - "maskedadmins.com"
@@ -124,11 +134,12 @@ sat6:
 #        - "Dev_103"
 #        - "Test_104"
 #        - "AWS_RTO"
-        - "AWS_TFOUND"
+#        - "AWS_TFOUND"
+        - "ESXI_TFOUND"
 tower_key: firstboot
 tower_jobid: 22
 sat6_default_org: Redhat_Lab
-sat6_default_location: AWS_TFOUND
+sat6_default_location: ESXI_TFOUND
 sat6_default_hostcollection: RHEL_7_x86_64
 sat6_default_hostgroup: "RHEL_7_x86_64_Hostgroup"
 sat6_default_hostgroup_rhel8: "RHEL_8_x86_64_Hostgroup"
