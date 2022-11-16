@@ -97,6 +97,7 @@
         - ansible_local['awsroles']['default'] is defined
         - ansible_local['awsroles']['default']['role'] != 'satellite-server'
 
+  # end of block
   - name: "No Satellite defined. Set the facts to None"
     set_fact:
       sat6_fqdn: "None"
@@ -127,7 +128,7 @@
     become: true
     args:
       creates: /opt/.firstboot
-    when: "ansible_system_vendor | regex_search('VMware')"
+    when: "ansible_system_vendor == 'VMware, Inc.'"
   
   - name: "Set up /etc/hosts file and hostname for Satellite"
     shell: |
@@ -172,7 +173,7 @@
   - name: "Set ntp server for vmware"
     set_fact:
       ntp_server: "0.rhel.pool.ntp.org"
-    when: "ansible_system_vendor | regex_search('VMware')"
+    when: "ansible_system_vendor == 'VMware, Inc.'"
 
   - name: "Set ntp to true"
     shell: |
