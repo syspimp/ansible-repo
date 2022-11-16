@@ -67,10 +67,12 @@
 
     - name: "Reboot."
       shell: |
+        touch /opt/.rebooted
         shutdown -r +1 || true
       become: true
       args:
         executable: /bin/bash
+        creates: /opt/.rebooted
 
     - name: "Wait 5 to 11 mins for host to reboot"
       wait_for:
