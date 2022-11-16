@@ -153,6 +153,11 @@
 #        owner: root
 #        group: root
 #        mode: 0600
+    # fix for satellite
+    - name: "Enable dnf module for rhel 8"
+      shell: |
+        groupadd puppet
+      become: true
 
     - name: "Run fusor installer, takes about 30 mins ..."
       shell: |
