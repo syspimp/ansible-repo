@@ -261,19 +261,19 @@
       cat /etc/ansible/facts.d/awsroles.fact >> /etc/motd
       cat /etc/ansible/facts.d/awsroles.fact
     become: true
-  when: 
-  - firstbootcheck.stdout == "false"
-  #- "ansible_system_vendor | regex_search('EC2') "
+    when:
+    - "ansible_system_vendor | regex_search('EC2') "
 
-- name: total hack for rhel8
-  block:
   - name: "try to install python for rhel8 real quick"
     yum:
       name: "{{ item }}"
       state: latest
     loop: "{{ redhat8_packages }}"
     become: true
-  when: firstbootcheck.stdout == "false"
+    when:
+    - ansible_distribution_major_version == '8'
+  when: 
+  - firstbootcheck.stdout == "false"
 
 - name: entitlement block
   block:
