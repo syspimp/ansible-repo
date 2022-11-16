@@ -1,6 +1,6 @@
 snmpd:
   sysname: "{{ inventory_hostname }}"
-  sysdescr: "{{ ansible_local['awsroles']['default']['role'] }}"
+  sysdescr: "{{ ansible_local['awsroles']['default']['role']  | default('No defined role')}}"
   syscontact: "Powered by Ansible"
   syslocation: "Somewhere ..."
   rocommunity: "RTO"
