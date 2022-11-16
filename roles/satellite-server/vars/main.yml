@@ -4,6 +4,7 @@ openstack_version: 14
 openshift_version: 3.11
 host_config_key: firstboot
 host_config_jobid: 22
+host_config_server: 10.55.102.51
 redhat_packages: ['nspr','redhat-access-insights','deltarpm','bash-completion','vim-enhanced','ntp','ntpdate','git','wget','bind-utils']
 dns_domain: "dev.maskedadmins.com"
 compute_resources:
