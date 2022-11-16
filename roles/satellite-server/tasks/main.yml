@@ -53,37 +53,49 @@
       #add satellite to tower group early
     - include: "tower.yml"
 
-    - name: "Run yum update to avoid a bug. Please wait. SSH to Host and tail /tmp/tower.output for status"
-      shell: |
-        exec &> >(tee -a /tmp/tower.output)
-        yum -y update
-      become: true
-      args:
-        executable: /bin/bash
+    - name: "Check if this thing has been rebooted by us"
+      stat:
+        path: /opt/.rebooted
+      register: rebooted
+    
+    - name: Update the thing
+      block:
+      - name: "Run yum update to avoid a bug. Please wait. SSH to Host and tail /tmp/tower.output for status"
+        shell: |
+          exec &> >(tee -a /tmp/tower.output)
+          yum -y update
+        become: true
+        args:
+          executable: /bin/bash
+  
+      - name: "Perform a yum clean all"
+        shell:  yum clean all
+        become: true
+  
+      - name: "Reboot."
+        shell: |
+          touch /opt/.rebooted
+          shutdown -r +1 || true
+        become: true
+        args:
+          executable: /bin/bash
+          creates: /opt/.rebooted
+  
+      - name: "Wait 6 mins for host to reboot"
+        ansible.builtin.wait_for:
+          port: 22
+          host: "{{ (ansible_ssh_host | default(ansible_host)) | default(inventory_hostname) }}"
+          search_regex: OpenSSH
+          delay: 30
+          timeout: 360
+        delegate_to: localhost
+        become: false
+      when: rebooted.stat.exists == false
 
-    - name: "Perform a yum clean all"
-      shell:  yum clean all
-      become: true
-
-    - name: "Reboot."
-      shell: |
-        touch /opt/.rebooted
-        shutdown -r +1 || true
-      become: true
-      args:
-        executable: /bin/bash
-        creates: /opt/.rebooted
-
-    - name: "Wait 6 mins for host to reboot"
-      ansible.builtin.wait_for:
-        port: 22
-        host: "{{ (ansible_ssh_host | default(ansible_host)) | default(inventory_hostname) }}"
-        search_regex: OpenSSH
-        delay: 30
-        timeout: 360
-      delegate_to: localhost
-      become: false
-
+      rescue:
+      - name: "LOl why does it do that?"
+        debug: msg="Let's keep going"
+          
     - name: "Disabling all repos"
       shell: "subscription-manager repos --disable='*'"
       become: true
