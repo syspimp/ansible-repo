@@ -115,6 +115,19 @@
     become: true
     args:
       creates: /opt/.firstboot
+    when: "ansible_system_vendor | regex_search('KVM')"
+  
+  - name: "Set up /etc/hosts file and hostname"
+    shell: |
+      shortname=$(/usr/bin/vmware-rpctool "info-get guestinfo.hostname")
+      hostname=${shortname}.{{ dns_domain }}
+      echo "${hostname}" > /etc/hostname
+      hostnamectl set-hostname ${hostname}
+      grep "{{ ansible_default_ipv4['address'] }}" /etc/hosts || echo "{{ ansible_default_ipv4['address'] }} ${hostname} ${shortname}" >> /etc/hosts
+    become: true
+    args:
+      creates: /opt/.firstboot
+    when: "ansible_system_vendor | regex_search('VMware')"
   
   - name: "Set up /etc/hosts file and hostname for Satellite"
     shell: |
