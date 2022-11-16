@@ -9,7 +9,10 @@
   - name: "Include roles for cloud servers"
     include_role:
       name: "{{ esxirole.stdout }}"
-  when: "ansible_system_vendor == 'VMware, Inc.'"
+    when:
+    - esxirole.stdout != 'None'
+  when:
+  - "ansible_system_vendor == 'VMware, Inc.'"
 
   rescue:
     - name:

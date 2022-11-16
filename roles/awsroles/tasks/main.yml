@@ -4,13 +4,17 @@
   - name: "Include roles for AWS servers"
     include_role:
       name: "{{ ansible_local['awsroles']['default']['role'] }}"
+    when:
+    - ansible_local['awsroles']['default']['role'] != 'None'
   
   - name: "Include secondary roles for AWS servers"
     include_role:
       name: "{{ ansible_local['awsroles']['secondary']['role'] }}"
+    when:
+    - ansible_local['awsroles']['secondary'] is defined
+    - ansible_local['awsroles']['secondary']['role'] != 'None'
   when:
-  - ansible_local['awsroles']['secondary'] is defined
-  - ansible_local['awsroles']['secondary']['role'] != 'None'
+  - ansible_local['awsroles']['default']['role'] is defined
 
   rescue:
     - name:
