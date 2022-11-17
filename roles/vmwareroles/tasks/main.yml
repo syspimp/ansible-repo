@@ -6,13 +6,22 @@
       /usr/bin/vmware-rpctool "info-get guestinfo.role"
     register: esxirole
 
-  - name: "Include roles for cloud servers"
+  - name: "Set second role fact for esxi vms"
+    shell: |
+      /usr/bin/vmware-rpctool "info-get guestinfo.secondaryrole"
+    register: esxirole2
+
+  - name: "Include roles for vmware servers"
     include_role:
       name: "{{ esxirole.stdout }}"
     when:
     - esxirole.stdout != 'None'
-  when:
-  - "ansible_system_vendor == 'VMware, Inc.'"
+
+  - name: "Include secondary roles for vmware servers"
+    include_role:
+      name: "{{ esxirole2.stdout }}"
+    when:
+    - esxirole2.stdout != 'None'
 
   rescue:
     - name:
