@@ -77,7 +77,7 @@
     - action: DeviceRouter
       method: addDevice
       data:
-      - deviceName: "{{ item.0.stdout | to_json | community.general.json_query('ansible_hostname') }}"
+      - deviceName: "{{ item.0.stdout | to_json | community.general.json_query('ansible_hostname') | default(item.1.name,True) }}"
         deviceClass: "/{{ rootorg }}/Linux/Ansible Tower/Inventory Groups/{{ towergroup }}"
         collector: localhost
         model: true
