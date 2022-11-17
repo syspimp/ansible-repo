@@ -459,10 +459,11 @@
   copy:
       dest: /tmp/manifest.zip
       #src: "satellite/{{ sat6_manifest }}"
-      src: "/aap_files/{{ sat6_manifest }}"
+      src: "/tmp/{{ sat6_manifest }}"
       owner: root
       group: root
       mode: 0644
+      remote_src: no
   become: true
 
 - name: "Provisioning Satellite 6 - upload and refresh manifest"
