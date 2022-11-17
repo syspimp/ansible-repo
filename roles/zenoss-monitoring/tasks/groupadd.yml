@@ -92,5 +92,5 @@
     status_code: 200
     body_format: json
   vars:
-    ipaddress: "{{ item.variables | replace('\"', '"') | to_json }}"
+    ipaddress: "{{ item.variables | replace('\\"', '"') | to_json }}"
   loop: "{{ target_servers }}"
