@@ -87,7 +87,7 @@
           #host: "{{ (ansible_ssh_host | default(ansible_host)) | default(inventory_hostname) }}"
           host: "{{ ansible_default_ipv4['address'] }}"
           search_regex: OpenSSH
-          delay: 30
+          delay: 90
           timeout: 360
         delegate_to: localhost
         become: false
