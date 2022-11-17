@@ -27,7 +27,7 @@
 - name: start minikube with non root user
   shell: |
     #minikube config set driver podman
-    minikube start  --driver=podman --container-runtime=cri-o && touch .minikube-installed
+    minikube start --force --driver=podman --container-runtime=cri-o && touch .minikube-installed
   become: no
   args:
     creates: .minikube-installed
