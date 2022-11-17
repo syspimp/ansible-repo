@@ -210,9 +210,9 @@
           mode: 0644
       become: true
 
-    - name: "Restart puppetmaster"
-      shell: systemctl restart puppetserver
-      become: true
+#    - name: "Restart puppetmaster"
+#      shell: systemctl restart puppetserver
+#      become: true
 
 
 #    - name: "Open firewall port for external access to Satellite at sat6.dev.maskedadmins.com:8448"
