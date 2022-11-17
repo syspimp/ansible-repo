@@ -9,15 +9,7 @@
     fi
   register: firstbootcheck
 
-- name: "list the rpms installed"
-  shell: rpm -qa
-  register: rpmlist
-
-- name: "list the rpms installed"
-  shell: yum repolist
-  register: repolist
-
-- name: "First boot configuration block"
+- name: "First boot configuration block for aws"
   block:
   - name: "Grab Satellite information block"
     block:
@@ -105,6 +97,14 @@
     when:
     - sat6_fqdn is not defined
     - sat6_server is not defined
+
+  - name: "list the rpms installed"
+    shell: rpm -qa
+    register: rpmlist
+
+  - name: "list the rpms installed"
+    shell: yum repolist
+    register: repolist
 
   - name: "Set up /etc/hosts file and hostname"
     shell: |
@@ -283,6 +283,7 @@
     become: yes
   when:
   - ansible_distribution_major_version == '8'
+  - firstbootcheck.stdout == "false"
 
   rescue:
   - name: "well that didn't work"
@@ -328,6 +329,8 @@
     shell: "subscription-manager status"
     register: rhsm_reg
     become: yes
+  when:
+  - firstbootcheck.stdout == "false"
 
   rescue: 
   - name: "Bootstrap check"
@@ -487,13 +490,6 @@
         enabled: no
       become: true
 
-    - name: "first boot complete"
-      file:
-        path: /opt/.firstboot
-        state: touch
-        mode: 0444
-      become: true
-
 #    - name: "Reboot."
 #      shell: |
 #        shutdown -r +1 || true
@@ -512,4 +508,5 @@
 #      delegate_to: localhost
 #      become: false
 
-  when: firstbootcheck.stdout == "false"
+  when:
+    - firstbootcheck.stdout == "false"
