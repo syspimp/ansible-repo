@@ -36,7 +36,7 @@
 
   - name: "convert to json"
     shell: |
-      echo '{{ item.variables }}' | jq
+      echo '{{ item.variables }}' | jq | grep ansible_host | tr -d '"'| tr -d ',' | sed -e 's/ansible_host: //g'
     loop: "{{ target_servers }}"
     register: ipaddys
 
@@ -77,7 +77,7 @@
     - action: DeviceRouter
       method: addDevice
       data:
-      - deviceName: "{{ item.0.stdout | to_json | community.general.json_query('ansible_host') | default(item.1.name,True) }}"
+      - deviceName: "{{ item.0.stdout | trim | default(item.1.name,True) }}"
         deviceClass: "/{{ rootorg }}/Linux/Ansible Tower/Inventory Groups/{{ towergroup }}"
         collector: localhost
         model: true
