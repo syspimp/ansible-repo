@@ -165,7 +165,7 @@
         --foreman-initial-organization "{{ sat6_default_org }}" \
         --foreman-initial-location "{{ sat6_default_location }}" \
         --foreman-initial-admin-password {{ sat6_pass }} \
-        --foreman-proxy-puppetca true \
+        --foreman-proxy-puppetca false \
         --foreman-proxy-tftp true \
         --disable-system-checks \
         --enable-foreman-plugin-leapp \
