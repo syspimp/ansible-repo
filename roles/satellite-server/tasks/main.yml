@@ -72,7 +72,7 @@
         shell:  yum clean all
         become: true
   
-      - name: "Reboot."
+      - name: "Set reboot in 1 min."
         shell: |
           touch /opt/.rebooted
           shutdown -r +1 || true
@@ -81,7 +81,7 @@
           executable: /bin/bash
           creates: /opt/.rebooted
   
-      - name: "Wait 6 mins for host to reboot"
+      - name: "Wait at least a minute and half, max 6 mins for host to reboot"
         ansible.builtin.wait_for:
           port: 22
           #host: "{{ (ansible_ssh_host | default(ansible_host)) | default(inventory_hostname) }}"
