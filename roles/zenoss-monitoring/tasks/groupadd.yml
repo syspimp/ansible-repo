@@ -33,6 +33,13 @@
   - name: "Set the target_servers fact"
     set_fact:
       target_servers: "{{ hostidcheck.json.results }}"
+
+  - name: "convert to json"
+    shell: |
+      echo '{{ item.variables }}' | jq
+    loop: "{{ target_servers }}"
+    register: ipaddys
+
   rescue:
   - name: There are no servers in this tower group
     debug:
@@ -70,11 +77,11 @@
     - action: DeviceRouter
       method: addDevice
       data:
-      - deviceName: "{{ item.variables.ansible_host }}"
+      - deviceName: "{{ item.0.stdout | to_json | community.general.json_query('ansible_hostname') }}"
         deviceClass: "/{{ rootorg }}/Linux/Ansible Tower/Inventory Groups/{{ towergroup }}"
         collector: localhost
         model: true
-        title: "{{ item.name }}"
+        title: "{{ item.1.name }}"
         productionState: 1000
         priority: 3
         snmpCommunity: RTO
@@ -91,4 +98,4 @@
     force_basic_auth: yes
     status_code: 200
     body_format: json
-  loop: "{{ target_servers }}"
+  loop: "{{ ipaddys.results|zip(target_servers)|list }}"
