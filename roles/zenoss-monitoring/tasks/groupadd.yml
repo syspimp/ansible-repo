@@ -70,7 +70,7 @@
     - action: DeviceRouter
       method: addDevice
       data:
-      - deviceName: "{{ ipaddress.ansible_host }}"
+      - deviceName: "{{ item.variables.ansible_host }}"
         deviceClass: "/{{ rootorg }}/Linux/Ansible Tower/Inventory Groups/{{ towergroup }}"
         collector: localhost
         model: true
@@ -91,6 +91,4 @@
     force_basic_auth: yes
     status_code: 200
     body_format: json
-  vars:
-    ipaddress: "{{ item.variables | replace('\\"', '"') | to_json }}"
   loop: "{{ target_servers }}"
