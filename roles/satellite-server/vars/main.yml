@@ -64,7 +64,7 @@ sat6:
     - "prod.maskedadmins.com"
 #    - "strg.maskedadmins.com"
   subnets:
-#    - name: "AWS_RTO"
+#    - name: "AWS_TFOUND"
 #      prefix: "24"
 #      network: "11.22.33.0"
 #      mask: "255.255.255.0"
@@ -144,7 +144,7 @@ sat6_default_hostcollection: RHEL_7_x86_64
 sat6_default_hostgroup: "RHEL_7_x86_64_Hostgroup"
 sat6_default_hostgroup_rhel8: "RHEL_8_x86_64_Hostgroup"
 sat6_default_domain: "prod.maskedadmins.com"
-sat6_default_subnet: "AWS_TFOUND"
+sat6_default_subnet: "ESXI_TFOUND"
 sat6_default_environment: "production"
 #sat6_manifest: "manifest_sat6_20210204T140357Z.zip"
 #sat6_manifest: "manifest_sat6_20210526T193331Z.zip"
