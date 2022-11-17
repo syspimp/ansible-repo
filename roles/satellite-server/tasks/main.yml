@@ -459,7 +459,7 @@
   copy:
       dest: /tmp/manifest.zip
       #src: "satellite/{{ sat6_manifest }}"
-      src: "/opt/satellite/{{ sat6_manifest }}"
+      src: "/aap_files/{{ sat6_manifest }}"
       owner: root
       group: root
       mode: 0644
