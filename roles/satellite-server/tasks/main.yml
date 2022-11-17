@@ -465,6 +465,13 @@
 #      remote_src: no
 #  become: true
 
+- name: "Disable firewall"
+  service:
+    name: "firewalld"
+    state: "stopped"
+    enabled: no
+  become: true
+
 - name: "Copy over manifest from tower to the sat server"
   ansible.builtin.get_url:
     url: "http://10.55.102.5/{{ sat6_manifest }}"
