@@ -120,6 +120,10 @@
   debug:
     msg: "Visit the Zenoss home page at http://{{ ansible_default_ipv4['address'] }}:30080/zport/dmd/"
 
+- name: Wait a minute for Zenoss to wake up
+  pause:
+    minutes: 1
+
 - name: Create Org Nodes in Zenoss
   ignore_errors: yes
   uri:

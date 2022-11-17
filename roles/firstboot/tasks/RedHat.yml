@@ -24,7 +24,7 @@
           status_code: [200,202,204]
           body_format: json
         register: groupidcheck
-  
+ 
       - name: "Set the host_id fact"
         set_fact:
           satgroup_host_id: "{{ groupidcheck.json.results[0].id }}"
@@ -56,8 +56,6 @@
           sat6_fqdn: "{{ fqdnname.stdout }}"
     when:
         - ansible_local['awsroles'] is defined
-#        - ansible_local['awsroles']['default']['role'] == 'satellite-server'
-
     rescue:
       - name: "[rescue] satellite-servers: Get fqdn for the satellite server from localhost"
         shell: |
@@ -66,7 +64,7 @@
         when:
         - ansible_local['awsroles']['default'] is defined
         - ansible_local['awsroles']['default']['role'] == 'satellite-server'
-  
+
       - name: "[rescue] satellite-servers: Set the fqdn hostname fact"
         set_fact:
           sat6_fqdn: "{{ fqdnname.stdout }}"
@@ -89,7 +87,7 @@
         - ansible_local['awsroles']['default'] is defined
         - ansible_local['awsroles']['default']['role'] != 'satellite-server'
 
-  # end of block
+  # end of aws block
   - name: "No Satellite defined. Set the facts to None"
     set_fact:
       sat6_fqdn: "None"
@@ -202,14 +200,14 @@
     with_items: "{{ enabled_svcs }}"
     become: true
   
- #   - name: "Stopping and disabling services {{ disabled_svcs }}"
- #     service:
- #       name: "{{ item }}"
- #       state: stopped
- #       enabled: no
- #     with_items: "{{ disabled_svcs }}"
- #     ignore_errors: yes
- #     become: true
+   #   - name: "Stopping and disabling services {{ disabled_svcs }}"
+   #     service:
+   #       name: "{{ item }}"
+   #       state: stopped
+   #       enabled: no
+   #     with_items: "{{ disabled_svcs }}"
+   #     ignore_errors: yes
+   #     become: true
   
   - name: "update dns with the real hostname given in openstack"
     template:
@@ -220,15 +218,15 @@
       mode: 0755
     become: true
   
-#    - name: "put dns helper on tower server for aws hosts"
-#      template:
-#        src: dns-helper.sh.j2
-#        dest: /opt/dns-helper.sh
-##        owner: root
-#        group: root
-#        mode: 0755
-#      delegate_to: sat6
-#      when: "ansible_system_vendor | regex_search('EC2') "
+  #    - name: "put dns helper on tower server for aws hosts"
+  #      template:
+  #        src: dns-helper.sh.j2
+  #        dest: /opt/dns-helper.sh
+  ##        owner: root
+  #        group: root
+  #        mode: 0755
+  #      delegate_to: sat6
+  #      when: "ansible_system_vendor | regex_search('EC2') "
 
   - name: "Run the AWS dns helper"
     shell: |
@@ -236,16 +234,16 @@
     when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
     become: true
 
-#    - name: "AWS: Tag the instance with DNS"
-#      ec2_tag:
-#        region: "{{ regionid.stdout }}"
-#        resource: "{{ instanceid.stdout }}"
-#        state: present
-#        tags:
-#          DNS: "{{awsshortname.stdout}}.{{ dns_domain }}"
-#      delegate_to: localhost
-#      become: no
-#      when: "ansible_system_vendor | regex_search('EC2') "
+  #    - name: "AWS: Tag the instance with DNS"
+  #      ec2_tag:
+  #        region: "{{ regionid.stdout }}"
+  #        resource: "{{ instanceid.stdout }}"
+  #        state: present
+  #        tags:
+  #          DNS: "{{awsshortname.stdout}}.{{ dns_domain }}"
+  #      delegate_to: localhost
+  #      become: no
+  #      when: "ansible_system_vendor | regex_search('EC2') "
 
   - name: "Updating MOTD"
     template: 
@@ -402,21 +400,21 @@
         [ -e /etc/rhsm/rhsm.conf.kat-backup ] && cp -f /etc/rhsm/rhsm.conf.kat-backup /etc/rhsm/rhsm.conf
       become: true
       ignore_errors: true
-
-#    - name: Register and subscribe to multiple pools for virtual hosts
-#      community.general.redhat_subscription:
-#        state: present
-#        username: "{{ rh_satellite_user }}"
-#        password: "{{ rh_satellite_pass }}"
-#        pool_ids: "{{ rh_subscription_pool_ids }}"
-#    #    pools: "{{ rh_subscription_pools }}"
-#      become: true
-#      register: rhsm_status
-#      #when: "'Current' not in rhsm_reg.stdout"
-#      #when: "'Current' not in rhsm_reg.stdout and ansible_virtualization_role == 'guest' "
-#      retries: 3
-#      until: rhsm_status.msg.find("System successfully registered") != -1
-#      delay: 1
+  
+  #    - name: Register and subscribe to multiple pools for virtual hosts
+  #      community.general.redhat_subscription:
+  #        state: present
+  #        username: "{{ rh_satellite_user }}"
+  #        password: "{{ rh_satellite_pass }}"
+  #        pool_ids: "{{ rh_subscription_pool_ids }}"
+  #    #    pools: "{{ rh_subscription_pools }}"
+  #      become: true
+  #      register: rhsm_status
+  #      #when: "'Current' not in rhsm_reg.stdout"
+  #      #when: "'Current' not in rhsm_reg.stdout and ansible_virtualization_role == 'guest' "
+  #      retries: 3
+  #      until: rhsm_status.msg.find("System successfully registered") != -1
+  #      delay: 1
 
     - name: "subscribe to the cdn"
       shell: subscription-manager register --auto-attach --username "{{ rh_satellite_user }}" --password "{{ rh_satellite_pass }}"
@@ -476,12 +474,12 @@
       when:
       - ansible_distribution_major_version == '8'
 
-#    - name: "Update dns entry"
-#      shell: "/sbin/ifup-local || true"
-#      become: true
-#      ignore_errors: yes
-#      args:
-#        creates: /opt/.firstboot
+  #    - name: "Update dns entry"
+  #      shell: "/sbin/ifup-local || true"
+  #      become: true
+  #      ignore_errors: yes
+  #      args:
+  #        creates: /opt/.firstboot
 
     - name: "Disable firewall"
       service:
@@ -490,23 +488,23 @@
         enabled: no
       become: true
 
-#    - name: "Reboot."
-#      shell: |
-#        shutdown -r +1 || true
-#      become: true
-#      args:
-#        executable: /bin/bash
-#        creates: /opt/.firstboot
-#
-#    - name: "Wait 5 to 11 mins for host to reboot"
-#      wait_for:
-#        port: 22
-#        host: "{{ ansible_ssh_host | default(inventory_hostname) }}"
-#        #search_regex: OpenSSH
-#        delay: 60
-#        timeout: 660
-#      delegate_to: localhost
-#      become: false
+  #    - name: "Reboot."
+  #      shell: |
+  #        shutdown -r +1 || true
+  #      become: true
+  #      args:
+  #        executable: /bin/bash
+  #        creates: /opt/.firstboot
+  #
+  #    - name: "Wait 5 to 11 mins for host to reboot"
+  #      wait_for:
+  #        port: 22
+  #        host: "{{ ansible_ssh_host | default(inventory_hostname) }}"
+  #        #search_regex: OpenSSH
+  #        delay: 60
+  #        timeout: 660
+  #      delegate_to: localhost
+  #      become: false
 
   when:
     - firstbootcheck.stdout == "false"
