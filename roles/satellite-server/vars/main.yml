@@ -141,7 +141,7 @@ tower_jobid: 22
 sat6_default_org: Redhat_Lab
 sat6_default_location: ESXI_TFOUND
 sat6_default_hostcollection: RHEL_7_x86_64
-sat6_default_hostgroup: "RHEL_7_x86_64_Hostgroup"
+sat6_default_hostgroup: "RHEL_8_x86_64_Hostgroup"
 sat6_default_hostgroup_rhel8: "RHEL_8_x86_64_Hostgroup"
 sat6_default_domain: "prod.maskedadmins.com"
 sat6_default_subnet: "ESXI_TFOUND"

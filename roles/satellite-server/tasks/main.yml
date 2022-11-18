@@ -668,6 +668,7 @@
     creates: /root/.setup/step18
 
 - name: "Enabling sat tools repo in the keys"
+  ignore_errors: yes
   shell: |
     hammer activation-key content-override --name "{{ sat6_default_org }}-{{ item.name }}-key" \
     --content-label rhel-7-server-satellite-tools-{{ satellite_version }}-rpms \
@@ -678,6 +679,7 @@
     creates: /root/.setup/step19
 
 - name: "Enabling rhel8 sat tools repo in the keys"
+  ignore_errors: yes
   shell: |
     hammer activation-key content-override --name "{{ sat6_default_org }}-{{ item.name }}-key" \
     --content-label satellite-tools-{{ satellite_version }}-for-rhel-8-x86_64-rpms \
@@ -694,6 +696,7 @@
     creates: /root/.setup/step19
 
 - name: "Adding host collection to activation keys"
+  ignore_errors: yes
   shell: |
     hammer activation-key add-host-collection --name={{ sat6_default_org }}-{{ item.name }}-key --host-collection={{ sat6_default_hostcollection }} --organization={{ sat6_default_org }}
   become: true
@@ -720,6 +723,7 @@
     creates: /root/.setup/step21
 
 - name: "Add partition table to OS"
+  ignore_errors: yes
   become: true
   shell: |
     PARTID=$(hammer --csv partition-table list | grep 'Kickstart default,' | awk -F, {'print $1'})
@@ -732,6 +736,7 @@
     creates: /root/.setup/step22
 
 - name: "Clone the Default User Data Kickstart"
+  ignore_errors: yes
   become: true
   shell: |
     hammer template clone --name 'Kickstart default user data' --new-name '{{ sat6_default_org }} User Data' && \
@@ -741,6 +746,7 @@
 
 - name: "Update the new user data template"
   become: true
+  ignore_errors: yes
   shell: |
     USERDATAID=$(hammer --csv template list | grep "{{ sat6_default_org }}" | awk -F, {'print $1'})
     hammer template update --file /var/tmp/user-data-template.txt --id ${USERDATAID} && \
@@ -749,6 +755,7 @@
     creates: /root/.setup/step23b
 
 - name: "Add kickstart pxe template to OS"
+  ignore_errors: yes
   become: true
   shell: |
     PXEID=$(hammer --csv template list | grep 'Kickstart default PXELinux' | awk -F, {'print $1'})
@@ -768,6 +775,7 @@
     creates: /root/.setup/step23
 
 - name: "Add operating systems"
+  ignore_errors: yes
   shell: |
     hammer os list | grep "{{ item }}" || \
     hammer os create --name {{ item.split()[0] }} --major {{ item.split()[1] }} --architectures="x86_64"
@@ -777,6 +785,7 @@
     creates: /root/.setup/step23aa
 
 - name: "Adding os done"
+  ignore_errors: yes
   become: true
   shell: touch /root/.setup/step23aa
   args:
@@ -795,6 +804,7 @@
 #    creates: /root/.setup/step23bb
 
 - name: "Add RHEL7 host group for each domain"
+  ignore_errors: yes
   become: true
   shell: |
     #MEDID=$(hammer --csv medium list | grep 'Kickstart_x86_64_7Server' | awk -F, {'print $1'})
@@ -822,6 +832,7 @@
   with_items: "{{ sat6.subnets }}"
 
 - name: "Add RHEL7 host group for default domain"
+  ignore_errors: yes
   become: true
   shell: |
     #MEDID=$(hammer --csv medium list | grep 'Kickstart_x86_64_7Server' | awk -F, {'print $1'})
@@ -847,12 +858,14 @@
     creates: /root/.setup/step24
 
 - name: "Host groups to domain Complete"
+  ignore_errors: yes
   become: true
   shell: touch /root/.setup/step24
   args:
     creates: /root/.setup/step24
 
 - name: "Add RHEL8 host group for default domain"
+  ignore_errors: yes
   become: true
   shell: |
     PARTID=$(hammer --csv partition-table list | grep 'Kickstart default,' | awk -F, {'print $1'})
@@ -882,6 +895,7 @@
     creates: /root/.setup/step24a
 
 - name: "Set unattended_url to ip address"
+  ignore_errors: yes
   become: true
   shell: |
     hammer settings set \
@@ -892,6 +906,7 @@
     creates: /root/.setup/step28
 
 - name: "Set Capsule to proper location"
+  ignore_errors: yes
   become: true
   shell: |
     hammer capsule update --id 1 --locations {{ sat6_default_location }} && \
