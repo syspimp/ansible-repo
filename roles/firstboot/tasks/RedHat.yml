@@ -86,7 +86,6 @@
         when:
         - ansible_local['awsroles']['default'] is defined
         - ansible_local['awsroles']['default']['role'] != 'satellite-server'
-
   # end of aws block
   - name: "No Satellite defined. Set the facts to None"
     set_fact:
@@ -95,15 +94,15 @@
     when:
     - sat6_fqdn is not defined
     - sat6_server is not defined
-
+  
   - name: "list the rpms installed"
     shell: rpm -qa
     register: rpmlist
-
+  
   - name: "list the rpms installed"
     shell: yum repolist
     register: repolist
-
+  
   - name: "Set up /etc/hosts file and hostname"
     shell: |
       shortname=$(hostname --short)
@@ -115,7 +114,7 @@
     args:
       creates: /opt/.firstboot
     when: "ansible_system_vendor | regex_search('KVM')"
-  
+   
   - name: "Set up /etc/hosts file and hostname"
     shell: |
       shortname=$(/usr/bin/vmware-rpctool "info-get guestinfo.hostname")
@@ -146,33 +145,33 @@
       curl -s http://169.254.169.254/2019-10-01/meta-data/instance-id
     register: instanceid
     when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
-
+  
   - name: "AWS: get region id"
     shell: |
       curl -s http://169.254.169.254/2019-10-01/meta-data/placement/availability-zone
     register: regionid
     when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
-
+  
   - name: "Check for hosts not in aws"
     set_fact:
       in_aws: "{{ ansible_system_vendor | regex_search('EC2') }} or ansible_system_vendor | regex_search('Xen')"
-
+  
   - name: "Get the aws short hostname"
     shell: |
       hostname --short  
     register: awsshortname
     when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
-
+  
   - name: "Set ntp server"
     set_fact:
       ntp_server: "0.rhel.pool.ntp.org"
     when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
-
+  
   - name: "Set ntp server for vmware"
     set_fact:
       ntp_server: "0.rhel.pool.ntp.org"
     when: "ansible_system_vendor == 'VMware, Inc.'"
-
+  
   - name: "Set ntp to true"
     shell: |
       ntpdate server {{ ntp_server }} iburst
@@ -227,13 +226,13 @@
   #        mode: 0755
   #      delegate_to: sat6
   #      when: "ansible_system_vendor | regex_search('EC2') "
-
+  
   - name: "Run the AWS dns helper"
     shell: |
       /usr/sbin/ifup-local
     when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
     become: true
-
+  
   #    - name: "AWS: Tag the instance with DNS"
   #      ec2_tag:
   #        region: "{{ regionid.stdout }}"
@@ -244,7 +243,7 @@
   #      delegate_to: localhost
   #      become: no
   #      when: "ansible_system_vendor | regex_search('EC2') "
-
+  
   - name: "Updating MOTD"
     template: 
       src: tiger.ascii.j2
@@ -261,7 +260,7 @@
     become: true
     when:
     - "ansible_system_vendor | regex_search('EC2') "
-
+  
   - name: "try to install python for rhel8 real quick"
     yum:
       name: "{{ item }}"
@@ -272,7 +271,7 @@
     - ansible_distribution_major_version == '8'
   when: 
   - firstbootcheck.stdout == "false"
-
+  
 - name: entitlement block
   block:
   - name: "Fall back to RHSM, Check if we are registered"

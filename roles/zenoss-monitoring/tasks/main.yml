@@ -175,7 +175,7 @@
     value: root
   - uid: /zport/dmd/Devices/Server/Linux
     property: zKeyPath
-    value: "~/.ssh/id_rsa"
+    value: "~/.ssh/{{ zenoss_sshkey }}"
   - uid: /zport/dmd/Devices/Server/Linux/Openshift
     property: zCommandUsername
     value: core
@@ -214,6 +214,12 @@
     status_code: 200
     body_format: json
   loop: "{{ addme }}"
+
+- name: monitor hosts in inventory groups
+  include_tasks: groupadd.yml
+  loop: "{{ inventory_groups }}"
+  loop_control:
+    loop_var: inventorygroup
 
 - name: monitor hosts in tower groups
   include_tasks: groupadd.yml

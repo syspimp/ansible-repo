@@ -2,8 +2,7 @@ zenoss_namespace: monitoring
 tower_inventory_group: zenoss-server
 # this is the private key used to access your servers
 # it should be unique to zenoss
-zenoss_sshkey: dtaylor-openstack.priv
-zenoss_sshkeypath: /home/dataylor/.ssh
+zenoss_sshkey: id_rsa
 onhere: "http://zenoss4-nginx-{{ ocpproject }}.apps.{{ ocpclustername }}.{{ ocpbaseurl }}/zport/dmd/device_router"
 usingthis: admin
 andthis: zenoss
@@ -157,3 +156,7 @@ tower_groups:
   - tang-servers
   - tower-servers
   - us-east-1
+inventory_groups:
+  - All Hosts
+#  - Satellite Inventory
+#  - Vmware

@@ -1,0 +1,102 @@
+---
+
+- name: "Add hosts to zenoss"
+  block:
+  - name: "Find Group Inventory for '{{ inventorygroup }}'"
+    uri:
+      url: "https://{{ tower_server }}/api/v2/inventories/?search={{ inventorygroup }}"
+      validate_certs: no
+      method: GET
+      user: "{{ tower_user }}"
+      password: "{{ tower_pass }}"
+      force_basic_auth: yes
+      status_code: [200,202,204]
+      body_format: json
+    register: groupidcheck
+
+  - name: "Set the host_id fact"
+    set_fact:
+      hostgroup_host_id: "{{ groupidcheck.json.results[0].id }}"
+
+  - name: "Get the json object containing the servers in the group inventory"
+    uri:
+      url: "https://{{ tower_server }}/api/v2/inventories/{{ hostgroup_host_id }}/hosts"
+      validate_certs: no
+      method: GET
+      user: "{{ tower_user }}"
+      password: "{{ tower_pass }}"
+      force_basic_auth: yes
+      status_code: [200,202,204]
+      body_format: json
+    register: hostidcheck
+
+  - name: "Set the target_servers fact"
+    set_fact:
+      target_servers: "{{ hostidcheck.json.results }}"
+
+  - name: "convert to json"
+    shell: |
+      echo '{{ item.variables }}' | jq | grep ansible_host | tr -d '"'| tr -d ',' | sed -e 's/ansible_host: //g'
+    loop: "{{ target_servers }}"
+    register: ipaddys
+
+  rescue:
+  - name: There are no servers in this tower group
+    debug:
+      msg: "There are no servers in {{ inventorygroup }} tower group"
+
+- name: Create Org Nodes in Zenoss
+  ignore_errors: yes
+  uri:
+    url: "{{ zrouter }}"
+    user: "{{ usingthis }}"
+    password: "{{ andthis }}"
+    method: POST
+    body:
+    - action: DeviceRouter
+      method: addNode
+      data:
+      - id: "{{ inventorygroup }}"
+        description: "{{ inventorygroup }} Tower Inventory Group"
+        type: organizer
+        contextUid: "/zport/dmd/Devices/{{ rootorg }}/Linux/Ansible Tower/Inventory Groups"
+      tid: 51
+      type: rpc
+    force_basic_auth: yes
+    status_code: 200
+    body_format: json
+
+- name: Create a Host in Zenoss from JSON
+  ignore_errors: yes
+  uri:
+    url: "{{ zrouter }}"
+    user: "{{ usingthis }}"
+    password: "{{ andthis }}"
+    method: POST
+    body:
+    - action: DeviceRouter
+      method: addDevice
+      data:
+      # try ec2 ip from ansible facts first, then ansible_hostname from vmware, then name from ansible facts
+      - deviceName: "{{ item.1.ec2_ip_address | default(item.0.stdout | trim,True) | default(item.1.name,True) }}"
+        deviceClass: "/{{ rootorg }}/Linux/Ansible Tower/Inventory Groups/{{ inventorygroup }}"
+        collector: localhost
+        model: true
+        title: "{{ item.1.ec2_tag_Name | default(item.1.name,True) }}"
+        productionState: 1000
+        priority: 3
+        snmpCommunity: RTO
+        snmpPort: 161
+        tag: ""
+        rackSlot: "aws"
+        serialNumber: "0"
+        hwManufacturer: "aws"
+        hwProductName: "aws"
+        osManufacturer: "Redhat"
+        osProductName: "Redhat"
+        comments: "added by ansible"
+      tid: 1
+    force_basic_auth: yes
+    status_code: 200
+    body_format: json
+  loop: "{{ ipaddys.results|zip(target_servers)|list }}"
