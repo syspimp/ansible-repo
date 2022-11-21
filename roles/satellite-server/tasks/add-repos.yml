@@ -23,10 +23,10 @@
     loop_control:
       loop_var: products
 
-    - name: "Publish BASE content view"
-      redhat.satellite.content_view_version:
-        content_view: "{{ sat6.content_view }}"
-        organization: "{{ sat6.default_org }}"
+  - name: "Publish BASE content view"
+    redhat.satellite.content_view_version:
+      content_view: "{{ sat6.content_view }}"
+      organization: "{{ sat6.default_org }}"
 
 #    - name: "[builder] config complete"
 #      file:
