@@ -1,6 +1,6 @@
 - name: debug
   debug:
-    var: "{{ pproducts.repoids|dict2items }}"
+    var: "{{ pproducts.repoids }}"
 
 - name: "Enable {{ pproducts.name }} repositories"
   redhat.satellite.repository_set:
@@ -13,7 +13,7 @@
     repositories: "{{ item|list }}"
     organization: "{{ sat6.default_org }}"
     state: enabled
-  loop: "{{ pproducts.repoids|dict2items }}"
+  loop: "{{ pproducts.repoids }}"
 
 - name: "Sync {{ repo }} repository"
   redhat.satellite.repository_sync:
