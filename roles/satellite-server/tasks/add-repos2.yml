@@ -1,3 +1,7 @@
+- name: debug
+  debug:
+    var: "{{ pproducts.repoids|dict2items }}"
+
 - name: "Enable {{ pproducts.name }} repositories"
   redhat.satellite.repository_set:
     username: "{{ sat6_user }}"
@@ -6,10 +10,10 @@
     validate_certs: no
     name: "{{ item.name }}"
     product: "{{ pproducts.name }}"
-    repositories: "{{ item }}"
+    repositories: "{{ item|list }}"
     organization: "{{ sat6.default_org }}"
     state: enabled
-  loop: "{{ pproducts.repoids }}"
+  loop: "{{ pproducts.repoids|dict2items }}"
 
 - name: "Sync {{ repo }} repository"
   redhat.satellite.repository_sync:
