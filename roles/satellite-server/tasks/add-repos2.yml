@@ -1,6 +1,6 @@
 - name: "Enable {{ products.name }} repositories"
   redhat.satellite.repository_set:
-    username: " {{ sat6_user }}"
+    username: "{{ sat6_user }}"
     password: "{{ sat6_pass }}"
     server_url: "{{ sat6_url }}"
     validate_certs: no
@@ -13,7 +13,7 @@
 
 - name: "Sync {{ repo }} repository"
   redhat.satellite.repository_sync:
-    username: " {{ sat6_user }}"
+    username: "{{ sat6_user }}"
     password: "{{ sat6_pass }}"
     server_url: "{{ sat6_url }}"
     validate_certs: no
@@ -32,7 +32,7 @@
 
 - name: "Create RHEL ContentView"
   redhat.satellite.content_view:
-    username: " {{ sat6_user }}"
+    username: "{{ sat6_user }}"
     password: "{{ sat6_pass }}"
     server_url: "{{ sat6_url }}"
     validate_certs: no

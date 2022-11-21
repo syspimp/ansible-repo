@@ -1,7 +1,7 @@
   - name: "Create {{ sat6.default_org }} LCE"
     no_log: no
     redhat.satellite.lifecycle_environment:
-      username: " {{ sat6_user }}"
+      username: "{{ sat6_user }}"
       password: "{{ sat6_pass }}"
       server_url: "{{ sat6_url }}"
       validate_certs: no
@@ -14,7 +14,7 @@
   
   - name: "Create {{ sat6.default_org }} Activation Keys"
     redhat.satellite.activation_key:
-      username: " {{ sat6_user }}"
+      username: "{{ sat6_user }}"
       password: "{{ sat6_pass }}"
       server_url: "{{ sat6_url }}"
       validate_certs: no
@@ -35,7 +35,7 @@
 
   - name: "Publish BASE content view"
     redhat.satellite.content_view_version:
-      username: " {{ sat6_user }}"
+      username: "{{ sat6_user }}"
       password: "{{ sat6_pass }}"
       server_url: "{{ sat6_url }}"
       validate_certs: no
