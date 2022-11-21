@@ -37,7 +37,8 @@
         msg: "This is normal for records not to exist."
 
     always:
-    - route53:
+    - name: "Update the DNS record"
+      route53:
           command: create
           zone: "{{ zone }}"
           record: "{{ fqdn }}"
