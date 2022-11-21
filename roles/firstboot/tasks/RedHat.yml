@@ -232,7 +232,7 @@
     - name: "Run the AWS dns helper"
       shell: |
         /usr/sbin/ifup-local
-      when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
+      #when: "ansible_system_vendor | regex_search('EC2') or ansible_system_vendor | regex_search('Xen')"
       become: true
     
     #    - name: "AWS: Tag the instance with DNS"
