@@ -4,7 +4,7 @@
   block:
   - name: "Find Group Inventory for '{{ inventorygroup }}'"
     uri:
-      url: "https://{{ tower_server }}/api/v2/inventories/?search={{ inventorygroup }}"
+      url: "https://{{ tower_server }}/api/v2/inventories/?search={{ inventorygroup|urlencode() }}"
       validate_certs: no
       method: GET
       user: "{{ tower_user }}"
