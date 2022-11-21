@@ -77,11 +77,11 @@
     - action: DeviceRouter
       method: addDevice
       data:
-      - deviceName: "{{ item.0.stdout | trim | default(item.1.name,True) }}"
+      - deviceName: "{{ item.1.ec2_ip_address | default(item.0.stdout | trim,True) | default(item.1.name,True) }}"
         deviceClass: "/{{ rootorg }}/Linux/Ansible Tower/Inventory Groups/{{ towergroup }}"
         collector: localhost
         model: true
-        title: "{{ item.1.name }}"
+        title: "{{ item.1.ec2_tag_Name | default(item.1.name,True) }}"
         productionState: 1000
         priority: 3
         snmpCommunity: RTO
