@@ -1,15 +1,15 @@
-- name: "Enable {{ products.name }} repositories"
+- name: "Enable {{ pproducts.name }} repositories"
   redhat.satellite.repository_set:
     username: "{{ sat6_user }}"
     password: "{{ sat6_pass }}"
     server_url: "{{ sat6_url }}"
     validate_certs: no
     name: "{{ item.name }}"
-    product: "{{ products.name }}"
+    product: "{{ pproducts.name }}"
     repositories: "{{ item }}"
     organization: "{{ sat6.default_org }}"
     state: enabled
-  loop: "{{ products.repoids }}"
+  loop: "{{ pproducts.repoids }}"
 
 - name: "Sync {{ repo }} repository"
   redhat.satellite.repository_sync:
@@ -18,17 +18,17 @@
     server_url: "{{ sat6_url }}"
     validate_certs: no
     repository: "{{ item.name }}"
-    product: "{{ products.name }}"
+    product: "{{ pproducts.name }}"
     organization: "{{ sat6.default_org }}"
-  loop: "{{ products.repoids }}"
+  loop: "{{ pproducts.repoids }}"
 
 - name: "set fact for content view"
   vars:
     name: "{{ item.name }}"
-    product: "{{ products.name }}"
+    product: "{{ pproducts.name }}"
   set_fact:
     contentviewpush: "{{ contentviewpush | combine({'name': name,'product': product}) }}"
-  loop: "{{ products.repoids }}"
+  loop: "{{ pproducts.repoids }}"
 
 - name: "Create RHEL ContentView"
   redhat.satellite.content_view:
