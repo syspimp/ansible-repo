@@ -11,6 +11,7 @@
     name: "{{ item.name }}"
     product: "{{ pproducts.name }}"
     repositories: "{{ item|list }}"
+    #repositories: "{{ pproducts.repoids }}"
     organization: "{{ sat6.default_org }}"
     state: enabled
   loop: "{{ pproducts.repoids }}"
