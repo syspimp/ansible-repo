@@ -216,12 +216,14 @@
   loop: "{{ addme }}"
 
 - name: monitor hosts in inventory groups
-  include_tasks: groupadd.yml
+  ignore_errors: yes
+  include_tasks: inventoryadd.yml
   loop: "{{ inventory_groups }}"
   loop_control:
     loop_var: inventorygroup
 
 - name: monitor hosts in tower groups
+  ignore_errors: yes
   include_tasks: groupadd.yml
   loop: "{{ tower_groups }}"
   loop_control:
