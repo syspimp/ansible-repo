@@ -3,6 +3,7 @@
       username: " {{ sat6_environment_vars.SATELLITE_USERNAME }}"
       password: "{{ sat6_environment_vars.SATELLITE_PASSWORD }}"
       server_url: "{{ sat6_environment_vars.SATELLITE_SERVER_URL }}"
+      validate_certs: no
       name: "{{ item.name }}"
       prior: "{{ item.prior }}"
       organization: "{{ sat6.default_org }}"
@@ -14,6 +15,7 @@
       username: " {{ sat6_environment_vars.SATELLITE_USERNAME }}"
       password: "{{ sat6_environment_vars.SATELLITE_PASSWORD }}"
       server_url: "{{ sat6_environment_vars.SATELLITE_SERVER_URL }}"
+      validate_certs: no
       name: "{{ sat6.default_org }}-{{ item.name }}-key"
       lifecycle_environment: "{{ item.name }}"
       content_view: "{{ sat6.content_view }}"
@@ -34,6 +36,7 @@
       username: " {{ sat6_environment_vars.SATELLITE_USERNAME }}"
       password: "{{ sat6_environment_vars.SATELLITE_PASSWORD }}"
       server_url: "{{ sat6_environment_vars.SATELLITE_SERVER_URL }}"
+      validate_certs: no
       content_view: "{{ sat6.content_view }}"
       organization: "{{ sat6.default_org }}"
 

@@ -3,6 +3,7 @@
     username: " {{ sat6_environment_vars.SATELLITE_USERNAME }}"
     password: "{{ sat6_environment_vars.SATELLITE_PASSWORD }}"
     server_url: "{{ sat6_environment_vars.SATELLITE_SERVER_URL }}"
+    validate_certs: no
     name: "{{ item.name }}"
     product: "{{ products.name }}"
     repositories: "{{ item }}"
@@ -15,6 +16,7 @@
     username: " {{ sat6_environment_vars.SATELLITE_USERNAME }}"
     password: "{{ sat6_environment_vars.SATELLITE_PASSWORD }}"
     server_url: "{{ sat6_environment_vars.SATELLITE_SERVER_URL }}"
+    validate_certs: no
     repository: "{{ item.name }}"
     product: "{{ products.name }}"
     organization: "{{ sat6.default_org }}"
@@ -33,6 +35,7 @@
     username: " {{ sat6_environment_vars.SATELLITE_USERNAME }}"
     password: "{{ sat6_environment_vars.SATELLITE_PASSWORD }}"
     server_url: "{{ sat6_environment_vars.SATELLITE_SERVER_URL }}"
+    validate_certs: no
     name: "{{ sat6.content_view }}"
     repositories: "{{ contentviewpush }}"
     organization: "{{ sat6.default_org }}"
