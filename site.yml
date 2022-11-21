@@ -30,11 +30,13 @@
 
 - name: Configure Satellite
   hosts: sat6*
+  environment: sat6.environment_vars
   roles:
     - satellite-server
 
 - name: Configure Satellite Capsules
   hosts: capsules*
+  environment: sat6.environment
   roles:
     - satellite-capsule
     - satellite-oscap
