@@ -487,12 +487,18 @@
   become: true
   args:
     creates: /root/.setup/step10
-
-- name: loop through products, add repos
-  include: add-sat6-products.yml
+#
+#- name: loop through products, add repos
+#  include: add-sat6-products.yml
+#  loop: "{{ sat6_product_repomap }}"
+#  loop_control:
+#    loop_var: product
+#
+- name: Loop over the repos
+  ansible.builtin.include_tasks: add-repos.yml
   loop: "{{ sat6_product_repomap }}"
   loop_control:
-    loop_var: product
+    loop_var: products
 
 #- name: "Provisioning Satellite 6 - base repositories"
 #  shell: |

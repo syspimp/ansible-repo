@@ -44,6 +44,18 @@ compute_resources:
     location_id: 3
     organization_id: 1
 sat6:
+  environment_vars:
+    SATELLITE_USERNAME: admin
+    SATELLITE_PASSWORD: CHANGEPASS
+    SATELLITE_SERVER_URL: "https://{{ inventory_hostname }}"
+  default_org: Redhat_Lab
+  content_view: Base
+  product: "Red Hat Enterprise Linux Server"
+  repo: "Red Hat Enterprise Linux 7 Server (RPMs)"
+  repo_variants:
+    - releasever: "7Server"
+      basearch: "x86_64"
+  organization: ACME
   subs_for_activationkeys:
     - "Employee SKU"
   environments:
@@ -178,94 +190,94 @@ sat6_product_repomap:
   - name: "Red Hat Enterprise Linux 7 Server (RPMs)"
     releasever: "7Server"
     basearch: "x86_64"
-    id: 2456
+#    id: 2456
   - name: "Red Hat Enterprise Linux 7 Server (Kickstart)"
     releasever: "7Server"
     basearch: "x86_64"
-    id: 2455
+#    id: 2455
   - name: "Red Hat Enterprise Linux 7 Server - RH Common (RPMs)"
     releasever: "7Server"
     basearch: "x86_64"
-    id: 2472
+#    id: 2472
   - name: "Red Hat Enterprise Linux 7 Server - Optional (RPMs)"
     releasever: "7Server"
     basearch: "x86_64"
-    id: 2463
+#    id: 2463
   - name: "Red Hat Satellite Tools 6.9 (for RHEL 7 Server) (RPMs)"
     releasever: "7Server"
     basearch: "x86_64"
-    id: 11502
+#    id: 11502
   - name: "Red Hat Enterprise Linux 7 Server - Supplementary (RPMs)"
     releasever: "7Server"
     basearch: "x86_64"
-    id: 2476
+#    id: 2476
   - name: "Red Hat Satellite Maintenance 6 (for RHEL 7 Server) (RPMs)"
     releasever: "7Server"
     basearch: "x86_64"
-    id: 5996
+#    id: 5996
   - name: "Red Hat Enterprise Linux 7 Server - Extras (RPMs)"
     releasever: "7Server"
     basearch: "x86_64"
-    id: 3030
+#    id: 3030
 - name: "Red Hat Enterprise Linux for x86_64"
   productid: 21
   repoids:
   - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)"
     releasever: "8"
     basearch: "x86_64"
-    id: 7421
+#    id: 7421
   - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
     releasever: "8"
     basearch: "x86_64"
-    id: 7441
+#    id: 7441
   - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
     releasever: "8"
     basearch: "x86_64"
-    id: 7416
+#    id: 7416
   - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)"
     releasever: "8"
     basearch: "x86_64"
-    id: 7446
+#    id: 7446
   - name: "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
     releasever: "8"
     basearch: "x86_64"
-    id: 7932
+#    id: 7932
   - name: "Red Hat Satellite Tools {{ satellite_version }} for RHEL 8 x86_64 (RPMs)"
     releasever: "8"
     basearch: "x86_64"
-    id: 11462
+#    id: 11462
 - name: "Red Hat Software Collections (for RHEL Server)"
   productid: 249
   repoids:
   - name: "Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server"
     releasever: "7Server"
     basearch: "x86_64"
-    id: 2808
+#    id: 2808
 - name: "Red Hat Ansible Engine"
   productid: 208
   repoids:
   - name: "Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server"
     releasever: "7Server"
     basearch: "x86_64"
-    id: 9318
+#    id: 9318
   - name: "Red Hat Ansible Engine 2.9 for RHEL 8 x86_64 (RPMs)"
     releasever: "8"
     basearch: "x86_64"
-    id: 9330
+#    id: 9330
 - name: "Red Hat Satellite"
   productid: 50
   repoids:
   - name: "Red Hat Satellite {{ satellite_version }} (for RHEL 7 Server) (RPMs)"
     releasever: "7Server"
     basearch: "x86_64"
-    id: 11455
+#    id: 11455
 - name: "Red Hat Satellite Capsule"
   productid: 87
   repoids:
   - name: "Red Hat Satellite Capsule {{ satellite_version }} (for RHEL 7 Server) (RPMs)"
     releasever: "7Server"
     basearch: "x86_64"
-    id: 11459
+#    id: 11459
 
 
 #sat6_enabled_repos:
@@ -355,3 +367,4 @@ rh_satellite_pool_id: !vault |
           3163383231356566610a346465663937613564613936633531393237303934373730373238623465
           34623265623330346637363730386135666134626265386534643935626431353135623130323332
           3839666635356437663530313764623962656262323366333562
+contentviewpush: []

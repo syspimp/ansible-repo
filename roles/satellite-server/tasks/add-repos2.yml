@@ -1,0 +1,31 @@
+- name: "Enable {{ products.name }} repositories"
+  redhat.satellite.repository_set:
+    name: "{{ item.name }}"
+    product: "{{ products.name }}"
+    repositories: "{{ item }}"
+    organization: "{{ sat6.default_org }}"
+    state: enabled
+  loop: "{{ products.repoids }}"
+
+- name: "Sync {{ repo }} repository"
+  redhat.satellite.repository_sync:
+    repository: "{{ item.name }}"
+    product: "{{ products.name }}"
+    organization: "{{ sat6.default_org }}"
+  loop: "{{ products.repoids }}"
+
+- name: "set fact for content view"
+  vars:
+    name: "{{ item.name }}"
+    product: "{{ products.name }}"
+  set_fact:
+    contentviewpush: "{{ contentviewpush | combine({'name': name,'product': product}) }}"
+  loop: "{{ products.repoids }}"
+
+- name: "Create RHEL ContentView"
+  redhat.satellite.content_view:
+    name: "{{ sat6.content_view }}"
+    repositories: "{{ contentviewpush }}"
+    organization: "{{ sat6.default_org }}"
+    state: present
+

@@ -1,0 +1,50 @@
+  - name: "Create {{ sat6.default_org }} LCE"
+    redhat.satellite.lifecycle_environment:
+      name: "{{ item.name }}"
+      prior: "{{ item.prior }}"
+      organization: "{{ sat6.default_org }}"
+      state: present
+    with_items: "{{ sat6.environments }}"
+  
+  - name: "Create {{ sat6.default_org }} Activation Keys"
+    redhat.satellite.activation_key:
+      name: "{{ sat6.default_org }}-{{ item.name }}-key"
+      lifecycle_environment: "{{ item.name }}"
+      content_view: "{{ sat6.content_view }}"
+      unlimited_hosts: true
+      #subscriptions: "{{ subscriptions }}"
+      organization: "{{ sat6.default_org }}"
+      state: present
+    with_items: "{{ sat6.environments }}"
+
+  - name: Loop over the repos
+    ansible.builtin.include_tasks: add-repos2.yml
+    loop: "{{ sat6_product_repomap }}"
+    loop_control:
+      loop_var: products
+
+    - name: "Publish BASE content view"
+      redhat.satellite.content_view_version:
+        content_view: "{{ sat6.content_view }}"
+        organization: "{{ sat6.default_org }}"
+
+#    - name: "[builder] config complete"
+#      file:
+#        path: /opt/.builder
+#        state: touch
+#        mode: 0444
+#      become: yes
+#    - name: "Create Organization"
+#      redhat.satellite.organization:
+#        name: "{{ Redhat Lab }}"
+#        state: present
+#
+#    - name: "create a domain"
+#      redhat.satellite.domain:
+#        name: example.org
+#        state: present
+#        server_url: https://satellite.example.com
+#        username: admin
+#        password: changeme
+
+
