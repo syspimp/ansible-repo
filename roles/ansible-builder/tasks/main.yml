@@ -1,0 +1,42 @@
+---
+- name: "[builder] Check if we did this already"
+  shell: |
+    if [ -e "/opt/.builder" ]
+    then
+      echo "true"
+    else
+      echo "false"
+    fi
+  register: buildercheck
+
+- name: "Make a ansible build environment"
+  block:
+    - name: "[builder] Enable required repos"
+      community.general.rhsm_repository:
+        name: "{{ builder_repos }}"
+        state: enabled
+      become: yes
+
+    - name: "[builder] Install required pkgs"
+      ansible.builtin.yum:
+        name: "{{ builder_pkgs }}"
+        state: present
+      become: yes
+
+    - name: "[builder] Checkout aap-repo in /opt dir"
+      ansible.builtin.git:
+        repo: 'https://github.com/syspimp/aap-repo.git'
+        clone: yes
+        dest: /opt
+      become: yes
+
+    - name: "Add to Tower 'builders' inventory group"
+      include: add-builder-to-towergroup.yml
+
+    - name: "[builder] config complete"
+      file:
+        path: /opt/.builder
+        state: touch
+        mode: 0444
+      become: yes
+  when: buildercheck.stdout == "false"

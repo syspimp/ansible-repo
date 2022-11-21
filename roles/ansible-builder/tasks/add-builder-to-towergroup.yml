@@ -1,0 +1,53 @@
+---
+- name: "Get host id to add to the '{{ inventory_groupname }}' Group Inventory"
+  uri:
+    url: "https://{{ tower_server }}/api/v2/hosts/?name={{ inventory_hostname }}"
+    validate_certs: no
+    method: GET
+    user: "{{ tower_user }}"
+    password: "{{ tower_pass }}"
+    force_basic_auth: yes
+    status_code: [200,202,204]
+    body_format: json
+  register: hostidcheck
+
+- name: "Set the host_id fact"
+  set_fact:
+    host_id: "{{ hostidcheck.json.results[0].id }}"
+
+- name: "Block for inventory group add"
+  block:
+    - name: "Find Group Inventory for '{{ inventory_groupname }}'"
+      uri:
+        url: "https://{{ tower_server }}/api/v2/groups/?search={{ inventory_groupname }}"
+        validate_certs: no
+        method: GET
+        user: "{{ tower_user }}"
+        password: "{{ tower_pass }}"
+        force_basic_auth: yes
+        status_code: [200,202,204]
+        body_format: json
+      register: groupidcheck
+
+    - name: "Set the host_id fact"
+      set_fact:
+        group_host_id: "{{ groupidcheck.json.results[0].id }}"
+
+    - name: "Add host to the '{{ inventory_groupname }}' Group Inventory"
+      uri:
+        url: "https://{{ tower_server }}/api/v2/groups/{{ group_host_id }}/hosts/"
+        validate_certs: no
+        method: POST
+        body: >
+          {
+             "id": {{ host_id }}
+          }
+        user: "{{ tower_user }}"
+        password: "{{ tower_pass }}"
+        force_basic_auth: yes
+        status_code: [201,202,204]
+        body_format: json
+  rescue:
+    - name: "Failed adding to inventory group"
+      debug:
+        msg: "The inventory group '{{ inventory_groupname }}' probably doesn't exist. Go create it, otherwise nevermind this error"

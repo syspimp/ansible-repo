@@ -26,4 +26,31 @@
   rescue:
     - name:
       debug:
-        msg: "No vmware role found for this host"
+        msg: "No vmware tools based role found for this host"
+
+- name: "block to check for facts.d vmware role"
+  block:
+  - name: "Include roles for VMware servers from facts.d"
+    include_role:
+      name: "{{ ansible_local['role'] | default(ansible_local['vmwareroles']['default']['role'],True) }}"
+    when:
+    - ansible_local['vmwareroles']['default']['role'] != 'None'
+  
+  - name: "Include secondary roles for vmware servers"
+    include_role:
+      name: "{{ ansible_local['awsroles']['secondary']['role'] }}"
+    when:
+    - ansible_local['vmwareroles']['secondary'] is defined
+    - ansible_local['vmwareroles']['secondary']['role'] != 'None'
+
+  - name: "Include roles for VMware servers from facts.d"
+    include_role:
+      name: "{{ ansible_local['role'] }}"
+    when:
+    - ansible_local['role'] is defined
+  when: "(ansible_local['vmwareroles']['default']['role'] is defined) or (ansible_local['role'] is defined)"
+
+  rescue:
+    - name:
+      debug:
+        msg: "No vmware roles found for this host"
