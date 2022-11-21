@@ -86,6 +86,8 @@
           when:
           - ansible_local['awsroles']['default'] is defined
           - ansible_local['awsroles']['default']['role'] != 'satellite-server'
+- name: "First boot configuration block for aws"
+  block:
     # end of aws block
     - name: "No Satellite defined. Set the facts to None"
       set_fact:
