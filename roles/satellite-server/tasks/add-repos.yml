@@ -1,5 +1,8 @@
   - name: "Create {{ sat6.default_org }} LCE"
     redhat.satellite.lifecycle_environment:
+      username: " {{ sat6_environment_vars.SATELLITE_USERNAME }}"
+      password: "{{ sat6_environment_vars.SATELLITE_PASSWORD }}"
+      server_url: "{{ sat6_environment_vars.SATELLITE_SERVER_URL }}"
       name: "{{ item.name }}"
       prior: "{{ item.prior }}"
       organization: "{{ sat6.default_org }}"
@@ -8,6 +11,9 @@
   
   - name: "Create {{ sat6.default_org }} Activation Keys"
     redhat.satellite.activation_key:
+      username: " {{ sat6_environment_vars.SATELLITE_USERNAME }}"
+      password: "{{ sat6_environment_vars.SATELLITE_PASSWORD }}"
+      server_url: "{{ sat6_environment_vars.SATELLITE_SERVER_URL }}"
       name: "{{ sat6.default_org }}-{{ item.name }}-key"
       lifecycle_environment: "{{ item.name }}"
       content_view: "{{ sat6.content_view }}"
@@ -25,6 +31,9 @@
 
   - name: "Publish BASE content view"
     redhat.satellite.content_view_version:
+      username: " {{ sat6_environment_vars.SATELLITE_USERNAME }}"
+      password: "{{ sat6_environment_vars.SATELLITE_PASSWORD }}"
+      server_url: "{{ sat6_environment_vars.SATELLITE_SERVER_URL }}"
       content_view: "{{ sat6.content_view }}"
       organization: "{{ sat6.default_org }}"
 

@@ -44,10 +44,6 @@ compute_resources:
     location_id: 3
     organization_id: 1
 sat6:
-  environment_vars:
-    SATELLITE_USERNAME: admin
-    SATELLITE_PASSWORD: CHANGEPASS
-    SATELLITE_SERVER_URL: "https://{{ inventory_hostname }}"
   default_org: Redhat_Lab
   content_view: Base
   product: "Red Hat Enterprise Linux Server"

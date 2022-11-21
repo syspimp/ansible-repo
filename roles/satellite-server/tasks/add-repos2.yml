@@ -1,5 +1,8 @@
 - name: "Enable {{ products.name }} repositories"
   redhat.satellite.repository_set:
+    username: " {{ sat6_environment_vars.SATELLITE_USERNAME }}"
+    password: "{{ sat6_environment_vars.SATELLITE_PASSWORD }}"
+    server_url: "{{ sat6_environment_vars.SATELLITE_SERVER_URL }}"
     name: "{{ item.name }}"
     product: "{{ products.name }}"
     repositories: "{{ item }}"
@@ -9,6 +12,9 @@
 
 - name: "Sync {{ repo }} repository"
   redhat.satellite.repository_sync:
+    username: " {{ sat6_environment_vars.SATELLITE_USERNAME }}"
+    password: "{{ sat6_environment_vars.SATELLITE_PASSWORD }}"
+    server_url: "{{ sat6_environment_vars.SATELLITE_SERVER_URL }}"
     repository: "{{ item.name }}"
     product: "{{ products.name }}"
     organization: "{{ sat6.default_org }}"
@@ -24,6 +30,9 @@
 
 - name: "Create RHEL ContentView"
   redhat.satellite.content_view:
+    username: " {{ sat6_environment_vars.SATELLITE_USERNAME }}"
+    password: "{{ sat6_environment_vars.SATELLITE_PASSWORD }}"
+    server_url: "{{ sat6_environment_vars.SATELLITE_SERVER_URL }}"
     name: "{{ sat6.content_view }}"
     repositories: "{{ contentviewpush }}"
     organization: "{{ sat6.default_org }}"
