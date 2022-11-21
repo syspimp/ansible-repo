@@ -1,4 +1,5 @@
   - name: "Create {{ sat6.default_org }} LCE"
+    no_log: no
     redhat.satellite.lifecycle_environment:
       username: " {{ sat6_user }}"
       password: "{{ sat6_pass }}"
