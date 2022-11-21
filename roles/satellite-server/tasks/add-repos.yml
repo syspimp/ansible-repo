@@ -9,6 +9,7 @@
       organization: "{{ sat6.default_org }}"
       state: present
     with_items: "{{ sat6.environments }}"
+    delegate_to: "{{ inventory_hostname }}"
   
   - name: "Create {{ sat6.default_org }} Activation Keys"
     redhat.satellite.activation_key:
