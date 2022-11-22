@@ -1,5 +1,6 @@
 ---
-dns_domain: "prod.maskedadmins.com"
+dns_domain: "tfound.org"
+#dns_domain: "prod.maskedadmins.com"
 host_config_server: "{{ tower_server }}"
 redhat_insights_key: ""
 redhat_insights_jobid: ""
@@ -7,7 +8,7 @@ rh7_enabled_repos: ['rhel-7-server-optional-rpms','rhel-7-server-rpms','rhel-7-s
 rh8_enabled_repos: ['ansible-2.9-for-rhel-8-x86_64-rpms','rhel-8-for-x86_64-appstream-rpms','rhel-8-for-x86_64-baseos-rpms']
 rh_disabled_repos: ['*']
 redhat_packages: ['sos','libselinux-python','rhel-system-roles','puppet','nspr','deltarpm','bash-completion','vim-enhanced','ntp','ntpdate','git','wget','bind-utils','nfs-utils','openscap-scanner','rubygem-foreman_scap_client','cockpit','cockpit-dashboard','firewalld']
-redhat8_packages: ['python3','git','firewalld']
+redhat8_packages: ['python3','git','firewalld','bind-utils']
 centos_packages: ['deltarpm','bash-completion','vim-enhanced','ntp','ntpdate','git','wget','bind-utils']
 fedora_packages: "deltarpm bash-completion ntp ntpdate git wget rsyslog bind-utils"
 enabled_svcs: ['sshd','rsyslog']
@@ -70,7 +71,8 @@ sat6_org: "Redhat_Lab"
 sat6_env: "production"
 sat6_loc: "AWS_TFOUND"
 #sat6_loc: "Private_Cloud"
-sat6_hostgroup: "RHEL_{{ ansible_distribution_major_version }}_x86_64_Hostgroup for prod.maskedadmins.com"
+sat6_hostgroup: "RHEL_{{ ansible_distribution_major_version }}_x86_64_Hostgroup for tfound.org"
+#sat6_hostgroup: "RHEL_{{ ansible_distribution_major_version }}_x86_64_Hostgroup for prod.maskedadmins.com"
 sat6:
   user: "admin"
   pass: "CHANGEPASS"

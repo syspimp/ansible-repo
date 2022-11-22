@@ -3,7 +3,8 @@ sat6_environment_vars:
     SATELLITE_USERNAME: admin
     SATELLITE_PASSWORD: CHANGEPASS
     SATELLITE_SERVER_URL: "https://{{ ansible_default_ipv4['address'] }}"
-dns_domain: prod.maskedadmins.com
+dns_domain: tfound.org
+#dns_domain: prod.maskedadmins.com
 #sat6_default_location: "RTO AWS Location"
 sat6_default_location: "ESXI_TFOUND"
 #sat6_default_location: "AWS_TFOUND"
