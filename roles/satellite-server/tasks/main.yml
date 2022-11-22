@@ -574,6 +574,7 @@
     creates: /root/.setup/step13
 
 - name: "Provisioning Satellite 6 Lifecycle"
+  ignore_errors: yes
   shell: |
       hammer lifecycle-environment create --name "{{ item.name }}" \
       --description "Environment for {{ sat6_default_org }}'s {{ item.name }} Team" \
@@ -611,6 +612,7 @@
   debug: var=availablerepos
 
 - name: "Creating Base Content View"
+  ignore_errors: yes
   shell: |
       set -x
       hammer content-view create --name "Base" \
@@ -622,6 +624,7 @@
     creates: /root/.setup/step15
 
 - name: "Publishing Base Content View"
+  ignore_errors: yes
   shell: |
       hammer content-view publish --name "Base" \
       --description "Initial content view for our operating system" \
@@ -632,6 +635,7 @@
     creates: /root/.setup/step15
 
 - name: "Promoting Environments {{ sat6.environments }}"
+  ignore_errors: yes
   become: true
   shell: |
       hammer content-view version promote --content-view "Base" --version 1 \
@@ -647,6 +651,7 @@
     creates: /root/.setup/step16
 
 - name: "Creating activation keys for environments"
+  ignore_errors: yes
   shell: |
     hammer activation-key create --name "{{ sat6_default_org }}-{{ item.name }}-key" \
     --unlimited-hosts --description "Example activation key for {{ item.name }}" \
@@ -664,6 +669,7 @@
     creates: /root/.setup/step17
 
 - name: "Adding subs to activation keys for environments"
+  ignore_errors: yes
   shell: |
     subid=$(hammer subscription list --organization "{{ sat6_default_org }}"| grep "{{ item[1] }}"| cut -f1 -d\|)
     hammer activation-key add-subscription --name "{{ sat6_default_org }}-{{ item[0]['name'] }}-key" \
