@@ -43,7 +43,9 @@
     server_url: "{{ sat6_url }}"
     validate_certs: no
     name: "{{ sat6.content_view }}"
-    repositories: "{{ contentviewpush }}"
+    repositories:
+      - name: "{{ item.name }}"
+        product: "{{ item.product }}"
     organization: "{{ sat6.default_org }}"
     state: present
-
+  loop: "{{ contentviewpush }}"
