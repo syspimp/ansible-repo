@@ -145,8 +145,14 @@
     - name: "Fix the DNS in ifcfg-eth0"
       ansible.builtin.lineinfile:
         path: /etc/sysconfig/network-scripts/ifcfg-eth0
-        regexp: '^DNS=='
+        regexp: '^DNS1=='
         line: "DNS1={{ dns_server }}"
+
+    - name: "Fix the DNS in ifcfg-eth0"
+      ansible.builtin.lineinfile:
+        path: /etc/sysconfig/network-scripts/ifcfg-eth0
+        regexp: '^DNS2=='
+        line: "DNS2={{ dns2_server }}"
 
     - name: "AWS: get instance id"
       shell: |

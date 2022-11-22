@@ -89,3 +89,4 @@ dhcp_server_key: !vault |
 ntp_server: "10.55.102.5"
 dhcp_server: "{{ ntp_server }}"
 dns_server: "10.55.102.5"
+dns2_server: "10.55.110.1"
