@@ -12,13 +12,13 @@
     name: "{{ item.name }}"
     product: "{{ pproducts.name }}"
     repositories:
-      - releasever: "{{ item.releasever }}"
-        basearch: "{{ item.basearch }}"
+      - releasever: "{{ item.releasever|default('',True) }}"
+        basearch: "{{ item.basearch|default('',True) }}"
     organization: "{{ sat6.default_org }}"
     state: enabled
   loop: "{{ pproducts.repoids }}"
 
-- name: "Sync {{ repo }} repository"
+- name: "Sync {{ pproducts.name }} repositories"
   ignore_errors: yes
   redhat.satellite.repository_sync:
     username: "{{ sat6_user }}"

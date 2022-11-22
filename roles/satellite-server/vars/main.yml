@@ -202,7 +202,7 @@ sat6_product_repomap:
     basearch: "x86_64"
 #    id: 2463
   - name: "Red Hat Satellite Tools {{ satellite_version }} for RHEL 7 Server RPMs x86_64"
-    releasever: "7Server"
+#    releasever: "7Server"
     basearch: "x86_64"
 #    id: 11502
   - name: "Red Hat Enterprise Linux 7 Server - Supplementary (RPMs)"
@@ -210,11 +210,11 @@ sat6_product_repomap:
     basearch: "x86_64"
 #    id: 2476
   - name: "Red Hat Satellite Maintenance 6 for RHEL 7 Server RPMs x86_64"
-    releasever: "7Server"
+#    releasever: "7Server"
     basearch: "x86_64"
 #    id: 5996
   - name: "Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64"
-    releasever: "7Server"
+#    releasever: "7Server"
     basearch: "x86_64"
 #    id: 3030
 - name: "Red Hat Enterprise Linux for x86_64"
