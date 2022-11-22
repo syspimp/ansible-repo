@@ -18,18 +18,18 @@
     state: enabled
   loop: "{{ pproducts.repoids }}"
 
-- name: "Sync {{ pproducts.name }} repositories"
-  ignore_errors: yes
-  redhat.satellite.repository_sync:
-    username: "{{ sat6_user }}"
-    password: "{{ sat6_pass }}"
-    server_url: "{{ sat6_url }}"
-    validate_certs: no
-    repository: "{{ item.name }}"
-    product: "{{ pproducts.name }}"
-    organization: "{{ sat6.default_org }}"
-  loop: "{{ pproducts.repoids }}"
-
+#- name: "Sync {{ pproducts.name }} repositories"
+#  ignore_errors: yes
+#  redhat.satellite.repository_sync:
+#    username: "{{ sat6_user }}"
+#    password: "{{ sat6_pass }}"
+#    server_url: "{{ sat6_url }}"
+#    validate_certs: no
+#    repository: "{{ item.name }}"
+#    product: "{{ pproducts.name }}"
+#    organization: "{{ sat6.default_org }}"
+#  loop: "{{ pproducts.repoids }}"
+#
 - name: "set fact for content view"
   ignore_errors: yes
   vars:
