@@ -48,8 +48,7 @@
     validate_certs: no
     name: "{{ sat6.content_view }}"
     repositories:
-      - name: "{{ item.name }}"
-        product: "{{ item.product }}"
+      - name: "{{ contentviewpush.name }}"
+        product: "{{ contentviewpush.product }}"
     organization: "{{ sat6.default_org }}"
     state: present
-  loop: "{{ contentviewpush }}"
