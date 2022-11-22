@@ -1,8 +1,8 @@
 #- name: debug
 #  debug:
-#    var: "{{ pproducts.repoids }}"
+#    var: "{{ products.repoids }}"
 
-- name: "Enable {{ pproducts.name }} repositories"
+- name: "Enable {{ products.name }} repositories"
   ignore_errors: yes
   redhat.satellite.repository_set:
     username: "{{ sat6_user }}"
@@ -10,13 +10,13 @@
     server_url: "{{ sat6_url }}"
     validate_certs: no
     name: "{{ item.name }}"
-    product: "{{ pproducts.name }}"
+    product: "{{ item.product }}"
     repositories:
       - releasever: "{{ item.releasever|default('',True) }}"
         basearch: "{{ item.basearch|default('',True) }}"
     organization: "{{ sat6.default_org }}"
     state: enabled
-  loop: "{{ pproducts.repoids }}"
+  loop: "{{ products.repoids }}"
 
 #- name: "Sync {{ pproducts.name }} repositories"
 #  ignore_errors: yes
@@ -30,25 +30,3 @@
 #    organization: "{{ sat6.default_org }}"
 #  loop: "{{ pproducts.repoids }}"
 #
-- name: "set fact for content view"
-  ignore_errors: yes
-  vars:
-    name: "{{ item.name }}"
-    product: "{{ pproducts.name }}"
-  set_fact:
-    contentviewpush: "{{ contentviewpush | combine({'name': name,'product': product}) }}"
-  loop: "{{ pproducts.repoids }}"
-
-- name: "Create RHEL ContentView"
-  ignore_errors: yes
-  redhat.satellite.content_view:
-    username: "{{ sat6_user }}"
-    password: "{{ sat6_pass }}"
-    server_url: "{{ sat6_url }}"
-    validate_certs: no
-    name: "{{ sat6.content_view }}"
-    repositories:
-      - name: "{{ contentviewpush.name }}"
-        product: "{{ contentviewpush.product }}"
-    organization: "{{ sat6.default_org }}"
-    state: present
