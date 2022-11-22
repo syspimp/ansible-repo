@@ -38,7 +38,7 @@
 
 - name: "setting the sat6_url fact"
   set_fact:
-    sat6_url: "{{ sat6url.stdout }}"
+    sat6_url: "https://{{ sat6url.stdout }}/"
 
 - name: "Updated User data template"
   template:
