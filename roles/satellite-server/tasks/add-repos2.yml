@@ -3,6 +3,7 @@
 #    var: "{{ pproducts.repoids }}"
 
 - name: "Enable {{ pproducts.name }} repositories"
+  ignore_errors: yes
   redhat.satellite.repository_set:
     username: "{{ sat6_user }}"
     password: "{{ sat6_pass }}"
@@ -18,6 +19,7 @@
   loop: "{{ pproducts.repoids }}"
 
 - name: "Sync {{ repo }} repository"
+  ignore_errors: yes
   redhat.satellite.repository_sync:
     username: "{{ sat6_user }}"
     password: "{{ sat6_pass }}"
@@ -29,6 +31,7 @@
   loop: "{{ pproducts.repoids }}"
 
 - name: "set fact for content view"
+  ignore_errors: yes
   vars:
     name: "{{ item.name }}"
     product: "{{ pproducts.name }}"
@@ -37,6 +40,7 @@
   loop: "{{ pproducts.repoids }}"
 
 - name: "Create RHEL ContentView"
+  ignore_errors: yes
   redhat.satellite.content_view:
     username: "{{ sat6_user }}"
     password: "{{ sat6_pass }}"

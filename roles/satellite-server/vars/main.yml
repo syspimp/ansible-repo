@@ -2,6 +2,8 @@
 satellite_version: 6.11
 openstack_version: 14
 openshift_version: 3.11
+rhel7latestversion: 7.9
+rhel8latestversion: 8.7
 host_config_key: firstboot
 host_config_jobid: 22
 host_config_server: 10.55.102.51
@@ -187,8 +189,8 @@ sat6_product_repomap:
     releasever: "7Server"
     basearch: "x86_64"
 #    id: 2456
-  - name: "Red Hat Enterprise Linux 7 Server (Kickstart)"
-    releasever: "7Server"
+  - name: "Red Hat Enterprise Linux 7 Server Kickstart x86_64 {{ rhel7latestversion }}"
+    releasever: "{{ rhel7latestversion }}"
     basearch: "x86_64"
 #    id: 2455
   - name: "Red Hat Enterprise Linux 7 Server - RH Common (RPMs)"
@@ -199,7 +201,7 @@ sat6_product_repomap:
     releasever: "7Server"
     basearch: "x86_64"
 #    id: 2463
-  - name: "Red Hat Satellite Tools 6.9 (for RHEL 7 Server) (RPMs)"
+  - name: "Red Hat Satellite Tools {{ satellite_version }} for RHEL 7 Server RPMs x86_64"
     releasever: "7Server"
     basearch: "x86_64"
 #    id: 11502
@@ -207,11 +209,11 @@ sat6_product_repomap:
     releasever: "7Server"
     basearch: "x86_64"
 #    id: 2476
-  - name: "Red Hat Satellite Maintenance 6 (for RHEL 7 Server) (RPMs)"
+  - name: "Red Hat Satellite Maintenance 6 for RHEL 7 Server RPMs x86_64"
     releasever: "7Server"
     basearch: "x86_64"
 #    id: 5996
-  - name: "Red Hat Enterprise Linux 7 Server - Extras (RPMs)"
+  - name: "Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64"
     releasever: "7Server"
     basearch: "x86_64"
 #    id: 3030
