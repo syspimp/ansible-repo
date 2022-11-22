@@ -609,139 +609,139 @@
 #  with_items: "{{ sat6.environments }}"
 #  args:
 #    creates: /root/.setup/step14
-#
-##- name: "Provisioning Satellite 6 Puppet Environments"
-##  shell: |
-##      hammer puppet-environment create --name {{ sat6_default_environment }} --locations {{ sat6_default_location }} --organizations {{ sat6_default_org }} || true
-##  args:
-##    creates: /root/.setup/step14
-#
-#- name: "Provisionging Lifecycle Complete"
-#  shell: touch /root/.setup/step14
-#  become: true
+
+#- name: "Provisioning Satellite 6 Puppet Environments"
+#  shell: |
+#      hammer puppet-environment create --name {{ sat6_default_environment }} --locations {{ sat6_default_location }} --organizations {{ sat6_default_org }} || true
 #  args:
 #    creates: /root/.setup/step14
-#
-#- name: "Get the ids of all the repos"
-#  shell: |
-#    hammer --csv repository list --organization-id 1 --fields id | grep -v 'Id'
-#  become: true
-#  register: availrepoids
-#  args:
-#    creates: /root/.setup/step15
-#
-#- name: "Set the available repos fact"
-#  set_fact:
-#    availablerepos: "{{ availrepoids.stdout.split() | join(',') }}"
-#
-#- name: "debug the repos fact"
-#  debug: var=availablerepos
 
-- name: "Create RHEL ContentView"
+- name: "Provisionging Lifecycle Complete"
+  shell: touch /root/.setup/step14
+  become: true
+  args:
+    creates: /root/.setup/step14
+
+- name: "Get the ids of all the repos"
+  shell: |
+    hammer --csv repository list --organization-id 1 --fields id | grep -v 'Id'
+  become: true
+  register: availrepoids
+  args:
+    creates: /root/.setup/step15
+
+- name: "Set the available repos fact"
+  set_fact:
+    availablerepos: "{{ availrepoids.stdout.split() | join(',') }}"
+
+- name: "debug the repos fact"
+  debug: var=availablerepos
+
+###- name: "Create RHEL ContentView"
+###  ignore_errors: yes
+###  redhat.satellite.content_view:
+###    username: "{{ sat6_user }}"
+###    password: "{{ sat6_pass }}"
+###    server_url: "{{ sat6_url }}"
+###    validate_certs: no
+###    name: "{{ sat6.content_view }}"
+###    repositories:
+###      - name: "{{ item.name }}"
+###        product: "{{ item.product }}"
+###    organization: "{{ sat6.default_org }}"
+###    state: present
+###    loop:
+###      - "{{ sat6_product_repomap[0] }}"
+###      - "{{ sat6_product_repomap[1] }}"
+###      - "{{ sat6_product_repomap[2] }}"
+###      - "{{ sat6_product_repomap[3] }}"
+###      - "{{ sat6_product_repomap[4] }}"
+###      - "{{ sat6_product_repomap[5] }}"
+###
+###- name: "Publish BASE content view"
+###  redhat.satellite.content_view_version:
+###    username: "{{ sat6_user }}"
+###    password: "{{ sat6_pass }}"
+###    server_url: "{{ sat6_url }}"
+###    validate_certs: no
+###    content_view: "{{ sat6.content_view }}"
+###    organization: "{{ sat6.default_org }}"
+###    lifecycle_environments:
+###      - Library
+###      - production
+###
+###- name: "Create {{ sat6.default_org }} Activation Keys"
+###  redhat.satellite.activation_key:
+###    username: "{{ sat6_user }}"
+###    password: "{{ sat6_pass }}"
+###    server_url: "{{ sat6_url }}"
+###    validate_certs: no
+###    name: "{{ sat6.default_org }}-{{ item.name }}-key"
+###    lifecycle_environment: "{{ item.name }}"
+###    content_view: "{{ sat6.content_view }}"
+###    unlimited_hosts: true
+###    #subscriptions: "{{ subscriptions }}"
+###    organization: "{{ sat6.default_org }}"
+###    state: present
+###  with_items: "{{ sat6.environments }}"
+
+- name: "Creating Base Content View"
   ignore_errors: yes
-  redhat.satellite.content_view:
-    username: "{{ sat6_user }}"
-    password: "{{ sat6_pass }}"
-    server_url: "{{ sat6_url }}"
-    validate_certs: no
-    name: "{{ sat6.content_view }}"
-    repositories:
-      - name: "{{ item.name }}"
-        product: "{{ item.product }}"
-    organization: "{{ sat6.default_org }}"
-    state: present
-    loop:
-      - "{{ sat6_product_repomap[0] }}"
-      - "{{ sat6_product_repomap[1] }}"
-      - "{{ sat6_product_repomap[2] }}"
-      - "{{ sat6_product_repomap[3] }}"
-      - "{{ sat6_product_repomap[4] }}"
-      - "{{ sat6_product_repomap[5] }}"
+  shell: |
+      set -x
+      hammer content-view create --name "Base" \
+      --description "Base operating system" \
+      --repository-ids "{{ availablerepos }}" \
+      --organization "{{ sat6_default_org }}"
+  become: true
+  args:
+    creates: /root/.setup/step15
 
-- name: "Publish BASE content view"
-  redhat.satellite.content_view_version:
-    username: "{{ sat6_user }}"
-    password: "{{ sat6_pass }}"
-    server_url: "{{ sat6_url }}"
-    validate_certs: no
-    content_view: "{{ sat6.content_view }}"
-    organization: "{{ sat6.default_org }}"
-    lifecycle_environments:
-      - Library
-      - production
+- name: "Publishing Base Content View"
+  ignore_errors: yes
+  shell: |
+      hammer content-view publish --name "Base" \
+      --description "Initial content view for our operating system" \
+      --organization "{{ sat6_default_org }}" && \
+      touch /root/.setup/step15
+  become: true
+  args:
+    creates: /root/.setup/step15
 
-- name: "Create {{ sat6.default_org }} Activation Keys"
-  redhat.satellite.activation_key:
-    username: "{{ sat6_user }}"
-    password: "{{ sat6_pass }}"
-    server_url: "{{ sat6_url }}"
-    validate_certs: no
-    name: "{{ sat6.default_org }}-{{ item.name }}-key"
-    lifecycle_environment: "{{ item.name }}"
-    content_view: "{{ sat6.content_view }}"
-    unlimited_hosts: true
-    #subscriptions: "{{ subscriptions }}"
-    organization: "{{ sat6.default_org }}"
-    state: present
+- name: "Promoting Environments {{ sat6.environments }}"
+  ignore_errors: yes
+  become: true
+  shell: |
+      hammer content-view version promote --content-view "Base" --version 1 \
+      --to-lifecycle-environment "{{ item.name }}" --organization "{{ sat6_default_org }}"
   with_items: "{{ sat6.environments }}"
+  args:
+    creates: /root/.setup/step16
 
-#- name: "Creating Base Content View"
-#  ignore_errors: yes
-#  shell: |
-#      set -x
-#      hammer content-view create --name "Base" \
-#      --description "Base operating system" \
-#      --repository-ids "{{ availablerepos }}" \
-#      --organization "{{ sat6_default_org }}"
-#  become: true
-#  args:
-#    creates: /root/.setup/step15
-#
-#- name: "Publishing Base Content View"
-#  ignore_errors: yes
-#  shell: |
-#      hammer content-view publish --name "Base" \
-#      --description "Initial content view for our operating system" \
-#      --organization "{{ sat6_default_org }}" && \
-#      touch /root/.setup/step15
-#  become: true
-#  args:
-#    creates: /root/.setup/step15
-#
-#- name: "Promoting Environments {{ sat6.environments }}"
-#  ignore_errors: yes
-#  become: true
-#  shell: |
-#      hammer content-view version promote --content-view "Base" --version 1 \
-#      --to-lifecycle-environment "{{ item.name }}" --organization "{{ sat6_default_org }}"
-#  with_items: "{{ sat6.environments }}"
-#  args:
-#    creates: /root/.setup/step16
-#
-#- name: "Promotion Complete"
-#  shell: touch /root/.setup/step16
-#  become: true
-#  args:
-#    creates: /root/.setup/step16
-#
-#- name: "Creating activation keys for environments"
-#  ignore_errors: yes
-#  shell: |
-#    hammer activation-key create --name "{{ sat6_default_org }}-{{ item.name }}-key" \
-#    --unlimited-hosts --description "Example activation key for {{ item.name }}" \
-#    --lifecycle-environment "{{ item.name }}" --content-view "Base" \
-#    --organization "{{ sat6_default_org }}"
-#  become: true
-#  with_items: "{{ sat6.environments }}"
-#  args:
-#    creates: /root/.setup/step17
-#
-#- name: "Activation keys Complete"
-#  shell: touch /root/.setup/step17
-#  become: true
-#  args:
-#    creates: /root/.setup/step17
-#
+- name: "Promotion Complete"
+  shell: touch /root/.setup/step16
+  become: true
+  args:
+    creates: /root/.setup/step16
+
+- name: "Creating activation keys for environments"
+  ignore_errors: yes
+  shell: |
+    hammer activation-key create --name "{{ sat6_default_org }}-{{ item.name }}-key" \
+    --unlimited-hosts --description "Example activation key for {{ item.name }}" \
+    --lifecycle-environment "{{ item.name }}" --content-view "Base" \
+    --organization "{{ sat6_default_org }}"
+  become: true
+  with_items: "{{ sat6.environments }}"
+  args:
+    creates: /root/.setup/step17
+
+- name: "Activation keys Complete"
+  shell: touch /root/.setup/step17
+  become: true
+  args:
+    creates: /root/.setup/step17
+
 - name: "Adding subs to activation keys for environments"
   ignore_errors: yes
   shell: |
