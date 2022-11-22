@@ -500,6 +500,15 @@
   loop_control:
     loop_var: products
 
+- name: "Publish BASE content view"
+  redhat.satellite.content_view_version:
+    username: "{{ sat6_user }}"
+    password: "{{ sat6_pass }}"
+    server_url: "{{ sat6_url }}"
+    validate_certs: no
+    content_view: "{{ sat6.content_view }}"
+    organization: "{{ sat6.default_org }}"
+
 #- name: "Provisioning Satellite 6 - base repositories"
 #  shell: |
 #      hammer repository-set enable \

@@ -33,15 +33,6 @@
     loop_control:
       loop_var: pproducts
 
-  - name: "Publish BASE content view"
-    redhat.satellite.content_view_version:
-      username: "{{ sat6_user }}"
-      password: "{{ sat6_pass }}"
-      server_url: "{{ sat6_url }}"
-      validate_certs: no
-      content_view: "{{ sat6.content_view }}"
-      organization: "{{ sat6.default_org }}"
-
 #    - name: "[builder] config complete"
 #      file:
 #        path: /opt/.builder
