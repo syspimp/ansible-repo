@@ -1,6 +1,6 @@
-- name: debug
-  debug:
-    var: "{{ pproducts.repoids }}"
+#- name: debug
+#  debug:
+#    var: "{{ pproducts.repoids }}"
 
 - name: "Enable {{ pproducts.name }} repositories"
   redhat.satellite.repository_set:
@@ -10,8 +10,9 @@
     validate_certs: no
     name: "{{ item.name }}"
     product: "{{ pproducts.name }}"
-    repositories: "{{ item|list }}"
-    #repositories: "{{ pproducts.repoids }}"
+    repositories:
+      releasever: "{{ item.releasever }}"
+      basearch: "{{ item.basearch }}"
     organization: "{{ sat6.default_org }}"
     state: enabled
   loop: "{{ pproducts.repoids }}"
