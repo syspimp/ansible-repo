@@ -32,6 +32,14 @@
   register: initialsetup
   become: true
 
+- name: "grabbing hostname"
+  shell: hostname --fqdn
+  register: sat6url
+
+- name: "setting the sat6_url fact"
+  set_fact:
+    sat6_url: "{{ sat6url.stdout }}"
+
 - name: "Updated User data template"
   template:
     dest: /var/tmp/user-data-template.txt
