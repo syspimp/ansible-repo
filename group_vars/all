@@ -88,3 +88,4 @@ dhcp_server_key: !vault |
           35656531336566393135323734633932363863333863613366633635363030653662
 ntp_server: "10.55.102.5"
 dhcp_server: "{{ ntp_server }}"
+dns_server: "10.55.102.5"

@@ -1,5 +1,6 @@
 ---
 dns_domain: "tfound.org"
+dns_server: "10.55.102.5"
 #dns_domain: "prod.maskedadmins.com"
 host_config_server: "{{ tower_server }}"
 redhat_insights_key: ""

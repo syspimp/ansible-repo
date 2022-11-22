@@ -142,6 +142,12 @@
       #  curl -s http://169.254.169.254/2019-10-01/meta-data/public-ipv4 || echo "html"
       #register: dc
       
+    - name: "Fix the DNS in ifcfg-eth0"
+      ansible.builtin.lineinfile:
+        path: /etc/sysconfig/network-scripts/ifcfg-eth0
+        regexp: '^DNS=='
+        line: "DNS1={{ dns_server }}"
+
     - name: "AWS: get instance id"
       shell: |
         curl -s http://169.254.169.254/2019-10-01/meta-data/instance-id
@@ -171,7 +177,7 @@
     
     - name: "Set ntp server for vmware"
       set_fact:
-        ntp_server: "0.rhel.pool.ntp.org"
+        ntp_server: "10.55.102.5"
       when: "ansible_system_vendor == 'VMware, Inc.'"
     
     - name: "Set ntp to true"
