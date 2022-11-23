@@ -3,18 +3,23 @@
   hosts: all:!cfme*:!cloudforms*
   roles:
     - firstboot
+    - insights
     - snmp-client
-    #- satellite-clients
     - awsroles
     - vmwareroles
 
 - name: Supporting roles
-  hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*
+  hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsules*
   become: yes
   roles:
     - webconsole
-    - insights
     - leapp-upgrade
+
+- name: Satellite clients
+  hosts: all:!sat6*:!satellite*:!management*
+  become: yes
+  roles:
+    - satellite-clients
 
 - name: "Create ansible build environment"
   hosts: builder*
