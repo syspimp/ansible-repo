@@ -60,12 +60,18 @@
   when: buildercheck.stdout == "false"
 
 - name: "[builder] Log into registry.redhat.io"
+  environment:
+    subuser: "{{ SUBUSER }}"
+    subpass: "{{ SUBPASS }}"
   shell: |
-    podman login -u '{{ SUBUSER }}' -p '{{ SUBPASS }}' registry.redhat.io
+    podman login -u "${subuser}" -p "${subpass}" registry.redhat.io
   become: yes
 
 - name: "[builder] Log into docker.io"
+  environment:
+    dockeruser: "{{ SUBUSER }}"
+    dockerpass: "{{ SUBPASS }}"
   shell: |
-    podman login -u '{{ DOCKERUSER }}' -p '{{ DOCKERPASS }}' docker.io
+    podman login -u "${dockeruser}" -p "${dockerpass}" docker.io
   become: yes
 
