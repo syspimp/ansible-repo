@@ -29,9 +29,30 @@
       body_format: json
     register: hostidcheck
 
+  - name: "Set the sat6_hosturl fact"
+    set_fact:
+      sat6_hosturl: "{{ hostidcheck.json.results[0].related.variable_data }}"
+
+  - name: "Find the ip of the satellite-server"
+    uri:
+      url: "https://{{ tower_server }}/{{ sat6_hosturl }}"
+      validate_certs: no
+      method: GET
+      user: "{{ tower_user }}"
+      password: "{{ tower_pass }}"
+      force_basic_auth: yes
+      status_code: [200,202,204]
+      body_format: json
+    register: hostipcheck
+
+  - name: "debug the sat6 facts"
+    debug:
+      var: "{{ hostipcheck }}"
+
   - name: "Set the sat6_server fact"
     set_fact:
-      sat6_server: "{{ hostidcheck.json.results[0].name }}"
+      sat6_server: "{{ hostipcheck.json.ansible_host }}"
+
   rescue:
   - name: There is no satellite server
     debug:
@@ -47,9 +68,10 @@
     shell:
       subscription-manager config | grep "{{ sat6['lb_fqdn'] }}"
     become: yes
-    when:
-    - ansible_local['awsroles'] is defined
-    - ansible_local['awsroles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy']
+    #when:
+    #- (ansible_local['awsroles'] is defined) or (ansible_local['vmwareroles'] is defined)
+    #- ansible_local['awsroles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy']
+    #- ansible_local['vmwareroles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy']
   when:
   - "(sat6_server is defined) and (sat6_server != 'None')"
 
