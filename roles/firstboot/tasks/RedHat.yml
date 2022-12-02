@@ -213,6 +213,13 @@
       with_items: "{{ enabled_svcs }}"
       become: true
     
+    - name: "Restart NetworkManager"
+      shell: |
+        systemctl restart NetworkManager
+      become: true
+      ignore_errors: yes
+      args:
+        creates: /opt/.firstboot
      #   - name: "Stopping and disabling services {{ disabled_svcs }}"
      #     service:
      #       name: "{{ item }}"
