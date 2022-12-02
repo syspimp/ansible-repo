@@ -1,5 +1,5 @@
 zenoss_namespace: monitoring
-tower_inventory_group: zenoss-server
+aap_group_name: "{{ zenoss_namespace }}"
 # this is the private key used to access your servers
 # it should be unique to zenoss
 zenoss_sshkey: id_rsa

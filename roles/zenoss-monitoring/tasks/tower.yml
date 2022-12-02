@@ -1,5 +1,5 @@
 ---
-- name: "Tower Inventory Setup check"
+- name: "AAP Inventory Group Setup check"
   shell: |
     if [ -e "/root/.setup/tower-configed" ]
     then
@@ -10,9 +10,9 @@
   register: towersetup
   become: true
 
-- name: "Block add to Ansible Tower inventory"
+- name: "Block to add to AAP group inventory"
   block:
-    - name: "Get host id to add to the 'tower-server' Group Inventory"
+    - name: "Get host id to add to the 'monitoring' Group Inventory"
       uri:
         url: "https://{{ tower_server }}/api/v2/hosts/?name={{ inventory_hostname }}"
         validate_certs: no
@@ -26,16 +26,32 @@
 
     - name: "Set the host_id fact"
       set_fact:
-        tower_host_id: "{{ hostidcheck.json.results[0].id }}"
+        host_id: "{{ hostidcheck.json.results[0].id }}"
 
-    - name: "Add host to the 'tower-server' Group Inventory"
+    - name: "Find Group Inventory for '{{ aap_group_name }}'"
       uri:
-        url: "https://{{ tower_server }}/api/v2/groups/{{ tower_inventory_group }}/hosts/"
+        url: "https://{{ tower_server }}/api/v2/groups/?search={{ aap_group_name }}"
+        validate_certs: no
+        method: GET
+        user: "{{ tower_user }}"
+        password: "{{ tower_pass }}"
+        force_basic_auth: yes
+        status_code: [200,202,204]
+        body_format: json
+      register: groupidcheck
+
+    - name: "Set the host_id fact"
+      set_fact:
+        group_id: "{{ groupidcheck.json.results[0].id }}"
+
+    - name: "Add host to the '{{ aap_group_name }}' Group Inventory"
+      uri:
+        url: "https://{{ tower_server }}/api/v2/groups/{{ group_id }}/hosts/"
         validate_certs: no
         method: POST
         body: >
           {
-             "id": {{ tower_host_id }}
+             "id": {{ host_id }}
           }
         user: "{{ tower_user }}"
         password: "{{ tower_pass }}"
