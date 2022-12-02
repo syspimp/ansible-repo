@@ -33,7 +33,7 @@
     - name: "Add to Tower 'builders' inventory group"
       include: add-builder-to-towergroup.yml
 
-    - name: "Add cleanup utility"
+    - name: "Add configured ansible.cfg to environments"
       template:
         src: ansible.cfg.j2
         dest: "/opt/execution-environments/{{ item }}/ansible.cfg"
@@ -58,3 +58,14 @@
         mode: 0444
       become: yes
   when: buildercheck.stdout == "false"
+
+- name: "[builder] Log into registry.redhat.io"
+  shell: |
+    podman login -u {{ SUBUSER }} -p {{ SUBPASS }} registry.redhat.io
+  become: yes
+
+- name: "[builder] Log into docker.io"
+  shell: |
+    podman login -u {{ DOCKERUSER }} -p {{ DOCKERPASS }} docker.io
+  become: yes
+
