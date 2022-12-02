@@ -33,6 +33,24 @@
     - name: "Add to Tower 'builders' inventory group"
       include: add-builder-to-towergroup.yml
 
+    - name: "Add cleanup utility"
+      template:
+        src: ansible.cfg.j2
+        dest: "/opt/execution-environments/{{ item }}/ansible.cfg"
+        owner: root
+        group: root
+        mode: 0755
+      become: yes
+      loop:
+        - hybrid
+        - vmware
+        - aws
+        - azure
+        - builder
+        - cisco
+        - gcp
+        - ibm
+
     - name: "[builder] config complete"
       file:
         path: /opt/.builder
