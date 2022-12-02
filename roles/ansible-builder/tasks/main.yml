@@ -51,6 +51,22 @@
         - gcp
         - ibm
 
+    - name: "[builder] Log into registry.redhat.io"
+      environment:
+        subuser: "{{ SUBUSER }}"
+        subpass: "{{ SUBPASS }}"
+      shell: |
+        podman login -u "${subuser}" -p "${subpass}" registry.redhat.io
+      become: yes
+
+    - name: "[builder] Log into docker.io"
+      environment:
+        dockeruser: "{{ DOCKERUSER }}"
+        dockerpass: "{{ DOCKERPASS }}"
+      shell: |
+        podman login -u "${dockeruser}" -p "${dockerpass}" docker.io
+      become: yes
+
     - name: "[builder] config complete"
       file:
         path: /opt/.builder
@@ -58,20 +74,4 @@
         mode: 0444
       become: yes
   when: buildercheck.stdout == "false"
-
-- name: "[builder] Log into registry.redhat.io"
-  environment:
-    subuser: "{{ SUBUSER }}"
-    subpass: "{{ SUBPASS }}"
-  shell: |
-    podman login -u "${subuser}" -p "${subpass}" registry.redhat.io
-  become: yes
-
-- name: "[builder] Log into docker.io"
-  environment:
-    dockeruser: "{{ DOCKERUSER }}"
-    dockerpass: "{{ DOCKERPASS }}"
-  shell: |
-    podman login -u "${dockeruser}" -p "${dockerpass}" docker.io
-  become: yes
 
