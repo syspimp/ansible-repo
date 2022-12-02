@@ -61,11 +61,11 @@
 
 - name: "[builder] Log into registry.redhat.io"
   shell: |
-    podman login -u {{ SUBUSER }} -p {{ SUBPASS }} registry.redhat.io
+    podman login -u '{{ SUBUSER }}' -p '{{ SUBPASS }}' registry.redhat.io
   become: yes
 
 - name: "[builder] Log into docker.io"
   shell: |
-    podman login -u {{ DOCKERUSER }} -p {{ DOCKERPASS }} docker.io
+    podman login -u '{{ DOCKERUSER }}' -p '{{ DOCKERPASS }}' docker.io
   become: yes
 
