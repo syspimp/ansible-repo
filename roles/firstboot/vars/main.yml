@@ -12,7 +12,7 @@ redhat_packages: ['sos','libselinux-python','rhel-system-roles','puppet','nspr',
 redhat8_packages: ['python3','git','firewalld','bind-utils']
 centos_packages: ['deltarpm','bash-completion','vim-enhanced','ntp','ntpdate','git','wget','bind-utils']
 fedora_packages: "deltarpm bash-completion ntp ntpdate git wget rsyslog bind-utils"
-enabled_svcs: ['sshd','rsyslog']
+enabled_svcs: ['sshd','rsyslog','NetworkManager']
 disabled_svcs: ['']
 #disabled_svcs: ['NetworkManager']
 rh_satellite_url: https://subscription.rhn.redhat.com

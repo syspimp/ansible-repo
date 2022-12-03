@@ -1,7 +1,8 @@
 ---
-capsule_loadbalancer_fqdn: capsule-lb.prod.maskedadmins.com
+capsule_loadbalancer_fqdn: capsule-lb.tfound.org
 #sat6_server: ip-11-22-33-182.prod.maskedadmins.com
-satellite_version: 6.9
+satellite_version: 6.11
+aap_group_name: capsule-lb
 capsules_inventory_group: 81
 rh_satellite_user: !vault |
           $ANSIBLE_VAULT;1.1;AES256
