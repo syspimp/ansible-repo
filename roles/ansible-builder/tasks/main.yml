@@ -33,6 +33,15 @@
     - name: "Add to Tower 'builders' inventory group"
       include: add-builder-to-towergroup.yml
 
+    - name: "Add private builder ssh key"
+      template:
+        src: privatesshkey.j2
+        dest: "/root/.ssh/builder"
+        owner: root
+        group: root
+        mode: 0400
+      become: yes
+
     - name: "Add configured ansible.cfg to environments"
       template:
         src: ansible.cfg.j2
