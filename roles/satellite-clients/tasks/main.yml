@@ -47,11 +47,21 @@
 
   - name: "debug the sat6 facts"
     debug:
-      var: "{{ hostipcheck }}"
+      var: "{{ hostipcheck.results }}"
+
+  - name: "Check if the satellite server is alive"
+    ansible.builtin.wait_for:
+      port: 80
+      host: "{{ hostipcheck.json.ansible_host }}"
+      delay: 2
+      timeout: 5
+    delegate_to: localhost
+    become: false
 
   - name: "Set the sat6_server fact"
     set_fact:
       sat6_server: "{{ hostipcheck.json.ansible_host }}"
+
 
   rescue:
   - name: There is no satellite server
