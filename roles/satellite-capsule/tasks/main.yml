@@ -76,7 +76,8 @@
     - name: "Wait 5 to 11 mins for host to reboot"
       wait_for:
         port: 22
-        host: "{{ ansible_ssh_host | default(inventory_hostname) }}"
+        host: "{{ inventory_hostname }}"
+        #host: "{{ ansible_ssh_host | default(inventory_hostname) }}"
         #search_regex: OpenSSH
         delay: 120
         timeout: 660
