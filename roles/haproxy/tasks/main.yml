@@ -20,6 +20,7 @@
       become: true
 
     - name: "Installing haproxy rpms"
+      ignore_errors: yes
       yum:
         name: ["haproxy","policycoreutils-python"]
         state: latest
@@ -63,6 +64,7 @@
 
   always:
   - name: "Add loadbalancer to the DNS"
+    ignore_errors: yes
     shell: |
       zone="{{ dns_domain }}"
       hostname="capsule-lb"
