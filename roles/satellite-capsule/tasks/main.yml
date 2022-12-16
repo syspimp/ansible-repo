@@ -171,6 +171,35 @@
         body_format: json
       register: hostidcheck
   
+    - name: "Set the sat6_hosturl fact"
+      set_fact:
+        sat6_hosturl: "{{ hostidcheck.json.results[0].related.variable_data }}"
+
+    - name: "Find the ip of the satellite-server"
+      uri:
+        url: "https://{{ tower_server }}/{{ sat6_hosturl }}"
+        validate_certs: no
+        method: GET
+        user: "{{ tower_user }}"
+        password: "{{ tower_pass }}"
+        force_basic_auth: yes
+        status_code: [200,202,204]
+        body_format: json
+      register: hostipcheck
+
+    - name: "debug the sat6 facts"
+      debug:
+        var: "{{ hostipcheck.results }}"
+
+    - name: "Wait 15 mins for the satellite server to become alive"
+      ansible.builtin.wait_for:
+        port: 80
+        host: "{{ hostipcheck.json.ansible_host }}"
+        delay: 2
+        timeout: 900
+      delegate_to: localhost
+      become: false
+
     - name: "Set the host_id fact"
       set_fact:
         sat6_server: "{{ hostidcheck.json.results[0].name }}"
