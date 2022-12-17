@@ -52,6 +52,14 @@
       /usr/sbin/semanage boolean --modify --on haproxy_connect_any
     become: yes
 
+  - name: "Disable cockpit if found"
+    service:
+      name: cockpit.socket
+      enabled: no
+      state: stopped
+    become: yes
+    ignore_errors: yes
+
   - name: "Enable and start haproxy"
     service:
       name: haproxy
