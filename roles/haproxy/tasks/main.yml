@@ -22,7 +22,8 @@
     - name: "Installing haproxy rpms"
       ignore_errors: yes
       yum:
-        name: ["haproxy","policycoreutils-python"]
+        #name: ["haproxy","policycoreutils-python"]
+        name: ["haproxy"]
         state: latest
       become: true
 
