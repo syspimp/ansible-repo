@@ -252,13 +252,13 @@ sat6_product_repomap:
     basearch: "x86_64"
     label: rhel-8-for-x86_64-baseos-kickstart
 #    id: 7421
-  - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream RPMs 8"
     releasever: "8"
     product: "Red Hat Enterprise Linux for x86_64"
     basearch: "x86_64"
     label: rhel-8-for-x86_64-appstream-rpms
 #    id: 7441
-  - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS RPMs 8"
     product: "Red Hat Enterprise Linux for x86_64"
     releasever: "8"
     basearch: "x86_64"

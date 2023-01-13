@@ -47,7 +47,7 @@
 
   - name: "debug the sat6 facts"
     debug:
-      var: "{{ hostipcheck.results }}"
+      var: "{{ hostipcheck.json }}"
 
   - name: "Check if the satellite server is alive"
     ansible.builtin.wait_for:
