@@ -242,7 +242,7 @@
       become: yes
       loop:
       - git
-      - ansible
+      - ansible-core
       - ansible-pcp
       - grafana
       - grafana-pcp
