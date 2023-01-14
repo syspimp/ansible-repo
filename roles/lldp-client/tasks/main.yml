@@ -1,0 +1,29 @@
+---
+- name: Install the latest version of lldpd
+  ansible.builtin.package:
+    name: lldpd
+    state: latest
+  become: yes
+
+- name: Start the service
+  ansible.builtin.service:
+    name: lldpd
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Gather information from lldp
+  community.general.lldp:
+
+- name: Print each switch/port
+  ansible.builtin.debug:
+   msg: "{{ lldp[item]['chassis']['name'] }} / {{ lldp[item]['port']['ifname'] }}"
+  with_items: "{{ lldp.keys() }}"
+  when: lldp[item] is defined
+
+- name: Dump it all
+  ansible.builtin.debug:
+   msg: "{{ item }}"
+  with_items: "{{ lldp }}"
+  #when: lldp[item] is defined
+

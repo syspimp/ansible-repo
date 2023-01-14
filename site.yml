@@ -1,10 +1,12 @@
 ---
 - name: Firstboot configuration tasks
-  hosts: all:!cfme*:!cloudforms*
+  hosts: all
   roles:
     - firstboot
-    - insights
-    - snmp-client
+
+- name: Role specific tasks
+  hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsules*:!monitoring
+  roles:
     - awsroles
     - vmwareroles
 
@@ -12,9 +14,12 @@
   hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsules*:!monitoring
   become: yes
   roles:
+    - insights
     - webconsole
     - leapp-upgrade
     - rsyslog-client
+    - lldp-client
+    - snmp-client
 
 - name: Satellite clients
   hosts: all:!sat6*:!satellite*:!management*
@@ -22,7 +27,7 @@
   roles:
     - satellite-clients
 
-- name: "Create ansible build environment"
+- name: Create ansible build environment
   hosts: builder*
   become: yes
   roles:
