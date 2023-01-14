@@ -34,6 +34,7 @@
       include_role:
         name: "{{ ansible_local['role'] | default(ansible_local['vmwareroles']['default']['role'],True) }}"
       when:
+      - ansible_local['vmwareroles']['default'] is defined
       - ansible_local['vmwareroles']['default']['role'] != 'None'
     
     - name: "Include secondary roles for vmware servers"
@@ -48,6 +49,7 @@
         name: "{{ ansible_local['role'] }}"
       when:
       - ansible_local['role'] is defined
+      - ansible_local['role'] != 'None'
   when: "(ansible_local['vmwareroles']['default']['role'] is defined) or (ansible_local['vmwareroles']['secondary']['role'] is defined) or (ansible_local['role'] is defined)"
 
   rescue:
