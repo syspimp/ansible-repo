@@ -38,6 +38,7 @@
   environment: "{{ sat6_environment_vars }}"
   roles:
     - satellite-server
+    - satellite-oscap
 
 - name: Configure Satellite Capsules
   hosts: capsules*
