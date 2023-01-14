@@ -1,27 +1,27 @@
 ---
 - name: "Block for esxi vm config management"
   block:
-  - name: "Set role fact for esxi vms"
-    shell: |
-      /usr/bin/vmware-rpctool "info-get guestinfo.role"
-    register: esxirole
+    - name: "Set role fact for esxi vms"
+      shell: |
+        /usr/bin/vmware-rpctool "info-get guestinfo.role"
+      register: esxirole
 
-  - name: "Set second role fact for esxi vms"
-    shell: |
-      /usr/bin/vmware-rpctool "info-get guestinfo.secondaryrole"
-    register: esxirole2
+    - name: "Set second role fact for esxi vms"
+      shell: |
+        /usr/bin/vmware-rpctool "info-get guestinfo.secondaryrole"
+      register: esxirole2
 
-  - name: "Include roles for vmware servers"
-    include_role:
-      name: "{{ esxirole.stdout }}"
-    when:
-    - esxirole.stdout != 'None'
+    - name: "Include roles for vmware servers"
+      include_role:
+        name: "{{ esxirole.stdout }}"
+      when:
+      - esxirole.stdout != 'None'
 
-  - name: "Include secondary roles for vmware servers"
-    include_role:
-      name: "{{ esxirole2.stdout }}"
-    when:
-    - esxirole2.stdout != 'None'
+    - name: "Include secondary roles for vmware servers"
+      include_role:
+        name: "{{ esxirole2.stdout }}"
+      when:
+      - esxirole2.stdout != 'None'
 
   rescue:
     - name:
@@ -30,25 +30,25 @@
 
 - name: "block to check for facts.d vmware role"
   block:
-  - name: "Include roles for VMware servers from facts.d"
-    include_role:
-      name: "{{ ansible_local['role'] | default(ansible_local['vmwareroles']['default']['role'],True) }}"
-    when:
-    - ansible_local['vmwareroles']['default']['role'] != 'None'
-  
-  - name: "Include secondary roles for vmware servers"
-    include_role:
-      name: "{{ ansible_local['awsroles']['secondary']['role'] }}"
-    when:
-    - ansible_local['vmwareroles']['secondary'] is defined
-    - ansible_local['vmwareroles']['secondary']['role'] != 'None'
+    - name: "Include roles for VMware servers from facts.d"
+      include_role:
+        name: "{{ ansible_local['role'] | default(ansible_local['vmwareroles']['default']['role'],True) }}"
+      when:
+      - ansible_local['vmwareroles']['default']['role'] != 'None'
+    
+    - name: "Include secondary roles for vmware servers"
+      include_role:
+        name: "{{ ansible_local['awsroles']['secondary']['role'] }}"
+      when:
+      - ansible_local['vmwareroles']['secondary'] is defined
+      - ansible_local['vmwareroles']['secondary']['role'] != 'None'
 
-  - name: "Include roles for VMware servers from facts.d"
-    include_role:
-      name: "{{ ansible_local['role'] }}"
-    when:
-    - ansible_local['role'] is defined
-  when: "(ansible_local['vmwareroles']['default']['role'] is defined) or (ansible_local['role'] is defined)"
+    - name: "Include roles for VMware servers from facts.d"
+      include_role:
+        name: "{{ ansible_local['role'] }}"
+      when:
+      - ansible_local['role'] is defined
+  when: "(ansible_local['vmwareroles']['default']['role'] is defined) or (nsible_local['vmwareroles']['secondary']['role'] is defined) or (ansible_local['role'] is defined)"
 
   rescue:
     - name:
