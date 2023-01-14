@@ -86,7 +86,7 @@ sat6:
     - name: "ESXI_TFOUND"
       prefix: "8"
       network: "10.0.0.0"
-      mask: "255.255.255.0"
+      mask: "255.0.0.0"
       domain: "tfound.org"
       #domain: "prod.maskedadmins.com"
       location: "ESXI_TFOUND"
@@ -200,7 +200,7 @@ sat6_product_repomap:
     releasever: "7Server"
     label: rhel-7-server-kickstart
     releasever: "{{ rhel7latestversion }}"
-    basearch: "x86_64"
+#    basearch: "x86_64"
 #    id: 2455
   - name: "Red Hat Enterprise Linux 7 Server - RH Common (RPMs)"
     product: "Red Hat Enterprise Linux Server"
@@ -220,7 +220,7 @@ sat6_product_repomap:
     product: "Red Hat Enterprise Linux Server"
     releasever: "7Server"
 #    releasever: "7Server"
-    basearch: "x86_64"
+#    basearch: "x86_64"
     label: rhel-7-server-satellite-utils-6.11-rpms
 #    id: 11502
   - name: "Red Hat Enterprise Linux 7 Server - Supplementary (RPMs)"
@@ -246,10 +246,10 @@ sat6_product_repomap:
 - name: "Red Hat Enterprise Linux for x86_64"
   productid: 21
   repoids:
-  - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)"
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart {{ rhel8latestversion }}"
     product: "Red Hat Enterprise Linux for x86_64"
     releasever: "{{ rhel8latestversion }}"
-    basearch: "x86_64"
+    #basearch: "x86_64"
     label: rhel-8-for-x86_64-baseos-kickstart
 #    id: 7421
   - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream RPMs 8"
@@ -264,22 +264,22 @@ sat6_product_repomap:
     basearch: "x86_64"
     label: rhel-8-for-x86_64-baseos-rpms
 #    id: 7416
-  - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)"
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream Kickstart {{ rhel8latestversion }}"
     product: "Red Hat Enterprise Linux for x86_64"
     releasever: "{{ rhel8latestversion }}"
-    basearch: "x86_64"
+    #basearch: "x86_64"
     label: rhel-8-for-x86_64-appstream-kickstart
 #    id: 7446
-  - name: "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - Supplementary RPMs {{ rhel8latestversion }}"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "8"
-    basearch: "x86_64"
+    releasever: "{{ rhel8latestversion }}"
+#    basearch: "x86_64"
     label: rhel-8-for-x86_64-supplementary-rpms
 #    id: 7932
-  - name: "Red Hat Satellite Utils {{ satellite_version }} for RHEL 8 x86_64 (RPMs)"
+  - name: "Red Hat Satellite Utils {{ satellite_version }} for RHEL 8 x86_64 RPMs"
     product: "Red Hat Enterprise Linux for x86_64"
 #    releasever: "8"
-    basearch: "x86_64"
+#    basearch: "x86_64"
     label: satellite-utils-6.11-for-rhel-8-x86_64-rpms
 #    id: 11462
 - name: "Red Hat Software Collections (for RHEL Server)"
@@ -300,10 +300,10 @@ sat6_product_repomap:
     basearch: "x86_64"
     label: rhel-7-server-ansible-2.9-rpms
 #    id: 9318
-  - name: "Red Hat Ansible Engine 2.9 for RHEL 8 x86_64 (RPMs)"
+  - name: "Red Hat Ansible Engine 2.9 for RHEL 8 x86_64 RPMs"
     product: "Red Hat Ansible Engine"
 #    releasever: "8"
-    basearch: "x86_64"
+#    basearch: "x86_64"
     label: ansible-2.9-for-rhel-8-x86_64-rpms
 #    id: 9330
   - name: "Red Hat Automation Hub 4.2 for RHEL 8 x86_64 RPMs"
@@ -313,8 +313,8 @@ sat6_product_repomap:
     label: ansible-automation-platform-2.2-for-rhel-8-x86_64-rpms
   - name: "Red Hat Ansible Automation Platform 2.2 for RHEL 8 x86_64 RPMs"
     product: "Red Hat Ansible Engine"
-    releasever: "8"
-    basearch: "x86_64"
+#    releasever: "8"
+#   basearch: "x86_64"
     label: automation-hub-4.2-for-rhel-8-x86_64-rpms
 - name: "Red Hat Satellite"
   productid: 50
