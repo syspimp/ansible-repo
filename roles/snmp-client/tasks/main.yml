@@ -19,14 +19,10 @@
     dest: /etc/snmp/snmpd.conf
     mode: '0644'
   become: true
+  notify:
+    - "Enable and start snmpd service"
 
 - name: "Restore selinux context on  /etc/snmp/snmpd.conf"
   shell: restorecon /etc/snmp/snmpd.conf
   become: yes
 
-- name: "Enable and start snmpd service"
-  service:
-    name: snmpd
-    state: started
-    enabled: yes
-  become: true

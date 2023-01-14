@@ -1,7 +1,7 @@
 ---
 - name: "Update /etc/rsyslog.d with template"
   template:
-    content: zenoss.conf.j2
+    src: zenoss.conf.j2
     dest: /etc/rsyslog.d/zenoss.conf
     mode: '0600'
   notify:

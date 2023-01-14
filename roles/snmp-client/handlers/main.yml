@@ -1,0 +1,7 @@
+---
+- name: "Enable and start snmpd service"
+  service:
+    name: snmpd
+    state: restarted
+    enabled: yes
+  become: true
