@@ -12,7 +12,7 @@ builder_repos:
   - ansible-automation-platform-2.2-for-rhel-8-x86_64-rpms
   - rhel-8-for-x86_64-appstream-rpms
   - rhel-8-for-x86_64-baseos-rpms
-  - codeready-builder-for-rhel-8-x86_64-rpm
+  - codeready-builder-for-rhel-8-x86_64-rpms
 builder_github: "https://github.com/syspimp/aap-repo"
 builder_privatesshkey: !vault |
           $ANSIBLE_VAULT;1.1;AES256
