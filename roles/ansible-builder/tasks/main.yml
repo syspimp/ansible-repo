@@ -27,7 +27,7 @@
       ansible.builtin.git:
         repo: 'https://github.com/syspimp/aap-repo.git'
         clone: yes
-        dest: /opt
+        dest: /opt/aap-repo
       become: yes
 
     - name: "Add to Tower 'builders' inventory group"
@@ -45,7 +45,7 @@
     - name: "Add configured ansible.cfg to environments"
       template:
         src: ansible.cfg.j2
-        dest: "/opt/execution-environments/{{ item }}/ansible.cfg"
+        dest: "/opt/aap-repo/execution-environments/{{ item }}/ansible.cfg"
         owner: root
         group: root
         mode: 0755
