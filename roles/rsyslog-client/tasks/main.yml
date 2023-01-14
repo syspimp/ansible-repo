@@ -7,6 +7,6 @@
   notify:
     - restart rsyslogd
 
-- name: "Restore selinux context on  /etc/snmp/snmpd.conf"
+- name: "Restore selinux context on /etc/rsyslog.d"
   shell: restorecon -R /etc/rsyslog.d
   become: yes
