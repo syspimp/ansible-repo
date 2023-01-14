@@ -48,7 +48,7 @@
         name: "{{ ansible_local['role'] }}"
       when:
       - ansible_local['role'] is defined
-  when: "(ansible_local['vmwareroles']['default']['role'] is defined) or (nsible_local['vmwareroles']['secondary']['role'] is defined) or (ansible_local['role'] is defined)"
+  when: "(ansible_local['vmwareroles']['default']['role'] is defined) or (ansible_local['vmwareroles']['secondary']['role'] is defined) or (ansible_local['role'] is defined)"
 
   rescue:
     - name:
