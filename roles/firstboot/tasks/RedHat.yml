@@ -62,7 +62,7 @@
       sat6_fqdn: "{{ fqdnname.stdout }}"
     when:
         - ansible_local['awsroles'] is defined
-  when:  firstbootcheck.stat.exists == "false"
+  when:  firstbootcheck.stat.exists == false
 
   rescue:
     - name: "[rescue] satellite-servers: Get fqdn for the satellite server from localhost"
@@ -301,7 +301,7 @@
       become: true
       when:
       - ansible_distribution_major_version == '8'
-  when: firstbootcheck.stat.exists == "false"
+  when: firstbootcheck.stat.exists == false
   
 - name: entitlement block
   block:
@@ -311,7 +311,7 @@
       become: yes
       when:
       - ansible_distribution_major_version == '8'
-      - firstbootcheck.stat.exists == "false"
+      - firstbootcheck.stat.exists == false
 
   rescue:
     - name: "well that didn't work"
