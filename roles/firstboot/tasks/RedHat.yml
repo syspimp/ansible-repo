@@ -1,93 +1,97 @@
 ---
 - name: "Firstboot check"
-  shell: |
-    if [ -e "/opt/.firstboot" ]
-    then
-      echo "true"
-    else
-      echo "false"
-    fi
+  stat:
+    path: /opt/.firstboot
   register: firstbootcheck
 
 - name: "First boot configuration block for aws"
   block:
-    - name: "Grab Satellite information block"
-      block:
-        - name: "Find Group Inventory for 'capsule-lb'"
-          uri:
-            url: "https://{{ tower_server }}/api/v2/groups/?search=capsule-lb"
-            validate_certs: no
-            method: GET
-            user: "{{ tower_user }}"
-            password: "{{ tower_pass }}"
-            force_basic_auth: yes
-            status_code: [200,202,204]
-            body_format: json
-          register: groupidcheck
-   
-        - name: "Set the host_id fact"
-          set_fact:
-            satgroup_host_id: "{{ groupidcheck.json.results[0].id }}"
-      
-        - name: "Find the name of the satellite-server"
-          uri:
-            url: "https://{{ tower_server }}/api/v2/groups/{{ satgroup_host_id }}/hosts"
-            validate_certs: no
-            method: GET
-            user: "{{ tower_user }}"
-            password: "{{ tower_pass }}"
-            force_basic_auth: yes
-            status_code: [200,202,204]
-            body_format: json
-          register: hostidcheck
-      
-        - name: "Set the host_id fact for non sat servers"
-          set_fact:
-            sat6_server: "{{ hostidcheck.json.results[0].name }}"
-    
-        - name: "Get fqdn for the satellite server for non sat servers"
-          shell: |
-            hostname --fqdn
-          register: fqdnname
-          delegate_to: "{{ sat6_server }}"
-        
-        - name: "Set the fqdn hostname fact"
-          set_fact:
-            sat6_fqdn: "{{ fqdnname.stdout }}"
+  - name: "Find Group Inventory for 'capsule-lb'"
+    uri:
+      url: "https://{{ tower_server }}/api/v2/groups/?search=capsule-lb"
+      validate_certs: no
+      method: GET
+      user: "{{ tower_user }}"
+      password: "{{ tower_pass }}"
+      force_basic_auth: yes
+      status_code: [200,202,204]
+      body_format: json
+    register: groupidcheck
+    when:
+        - ansible_local['awsroles'] is defined
+
+  - name: "Set the host_id fact"
+    set_fact:
+      satgroup_host_id: "{{ groupidcheck.json.results[0].id }}"
+    when:
+        - ansible_local['awsroles'] is defined
+
+  - name: "Find the name of the satellite-server"
+    uri:
+      url: "https://{{ tower_server }}/api/v2/groups/{{ satgroup_host_id }}/hosts"
+      validate_certs: no
+      method: GET
+      user: "{{ tower_user }}"
+      password: "{{ tower_pass }}"
+      force_basic_auth: yes
+      status_code: [200,202,204]
+      body_format: json
+    register: hostidcheck
+    when:
+        - ansible_local['awsroles'] is defined
+
+  - name: "Set the host_id fact for non sat servers"
+    set_fact:
+      sat6_server: "{{ hostidcheck.json.results[0].name }}"
+    when:
+        - ansible_local['awsroles'] is defined
+
+  - name: "Get fqdn for the satellite server for non sat servers"
+    shell: |
+      hostname --fqdn
+    register: fqdnname
+    delegate_to: "{{ sat6_server }}"
+    when:
+        - ansible_local['awsroles'] is defined
+  
+  - name: "Set the fqdn hostname fact"
+    set_fact:
+      sat6_fqdn: "{{ fqdnname.stdout }}"
+    when:
+        - ansible_local['awsroles'] is defined
+  when:  firstbootcheck.stat.exists == "false"
+
+  rescue:
+    - name: "[rescue] satellite-servers: Get fqdn for the satellite server from localhost"
+      shell: |
+        hostname --fqdn
+      register: fqdnname
       when:
-          - ansible_local['awsroles'] is defined
-      rescue:
-        - name: "[rescue] satellite-servers: Get fqdn for the satellite server from localhost"
-          shell: |
-            hostname --fqdn
-          register: fqdnname
-          when:
-          - ansible_local['awsroles']['default'] is defined
-          - ansible_local['awsroles']['default']['role'] == 'satellite-server'
+      - ansible_local['awsroles']['default'] is defined
+      - ansible_local['awsroles']['default']['role'] == 'satellite-server'
 
-        - name: "[rescue] satellite-servers: Set the fqdn hostname fact"
-          set_fact:
-            sat6_fqdn: "{{ fqdnname.stdout }}"
-          when:
-          - ansible_local['awsroles']['default'] is defined
-          - ansible_local['awsroles']['default']['role'] == 'satellite-server'
+    - name: "[rescue] satellite-servers: Set the fqdn hostname fact"
+      set_fact:
+        sat6_fqdn: "{{ fqdnname.stdout }}"
+      when:
+      - ansible_local['awsroles']['default'] is defined
+      - ansible_local['awsroles']['default']['role'] == 'satellite-server'
 
-        - name: "[rescue] satellite-servers: Set the server ip fact"
-          set_fact:
-            sat6_server: "{{ inventory_hostname }}"
-          when:
-          - ansible_local['awsroles']['default'] is defined
-          - ansible_local['awsroles']['default']['role'] == 'satellite-server'
+    - name: "[rescue] satellite-servers: Set the server ip fact"
+      set_fact:
+        sat6_server: "{{ inventory_hostname }}"
+      when:
+      - ansible_local['awsroles']['default'] is defined
+      - ansible_local['awsroles']['default']['role'] == 'satellite-server'
 
-        - name: "[rescue] No Satellite defined. Set the facts to None"
-          set_fact:
-            sat6_fqdn: "None"
-            sat6_server: "None"
-          when:
-          - ansible_local['awsroles']['default'] is defined
-          - ansible_local['awsroles']['default']['role'] != 'satellite-server'
-  when:
-    - firstbootcheck.stdout == "false"
+    - name: "[rescue] No Satellite defined. Set the facts to None"
+      set_fact:
+        sat6_fqdn: "None"
+        sat6_server: "None"
+      when:
+      - ansible_local['awsroles']['default'] is defined
+      - ansible_local['awsroles']['default']['role'] != 'satellite-server'
+
 - name: "First boot configuration block for aws"
   block:
     # end of aws block
@@ -294,8 +298,7 @@
       become: true
       when:
       - ansible_distribution_major_version == '8'
-  when: 
-  - firstbootcheck.stdout == "false"
+  when:  firstbootcheck.stat.exists == "false"
   
 - name: entitlement block
   block:
@@ -303,9 +306,9 @@
       shell: "subscription-manager status || true"
       register: rhsm_reg
       become: yes
-  when:
-  - ansible_distribution_major_version == '8'
-  - firstbootcheck.stdout == "false"
+      when:
+      - ansible_distribution_major_version == '8'
+      - firstbootcheck.stat.exists == "false"
 
   rescue:
     - name: "well that didn't work"
