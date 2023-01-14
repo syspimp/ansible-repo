@@ -4,6 +4,9 @@
     path: /opt/.firstboot
   register: firstbootcheck
 
+- name: "debug"
+  debug: var=firstbootcheck
+
 - name: "First boot configuration block for aws"
   block:
   - name: "Find Group Inventory for 'capsule-lb'"
@@ -107,7 +110,7 @@
       shell: rpm -qa
       register: rpmlist
     
-    - name: "list the rpms installed"
+    - name: "list the repos installed"
       shell: yum repolist
       register: repolist
     
@@ -298,7 +301,7 @@
       become: true
       when:
       - ansible_distribution_major_version == '8'
-  when:  firstbootcheck.stat.exists == "false"
+  when: firstbootcheck.stat.exists == "false"
   
 - name: entitlement block
   block:
@@ -338,15 +341,15 @@
       shell:  yum clean all
       become: true
 
-    - name: "first boot complete"
-      file:
-        path: "/opt/{{ item }}"
-        state: touch
-        mode: 0444
-      become: true
-      loop:
-      - '.firstboot'
-      - '.bootstrap'
+- name: "first boot complete"
+  file:
+    path: "/opt/{{ item }}"
+    state: touch
+    mode: 0444
+  become: true
+  loop:
+  - '.firstboot'
+  - '.bootstrap'
 
 #- name: entitlement block
 #  block:
