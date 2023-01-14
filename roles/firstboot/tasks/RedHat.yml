@@ -86,6 +86,8 @@
           when:
           - ansible_local['awsroles']['default'] is defined
           - ansible_local['awsroles']['default']['role'] != 'satellite-server'
+  when:
+    - firstbootcheck.stdout == "false"
 - name: "First boot configuration block for aws"
   block:
     # end of aws block
@@ -298,7 +300,7 @@
 - name: entitlement block
   block:
     - name: "Fall back to RHSM, Check if we are registered"
-      shell: "subscription-manager status"
+      shell: "subscription-manager status || true"
       register: rhsm_reg
       become: yes
   when:
