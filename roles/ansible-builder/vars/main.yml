@@ -10,6 +10,8 @@ builder_pkgs:
 builder_repos:
   - ansible-2.9-for-rhel-8-x86_64-rpms
   - ansible-automation-platform-2.2-for-rhel-8-x86_64-rpms
+  - rhel-8-for-x86_64-appstream-rpms
+  - rhel-8-for-x86_64-baseos-rpms']
 builder_github: "https://github.com/syspimp/aap-repo"
 builder_privatesshkey: !vault |
           $ANSIBLE_VAULT;1.1;AES256

@@ -59,6 +59,7 @@
         - cisco
         - gcp
         - ibm
+        - ffmpeg
 
     - name: "[builder] Log into registry.redhat.io"
       environment:
