@@ -1,66 +1,12 @@
 ---
-- name: "Create the nfs mount point"
-  file:
-    path: "{{ nfs_mountpoint }}"
-    mode: '0777'
-    state: directory
-
-- name: "Update /etc/exports"
+- name: "Update /etc/rsyslog.d with template"
   template:
-    content: exports.j2
-    dest: /etc/exports
+    content: zenoss.conf.j2
+    dest: /etc/rsyslog.d/zenoss.conf
     mode: '0600'
+  notify:
+    - restart rsyslogd
 
-- name: "Installing selinux related rpms"
-  yum:
-    name: "{{ item }}"
-    state: latest
-  become: true
-  loop:
-  - policycoreutils-python-utils
-  - policycoreutils-python
-
-- name: "Enable selinxux contexts/flags for nfs"
-  shell: |
-   setsebool -P nfs_export_all_rw 1
-   setsebool -P nfs_export_all_ro 1
-   semanage fcontext -a -t public_content_rw_t  "{{ nfs_mountpoint }}(/.*)?"
-   restorecon -R {{ nfs_mountpoint }}
+- name: "Restore selinux context on  /etc/snmp/snmpd.conf"
+  shell: restorecon -R /etc/rsyslog.d
   become: yes
-
-- name: "Enable and start nfs services"
-  service:
-    name: "{{ item }}"
-    state: running
-    enabled: yes
-  loop:
-  - rpcbind
-  - nfs-lock
-  - nfs-idmap
-  - nfs-server
-
-
-
-
-
-
-- name: "Installing snmp related rpms"
-  yum:
-    name: "{{ item }}"
-    state: latest
-  become: true
-  loop:
-  - net-snmp
-  - net-snmp-devel
-
-- name: "Update /etc/snmp/snmpd.conf"
-  template:
-    content: exports.j2
-    dest: /etc/exports
-    mode: '0600'
-
-- name: "Enable and start snmpd service"
-  service:
-    name: snmpd
-    state: running
-    enabled: yes

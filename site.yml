@@ -9,11 +9,12 @@
     - vmwareroles
 
 - name: Supporting roles
-  hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsules*
+  hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsules*:!monitoring
   become: yes
   roles:
     - webconsole
     - leapp-upgrade
+    - rsyslog-client
 
 - name: Satellite clients
   hosts: all:!sat6*:!satellite*:!management*
