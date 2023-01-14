@@ -22,8 +22,9 @@
     - name: "Enable satellite tools repos"
       shell: |
         subscription-manager repos \
-        --enable rhel-7-server-satellite-tools-{{ satellite_version }}-rpms \
-        --enable=rhel-7-server-extras-rpms
+        --enable satellite-tools-6.10-for-rhel-8-x86_64-rpms
+#        --enable rhel-7-server-satellite-tools-{{ satellite_version }}-rpms \
+#        --enable=rhel-7-server-extras-rpms
       become: true
 
     - name: "Installing oscap rpms"
