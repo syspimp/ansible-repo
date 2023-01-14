@@ -39,7 +39,7 @@
     
     - name: "Include secondary roles for vmware servers"
       include_role:
-        name: "{{ ansible_local['awsroles']['secondary']['role'] }}"
+        name: "{{ ansible_local['vmwareroles']['secondary']['role'] }}"
       when:
       - ansible_local['vmwareroles']['secondary'] is defined
       - ansible_local['vmwareroles']['secondary']['role'] != 'None'
