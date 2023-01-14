@@ -255,13 +255,13 @@ sat6_product_repomap:
   - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream RPMs 8"
     releasever: "8"
     product: "Red Hat Enterprise Linux for x86_64"
-    basearch: "x86_64"
+#    basearch: "x86_64"
     label: rhel-8-for-x86_64-appstream-rpms
 #    id: 7441
   - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS RPMs 8"
     product: "Red Hat Enterprise Linux for x86_64"
     releasever: "8"
-    basearch: "x86_64"
+#    basearch: "x86_64"
     label: rhel-8-for-x86_64-baseos-rpms
 #    id: 7416
   - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream Kickstart {{ rhel8latestversion }}"
@@ -296,26 +296,32 @@ sat6_product_repomap:
   repoids:
   - name: "Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server"
     product: "Red Hat Ansible Engine"
-#    releasever: "7Server"
+    releasever: "7Server"
     basearch: "x86_64"
     label: rhel-7-server-ansible-2.9-rpms
 #    id: 9318
   - name: "Red Hat Ansible Engine 2.9 for RHEL 8 x86_64 RPMs"
     product: "Red Hat Ansible Engine"
-#    releasever: "8"
+    releasever: "8"
 #    basearch: "x86_64"
     label: ansible-2.9-for-rhel-8-x86_64-rpms
+#    id: 9330
+  - name: "Red Hat Ansible Engine 2 for RHEL 8 x86_64 (RPMs)"
+    product: "Red Hat Ansible Engine"
+    releasever: "8"
+#    basearch: "x86_64"
+    label: ansible-2-for-rhel-8-x86_64-rpms
 #    id: 9330
   - name: "Red Hat Automation Hub 4.2 for RHEL 8 x86_64 RPMs"
     product: "Red Hat Ansible Engine"
     releasever: "8"
-    basearch: "x86_64"
-    label: ansible-automation-platform-2.2-for-rhel-8-x86_64-rpms
+#    basearch: "x86_64"
+    label: automation-hub-4.2-for-rhel-8-x86_64-rpms
   - name: "Red Hat Ansible Automation Platform 2.2 for RHEL 8 x86_64 RPMs"
     product: "Red Hat Ansible Engine"
-#    releasever: "8"
+    releasever: "8"
 #   basearch: "x86_64"
-    label: automation-hub-4.2-for-rhel-8-x86_64-rpms
+    label: ansible-automation-platform-2.2-for-rhel-8-x86_64-rpms
 - name: "Red Hat Satellite"
   productid: 50
   repoids:
