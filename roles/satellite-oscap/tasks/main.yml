@@ -279,7 +279,7 @@
         shell: |
           hammer policy create --hostgroup-ids {{ item }} --location-id 2 --organization-id 1 --period weekly --weekday friday --scap-content-id 4 --scap-content-profile-id 33 --deploy-by ansible --name "SCAP RHEL7 DSS Policy"
         loop: "{{ hostgroupids.stdout.split() }}"
-        when: ansible_local['awsroles']['default']['role'] == 'satellite-server' 
+        when: ( ansible_local['awsroles'] is defined and ansible_local['awsroles']['default']['role'] == 'satellite-server') or (ansible_local['vmwareroles'] is defined and ansible_local['vmwareroles']['default']['role'] == 'satellite-server')
         args:
           creates: /root/.setup/oscap-ansible3
         #delegate_to: "{{ sat6_server }}"
@@ -288,6 +288,7 @@
       - name: "Ansible step complete"
         shell: touch /root/.setup/oscap-ansible3
         become: true
+        when: ( ansible_local['awsroles'] is defined and ansible_local['awsroles']['default']['role'] == 'satellite-server') or (ansible_local['vmwareroles'] is defined and ansible_local['vmwareroles']['default']['role'] == 'satellite-server')
         args:
           creates: /root/.setup/oscap-ansible3
         #delegate_to: "{{ sat6_server }}"
@@ -307,4 +308,4 @@
           creates: /root/.setup/oscap-ansible4
         become: true
         #delegate_to: "{{ sat6_server }}"
-      when: ansible_local['awsroles']['default']['role'] == 'satellite-server' 
+      when: ( ansible_local['awsroles'] is defined and ansible_local['awsroles']['default']['role'] == 'satellite-server') or (ansible_local['vmwareroles'] is defined and ansible_local['vmwareroles']['default']['role'] == 'satellite-server')
