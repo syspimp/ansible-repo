@@ -1,5 +1,5 @@
 ---
 - name: Refresh Monitoring
-  hosts: monitoring
+  hosts: all
   roles:
     - zenoss-monitoring
