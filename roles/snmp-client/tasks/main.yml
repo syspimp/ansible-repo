@@ -8,7 +8,7 @@
     name: "{{ item }}"
     state: latest
   become: true
-  when: item not in rpmlist.stdout
+  #when: item not in rpmlist.stdout
   loop:
   - net-snmp
   - net-snmp-devel
