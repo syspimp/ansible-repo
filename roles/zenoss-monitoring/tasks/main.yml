@@ -8,7 +8,7 @@
 - name: zenoss.service file
   template:
     src: zenoss.service.j2
-    dest: /etc/systemd/system/zenoss.service.j2
+    dest: /etc/systemd/system/zenoss.service
   become: yes
 
 - name: Reread configs to pick up minikube service
