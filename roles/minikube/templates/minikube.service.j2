@@ -1,0 +1,18 @@
+[Unit]
+Description=Kickoff Minikube Cluster
+Wants=network.target network-online.target
+After=network.target network-online.target
+
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/minikube start --force --driver=podman --container-runtime=cri-o
+RemainAfterExit=true
+ExecStop=/usr/bin/minikube stop
+StandardOutput=journal
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
+

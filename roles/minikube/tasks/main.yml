@@ -1,21 +1,27 @@
 ---
-- name: grab the rpm from google
+- name: grab the minkube rpm from google
   get_url:
     url: https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
     dest: /tmp/minikube-latest.x86_64.rpm
     mode: '0440'
 
-- name: put in kubectl repo file
+- name: kubectl repo file
   template:
     src: kube.repo.j2
     dest: /etc/yum.repos.d/kube.repo
+  become: yes
+
+- name: minikube.service file
+  template:
+    src: minikube.service.j2
+    dest: /etc/systemd/system/minikube.service.j2
   become: yes
 
 - name: install minikube rpm
   shell: yum -y localinstall /tmp/minikube-latest.x86_64.rpm
   become: yes
 
-- name: install kubectl rpm
+- name: install kubectl and podman
   yum:
     name: "{{ item }}"
     state: present
@@ -24,10 +30,14 @@
   - kubectl
   become: yes
 
-- name: start minikube with non root user
-  shell: |
-    #minikube config set driver podman
-    minikube start --force --driver=podman --container-runtime=cri-o && touch .minikube-installed
-  become: no
-  args:
-    creates: .minikube-installed
+- name: Reread configs to pick up minikube service
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  become: yes
+
+- name: start minikube service
+  service:
+    name: minikube
+    state: started
+    enabled: true
+  become: yes
