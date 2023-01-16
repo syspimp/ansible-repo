@@ -5,7 +5,7 @@ After=minikube.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/kubectl port-forward service/zenoss4-nginx --address 0.0.0.0 30080:80 -n monitoring
+ExecStart=/usr/bin/nohup /usr/bin/kubectl port-forward service/zenoss4-nginx --address 0.0.0.0 30080:80 -n monitoring
 RemainAfterExit=true
 StandardOutput=journal
 User=root
