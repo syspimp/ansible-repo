@@ -1,0 +1,15 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    host2check: None
+  tasks:
+    - name: "Wait at least a minute and half, max 6 mins for host to reboot"
+      ansible.builtin.wait_for:
+        port: 22
+        host: "{{ host2check }}"
+        search_regex: OpenSSH
+        delay: 90
+        timeout: 360
+      become: false

@@ -5,6 +5,17 @@
   args:
     creates: /opt/.zenoss-configed
 
+- name: zenoss.service file
+  template:
+    src: zenoss.service.j2
+    dest: /etc/systemd/system/zenoss.service.j2
+  become: yes
+
+- name: Reread configs to pick up minikube service
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  become: yes
+
 - name: get the namespaces available
   shell: kubectl get namespace
   register: namespaces
@@ -93,18 +104,25 @@
   args:
     creates: /opt/.zenoss-configed2
 
-- name: expose the service on port 30080
-  shell: |
-    kubectl get pods -n {{ zenoss_namespace }}
-    sleep 20
-    kubectl get pods -n {{ zenoss_namespace }}
-    nohup kubectl port-forward service/zenoss4-nginx --address 0.0.0.0 30080:80 -n {{ zenoss_namespace }} </dev/null >/dev/null 2>&1 &
-    sleep 5
-    disown
-    sleep 1
-  args:
-    creates: /opt/.zenoss-configed2
-    executable: /bin/bash
+- name: start zenoss port forward service
+  service:
+    name: zenoss
+    state: started
+    enabled: true
+  become: yes
+
+#- name: expose the service on port 30080
+#  shell: |
+#    kubectl get pods -n {{ zenoss_namespace }}
+#    sleep 20
+#    kubectl get pods -n {{ zenoss_namespace }}
+#    nohup kubectl port-forward service/zenoss4-nginx --address 0.0.0.0 30080:80 -n {{ zenoss_namespace }} </dev/null >/dev/null 2>&1 &
+#    sleep 5
+#    disown
+#    sleep 1
+#  args:
+#    creates: /opt/.zenoss-configed2
+#    executable: /bin/bash
 
 - name: touch a file to remain idempotent
   command: touch /opt/.zenoss-configed2

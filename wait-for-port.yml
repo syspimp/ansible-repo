@@ -1,0 +1,17 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    host2check: None
+    port2check: 22
+    delaycheck: 90
+    timeoutcheck: 360
+  tasks:
+    - name: "Wait {{ delaycheck}} secs, max {{ timeoutcheck }} for {{ port2check }} on {{ host2check }} to open"
+      ansible.builtin.wait_for:
+        port: "{{ port2check }}"
+        host: "{{ host2check }}"
+        delay: "{{ delaycheck }}"
+        timeout: "{{ timeoutcheck }}"
+      become: false
