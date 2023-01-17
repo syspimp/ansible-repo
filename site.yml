@@ -7,8 +7,7 @@
 - name: Role specific tasks
   hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsules*:!monitoring
   roles:
-    - awsroles
-    - vmwareroles
+    - assignedroles
 
 - name: Supporting roles
   hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsules*:!monitoring

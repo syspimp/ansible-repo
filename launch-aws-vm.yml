@@ -229,7 +229,7 @@
               permissions: '0440'
               content: |
                 Defaults:cloud-user !requiretty
-            - path: /etc/ansible/facts.d/awsroles.fact
+            - path: /etc/ansible/facts.d/roles.fact
               permissions: '0444'
               content: |
                 {% for awsrole in awsroles %}
@@ -326,7 +326,7 @@
               permissions: '0440'
               content: |
                 Defaults:cloud-user !requiretty
-            - path: /etc/ansible/facts.d/awsroles.fact
+            - path: /etc/ansible/facts.d/roles.fact
               permissions: '0444'
               content: |
                 {% for awsrole in awsroles %}

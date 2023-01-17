@@ -1,0 +1,30 @@
+---
+- name: "block to check for facts.d role"
+  block:
+    - name: "Include roles from facts.d"
+      include_role:
+        #name: "{{ ansible_local['role'] | default(ansible_local['roles']['default']['role'],True) }}"
+        name: "{{ ansible_local['roles']['default']['role'] }}"
+      when:
+      - ansible_local['roles']['default'] is defined
+      - ansible_local['roles']['default']['role'] != 'None'
+    
+    - name: "Include secondary role from facts.d"
+      include_role:
+        name: "{{ ansible_local['roles']['secondary']['role'] }}"
+      when:
+      - ansible_local['roles']['secondary'] is defined
+      - ansible_local['roles']['secondary']['role'] != 'None'
+
+    - name: "Include single role from facts.d, if available"
+      include_role:
+        name: "{{ ansible_local['role'] }}"
+      when:
+      - ansible_local['role'] is defined
+      - ansible_local['role'] != 'None'
+  when: "(ansible_local['roles']['default']['role'] is defined) or (ansible_local['roles']['secondary']['role'] is defined) or (ansible_local['role'] is defined)"
+
+  rescue:
+    - name:
+      debug:
+        msg: "No assigned roles found for this host"

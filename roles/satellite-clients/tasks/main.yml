@@ -79,9 +79,9 @@
       subscription-manager config | grep "{{ sat6['lb_fqdn'] }}"
     become: yes
     #when:
-    #- (ansible_local['awsroles'] is defined) or (ansible_local['vmwareroles'] is defined)
-    #- ansible_local['awsroles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy']
-    #- ansible_local['vmwareroles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy']
+    #- (ansible_local['roles'] is defined) or (ansible_local['roles'] is defined)
+    #- ansible_local['roles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy']
+    #- ansible_local['roles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy']
   when:
   - "(sat6_server is defined) and (sat6_server != 'None')"
 

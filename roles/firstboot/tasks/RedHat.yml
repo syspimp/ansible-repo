@@ -21,13 +21,13 @@
       body_format: json
     register: groupidcheck
     when:
-        - ansible_local['awsroles'] is defined
+        - ansible_local['roles'] is defined
 
   - name: "Set the host_id fact"
     set_fact:
       satgroup_host_id: "{{ groupidcheck.json.results[0].id }}"
     when:
-        - ansible_local['awsroles'] is defined
+        - ansible_local['roles'] is defined
 
   - name: "Find the name of the satellite-server"
     uri:
@@ -41,13 +41,13 @@
       body_format: json
     register: hostidcheck
     when:
-        - ansible_local['awsroles'] is defined
+        - ansible_local['roles'] is defined
 
   - name: "Set the host_id fact for non sat servers"
     set_fact:
       sat6_server: "{{ hostidcheck.json.results[0].name }}"
     when:
-        - ansible_local['awsroles'] is defined
+        - ansible_local['roles'] is defined
 
   - name: "Get fqdn for the satellite server for non sat servers"
     shell: |
@@ -55,13 +55,13 @@
     register: fqdnname
     delegate_to: "{{ sat6_server }}"
     when:
-        - ansible_local['awsroles'] is defined
+        - ansible_local['roles'] is defined
   
   - name: "Set the fqdn hostname fact"
     set_fact:
       sat6_fqdn: "{{ fqdnname.stdout }}"
     when:
-        - ansible_local['awsroles'] is defined
+        - ansible_local['roles'] is defined
   when:  firstbootcheck.stat.exists == false
 
   rescue:
@@ -70,30 +70,30 @@
         hostname --fqdn
       register: fqdnname
       when:
-      - ansible_local['awsroles']['default'] is defined
-      - ansible_local['awsroles']['default']['role'] == 'satellite-server'
+      - ansible_local['roles']['default'] is defined
+      - ansible_local['roles']['default']['role'] == 'satellite-server'
 
     - name: "[rescue] satellite-servers: Set the fqdn hostname fact"
       set_fact:
         sat6_fqdn: "{{ fqdnname.stdout }}"
       when:
-      - ansible_local['awsroles']['default'] is defined
-      - ansible_local['awsroles']['default']['role'] == 'satellite-server'
+      - ansible_local['roles']['default'] is defined
+      - ansible_local['roles']['default']['role'] == 'satellite-server'
 
     - name: "[rescue] satellite-servers: Set the server ip fact"
       set_fact:
         sat6_server: "{{ inventory_hostname }}"
       when:
-      - ansible_local['awsroles']['default'] is defined
-      - ansible_local['awsroles']['default']['role'] == 'satellite-server'
+      - ansible_local['roles']['default'] is defined
+      - ansible_local['roles']['default']['role'] == 'satellite-server'
 
     - name: "[rescue] No Satellite defined. Set the facts to None"
       set_fact:
         sat6_fqdn: "None"
         sat6_server: "None"
       when:
-      - ansible_local['awsroles']['default'] is defined
-      - ansible_local['awsroles']['default']['role'] != 'satellite-server'
+      - ansible_local['roles']['default'] is defined
+      - ansible_local['roles']['default']['role'] != 'satellite-server'
 
 - name: "First boot configuration block for aws"
   block:
@@ -287,8 +287,8 @@
     
     - name: "Put the role in the MOTD"
       shell: |
-        cat /etc/ansible/facts.d/awsroles.fact >> /etc/motd
-        cat /etc/ansible/facts.d/awsroles.fact
+        cat /etc/ansible/facts.d/roles.fact >> /etc/motd
+        cat /etc/ansible/facts.d/roles.fact
       become: true
       when:
       - "ansible_system_vendor | regex_search('EC2') "
