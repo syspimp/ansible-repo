@@ -12,6 +12,10 @@
     enabled: yes
   become: yes
 
+- name: Wait a minute for info collection
+  pause:
+    minutes: 1
+
 - name: Gather information from lldp
   community.general.lldp:
   retries: 5
@@ -25,12 +29,12 @@
    msg: "{{ lldpcheck }}"
   ignore_errors: yes
 
-- name: Print each switch/port
-  ansible.builtin.debug:
-   msg: "{{ lldp[item]['chassis']['name'] }} / {{ lldp[item]['port']['ifname'] }}"
-  with_items: "{{ lldp.keys() }}"
-  when: lldp[item] is defined
-  ignore_errors: yes
+#- name: Print each switch/port
+#  ansible.builtin.debug:
+#   msg: "{{ lldp[item]['chassis']['name'] }} / {{ lldp[item]['port']['ifname'] }}"
+#  with_items: "{{ lldp.keys() }}"
+#  when: lldp[item] is defined
+#  ignore_errors: yes
 
 - name: Dump it all
   ansible.builtin.debug:
