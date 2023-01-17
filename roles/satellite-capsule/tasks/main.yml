@@ -111,7 +111,8 @@
     
     - name: "Installing satellite-capsule rpms"
       yum:
-        name: ['satellite-capsule','katello-agent']
+        name: ['satellite-capsule']
+        #name: ['satellite-capsule','katello-agent']
         #name: ['satellite-capsule','policycoreutils-python']
         state: latest
       become: true
