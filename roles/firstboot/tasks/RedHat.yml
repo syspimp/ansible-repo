@@ -301,6 +301,26 @@
       become: true
       when:
       - ansible_distribution_major_version == '8'
+
+    - name: "Add auditd rules to detect login log tampering to pass pci dss"
+      ansible.builtin.lineinfile:
+        path: /etc/audit/rules.d/audit.rules
+        regexp: '^{{ item }}'
+        line: "{{ item }}"
+      loop:
+      - "-w /var/log/tallylog -p wa -k logins"
+      - "-w /var/log/faillock -p wa -k logins"
+      - "-w /var/log/lastlog -p wa -k logins"
+
+    - name: "Add custom rules to detect login log tampering to pass pci dss"
+      template: 
+        src: custom-auditd.rules.j2
+        dest: /etc/audit/rules.d/custom.rules
+        owner: root 
+        group: root 
+        mode: 0644
+      become: true
+  # end of block
   when: firstbootcheck.stat.exists == false
   
 - name: entitlement block
