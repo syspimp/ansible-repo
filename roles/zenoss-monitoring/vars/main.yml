@@ -160,3 +160,21 @@ inventory_groups:
   - All Hosts
 #  - Satellite Inventory
 #  - Vmware
+cockpit_rpms:
+- cockpit-composer
+- cockpit-storaged
+- cockpit-podman
+- cockpit-networkmanager
+- cockpit-selinux
+- cockpit-sosreport
+- cockpit-kdump
+- cockpit-packagekit
+- cockpit-session-recording
+- cockpit-pcp
+- cockpit-navigator
+
+sambashares: yes
+samba_rpms:
+- samba
+- wget
+
