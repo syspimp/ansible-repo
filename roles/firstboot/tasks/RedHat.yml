@@ -288,10 +288,8 @@
     - name: "Put the role in the MOTD"
       shell: |
         cat /etc/ansible/facts.d/roles.fact >> /etc/motd
-        cat /etc/ansible/facts.d/roles.fact
       become: true
-      when:
-      - "ansible_system_vendor | regex_search('EC2') "
+      ignore_errors: yes
     
     - name: "try to install python for rhel8 real quick"
       yum:
