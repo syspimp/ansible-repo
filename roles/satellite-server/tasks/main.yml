@@ -1118,6 +1118,6 @@
           - inside: 9090
             outside: 9090
     body_format: json
-  when: ansible_local['awsroles'] is not defined
+  when: ansible_local['roles'] is not defined
 
 - include: "compute.yml"
