@@ -109,6 +109,11 @@
                            --enable=rhel-8-for-x86_64-baseos-rpms
       become: true
     
+    - name: "Enable satellite-capsule dnf module"
+      shell: |
+        dnf module enable satellite-capsule:el8
+      become: true
+
     - name: "Installing satellite-capsule rpms"
       yum:
         name: ['satellite-capsule']
