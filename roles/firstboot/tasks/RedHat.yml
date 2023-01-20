@@ -165,6 +165,12 @@
         regexp: '^DNS2='
         line: "DNS2={{ dns2_server }}"
 
+    - name: "Configure DNS via NetworkManager"
+      shell: |
+        nmcli con mod "System eth0" ipv4.dns "{{ dns_server }} {{ dns2_server }}"
+        nmcli con mod "System eth0" ipv4.ignore-auto-dns yes
+      become: yes
+      
     - name: "AWS: get instance id"
       shell: |
         curl -s http://169.254.169.254/2019-10-01/meta-data/instance-id
