@@ -167,8 +167,9 @@
 
     - name: "Configure DNS via NetworkManager"
       shell: |
-        nmcli con mod "System eth0" ipv4.dns "{{ dns_server }} {{ dns2_server }}"
-        nmcli con mod "System eth0" ipv4.ignore-auto-dns yes
+        nmcli con load /etc/sysconfig/network-scripts/ifcfg-eth0
+        #nmcli con mod "System eth0" ipv4.dns "{{ dns_server }} {{ dns2_server }}"
+        #nmcli con mod "System eth0" ipv4.ignore-auto-dns yes
       become: yes
       
     - name: "AWS: get instance id"
