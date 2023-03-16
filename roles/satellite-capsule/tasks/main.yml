@@ -59,6 +59,7 @@
         exec &> >(tee -a /tmp/tower.output)
         yum -y update
       become: true
+      register: rebootneeded
       args:
         executable: /bin/bash
 
@@ -83,6 +84,7 @@
         timeout: 660
       delegate_to: localhost
       become: false
+      when: rebootneeded.changed | bool == True
 
     - name: "Disabling all repos"
       shell: "subscription-manager repos --disable='*'"
