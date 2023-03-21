@@ -60,17 +60,20 @@
         yum -y update
       become: true
       register: rebootneeded
+      changed_when: rebootneeded.stdout.find("Nothing to do") != -1
       args:
         executable: /bin/bash
 
     - name: "Perform a yum clean all"
       shell:  yum clean all
+      when: rebootneeded.changed | bool == True
       become: true
 
     - name: "Reboot."
       shell: |
         shutdown -r +1 || true
       become: true
+      when: rebootneeded.changed | bool == True
       args:
         executable: /bin/bash
 
