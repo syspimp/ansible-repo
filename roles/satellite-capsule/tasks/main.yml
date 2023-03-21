@@ -130,12 +130,12 @@
         state: latest
       become: true
 
-    - name: "Enable and start goferd"
-      service:
-        name: goferd
-        enabled: yes
-        state: started
-      become: true
+#    - name: "Enable and start goferd"
+#      service:
+#        name: goferd
+#        enabled: yes
+#        state: started
+#      become: true
 
     - name: "rpms complete"
       file:
