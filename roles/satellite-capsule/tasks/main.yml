@@ -295,10 +295,10 @@
 
     - name: "Run the satellite-installer ... takes 20 mins"
       shell: |
+        #--foreman-proxy-content-parent-fqdn           "{{ sat6_fqdn }}"
         satellite-installer \
                     --scenario capsule \
                     --certs-tar-file                              "/root/{{ shorthostname}}.{{ dns_domain }}-certs.tar"\
-                    --foreman-proxy-content-parent-fqdn           "{{ sat6_fqdn }}"\
                     --foreman-proxy-register-in-foreman           "true"\
                     --foreman-proxy-foreman-base-url              "https://{{ sat6_fqdn }}"\
                     --foreman-proxy-trusted-hosts                 "{{ sat6_fqdn }}"\
