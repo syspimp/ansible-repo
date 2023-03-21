@@ -218,7 +218,7 @@
 
     - name: "debug the sat6 facts"
       debug:
-        var: "{{ hostipcheck.results }}"
+        var: "{{ hostipcheck }}"
 
     - name: "Wait 15 mins for the satellite server to become alive"
       ansible.builtin.wait_for:
