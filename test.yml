@@ -1,0 +1,8 @@
+---
+- hosts: all
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: "dump the inventory hosts"
+      debug: var=ansible_play_hosts_all
+      delegate_to: localhost
