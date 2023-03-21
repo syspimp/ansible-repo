@@ -266,14 +266,14 @@
     - name: "Wait for httpd to start on the Satellite Server"
       wait_for:
         port: 80
-        host: "{{ sat6_server }}"
+        host: "{{ sat6_fqdn }}"
         delay: 5
         timeout: 7200
       become: false
 
     - name: "Grab certs from the sat server"
       get_url:
-        url: "http://{{ sat6_server }}/pub/{{ shorthostname}}.{{ dns_domain }}-certs.tar"
+        url: "http://{{ sat6_fqdn }}/pub/{{ shorthostname}}.{{ dns_domain }}-certs.tar"
         dest: "/root/{{ shorthostname}}.{{ dns_domain }}-certs.tar"
       become: yes
       #register: grabcerts
