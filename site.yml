@@ -5,7 +5,7 @@
     - firstboot
 
 - name: Role specific tasks
-  hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsules*:!monitoring
+  hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsule*:!monitoring
   roles:
     - assignedroles
 
@@ -46,7 +46,7 @@
     - satellite-oscap
 
 - name: Configure Satellite Capsules
-  hosts: capsules*
+  hosts: capsule*:!capsule-lb*
   environment: "{{ sat6_environment_vars }}"
   roles:
     - satellite-capsule
