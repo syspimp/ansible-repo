@@ -296,6 +296,11 @@
     - name: "Run the satellite-installer ... takes 20 mins"
       shell: |
         #--foreman-proxy-content-parent-fqdn           "{{ sat6_fqdn }}"
+        #--puppet-dns-alt-names                     "{{ capsule_loadbalancer_fqdn }}" \
+        #--puppet-ca-server                         "{{ shorthostname}}.{{ dns_domain }}" \
+        #--foreman-proxy-puppetca                   "true" \
+        #--puppet-server-ca                         "true" \
+        #--puppet-server-foreman-url                   "https://{{ sat6_fqdn }}"\
         satellite-installer \
                     --scenario capsule \
                     --certs-tar-file                              "/root/{{ shorthostname}}.{{ dns_domain }}-certs.tar"\
@@ -305,12 +310,10 @@
                     --foreman-proxy-trusted-hosts                 "{{ shorthostname}}.{{ dns_domain }}"\
                     --foreman-proxy-oauth-consumer-key            "{{ oauth_consumer_key }}"\
                     --foreman-proxy-oauth-consumer-secret         "{{ oauth_consumer_secret }}"\
-                    --puppet-server-foreman-url                   "https://{{ sat6_fqdn }}"\
                     --certs-cname                              "{{ capsule_loadbalancer_fqdn }}" \
-                    --puppet-dns-alt-names                     "{{ capsule_loadbalancer_fqdn }}" \
-                    --puppet-ca-server                         "{{ shorthostname}}.{{ dns_domain }}" \
-                    --foreman-proxy-puppetca                   "true" \
-                    --puppet-server-ca                         "true" \
+                    --no-enable-puppet \
+                    --foreman-proxy-puppet false \
+                    --foreman-proxy-puppetca false \
                     --enable-foreman-proxy-plugin-remote-execution-ssh \
                     --enable-foreman-proxy-plugin-ansible \
                     --enable-foreman-proxy-plugin-openscap && \
