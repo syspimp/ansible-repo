@@ -153,6 +153,12 @@
       #  curl -s http://169.254.169.254/2019-10-01/meta-data/public-ipv4 || echo "html"
       #register: dc
       
+    - name: "Update auditd.conf log file size"
+      ansible.builtin.lineinfile:
+        path: /etc/audit/auditd.conf
+        regexp: "^max_log_file"
+        line: "max_log_file = 8"
+
     - name: "Fix the DNS in ifcfg-eth0"
       ansible.builtin.lineinfile:
         path: /etc/sysconfig/network-scripts/ifcfg-eth0
