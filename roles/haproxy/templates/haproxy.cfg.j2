@@ -65,6 +65,7 @@ backend proxy-{{ service.name }}
    balance {{ service.balance }}
    {% for host in groups['capsules'] %}
    server {{ hostvars[host]['ansible_facts']['eth0']['ipv4']['address'] }} {{ hostvars[host]['ansible_facts']['eth0']['ipv4']['address'] }}:{{ service.port }} check
+{{ hostvars[host] }}
    {% endfor %}
 
 {% endfor %}
