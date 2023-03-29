@@ -1,0 +1,4 @@
+---
+- name: "You've successfully applied the Ubuntu profile"
+  debug:
+    msg: "Congrats"
