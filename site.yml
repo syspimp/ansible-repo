@@ -19,12 +19,15 @@
     - rsyslog-client
     - lldp-client
     - snmp-client
+  when: ansible_distribution == 'RedHat'
 
 - name: Satellite clients
   hosts: all:!sat6*:!satellite*:!management*
   become: yes
   roles:
     - satellite-clients
+  when: ansible_distribution == 'RedHat'
+
 
 - name: Create ansible build environment
   hosts: builder*
