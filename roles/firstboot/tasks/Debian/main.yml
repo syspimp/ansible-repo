@@ -1,0 +1,7 @@
+---
+- name: "Include {{ ansible_lsb.id }} specific config"
+  include: "{{ ansible_distribution }}/{{ ansible_lsb.id }}.yml"
+
+- name: "You've successfully applied the {{ ansible_distribution }} profile"
+  debug:
+    msg: "Congrats"

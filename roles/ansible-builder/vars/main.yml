@@ -7,6 +7,7 @@ builder_pkgs:
   - ansible-builder
   - ansible-navigator
   - libguestfs-tools
+  - xauth
 builder_repos:
   - ansible-2.9-for-rhel-8-x86_64-rpms
   - ansible-automation-platform-2.2-for-rhel-8-x86_64-rpms

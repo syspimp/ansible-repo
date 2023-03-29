@@ -1,4 +1,0 @@
----
-  - name: Install Oscap-scanner
-    yum: name=openscap-scanner state=present
-
