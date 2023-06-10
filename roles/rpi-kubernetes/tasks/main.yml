@@ -129,7 +129,7 @@
 #  become: yes
 
 - name: Install docker
-  shell:
+  shell: |
     curl -fsSL https://get.docker.com -o get-docker.sh
     sh get-docker.sh
     usermod -aG docker ansiblesvc
@@ -198,7 +198,7 @@
 #  become: yes
 
 - name: Add gcp public key
-  shell:
+  shell: |
     curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg
   args:
     creates: /usr/share/keyrings/kubernetes-archive-keyring.gpg
@@ -274,7 +274,7 @@
 
 # host only commands
 - name: Create the network
-  shell:
+  shell: |
     kubeadm init --pod-network-cidr=10.244.0.0/16
   args:
     creates: /etc/kubernetes/admin.conf
@@ -301,11 +301,11 @@
     group: "{{ ansible_user }}"
 
 - name: Add flannel to cluster
-  shell:
+  shell: |
     kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
 
 - name: Add Metallb Loadbalancer to cluster
-  shell:
+  shell: |
     kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
     kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
 
@@ -327,5 +327,5 @@
     dest: /tmp/metallb-configmap.yml
 
 - name: Config Metallb Loadbalancer to cluster
-  shell:
+  shell: |
     kubectl apply -f /tmp/metallb-configmap.yml
