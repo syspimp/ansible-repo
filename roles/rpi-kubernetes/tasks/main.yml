@@ -178,18 +178,18 @@
       - curl
   become: yes
 
-- name: Download the Google Cloud public signing key
-  ansible.builtin.get_url:
-    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-    dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg
-    owner: root
-    group: root
-    mode: '0644'
-  become: yes
+#- name: Download the Google Cloud public signing key
+#  ansible.builtin.get_url:
+#    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+#    dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+#    owner: root
+#    group: root
+#    mode: '0644'
+#  become: yes
 
 - name: Add gcp public key
   shell:
-    cat /usr/share/keyrings/kubernetes-archive-keyring.gpg | apt-key add --keyring /usr/share/keyrings/kubernetes-archive-keyring.gpg -
+    curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg
   become: yes
 
 - name: Add the Kubernetes apt repository
