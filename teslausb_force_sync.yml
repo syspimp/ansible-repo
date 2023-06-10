@@ -1,0 +1,15 @@
+---
+- name: "Force teslausb to sync security videos to storage"
+  hosts: teslausb
+  gather_facts: no
+  tasks:
+  - name: "check if rsync is running"
+    shell: ps ax | grep rsync | grep -v grep
+    register: rsync
+
+  - name: "force a sync to storage"
+    shell: "timeout 120 /root/bin/force_sync.sh"
+    become: yes
+    when: '"rsync" not in rsync.stdout'
+        
+

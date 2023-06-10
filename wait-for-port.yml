@@ -3,7 +3,7 @@
   connection: local
   gather_facts: no
   vars:
-    host2check: None
+    host2check: localhost
     port2check: 22
     delaycheck: 90
     timeoutcheck: 360

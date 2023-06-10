@@ -5,3 +5,7 @@
   roles:
     - satellite-clients
     - webconsole
+  tasks:
+    - name: "lets smoke test"
+      shell: curl http://localhost/
+
