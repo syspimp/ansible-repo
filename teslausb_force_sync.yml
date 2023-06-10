@@ -4,7 +4,7 @@
   gather_facts: no
   tasks:
   - name: "check if rsync is running"
-    shell: ps ax | grep rsync | grep -v grep
+    shell: ps ax | grep rsync | grep -v grep || true
     register: rsync
 
   - name: "force a sync to storage"

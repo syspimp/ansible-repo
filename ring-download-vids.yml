@@ -1,0 +1,15 @@
+---
+- name: "Download ring security videos to storage"
+  hosts: lab-workstation
+  gather_facts: no
+  tasks:
+  - name: "check if rsync is running"
+    shell: ps ax | grep ringvids | grep -v grep
+    register: ringvids
+
+  - name: "Download the latest ring video files"
+    shell: "/root/download-ring-vids.sh"
+    become: yes
+    when: '"ringvids" not in ringvids.stdout'
+        
+
