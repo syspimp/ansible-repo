@@ -219,6 +219,7 @@
       - kubeadm
       - kubectl
   become: yes
+  ignore_errors: yes
 
 - name: Hold kubelet
   dpkg_selections:
