@@ -189,7 +189,7 @@
 
 - name: Add gcp public key
   shell:
-    cat /usr/share/keyrings/kubernetes-archive-keyring.gpg | apt-key --keyring /usr/share/keyrings/kubernetes-archive-keyring.gpg add -
+    cat /usr/share/keyrings/kubernetes-archive-keyring.gpg | apt-key add --keyring /usr/share/keyrings/kubernetes-archive-keyring.gpg -
   become: yes
 
 - name: Add the Kubernetes apt repository
