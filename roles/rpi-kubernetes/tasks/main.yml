@@ -190,6 +190,8 @@
 - name: Add gcp public key
   shell:
     curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/kubernetes-archive-keyring.gpg
   become: yes
 
 - name: Add the Kubernetes apt repository
