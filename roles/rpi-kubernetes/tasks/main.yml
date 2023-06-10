@@ -266,6 +266,8 @@
 - name: Create the network
   shell:
     kubeadm init --pod-network-cidr=10.244.0.0/16
+  args:
+    creates: /etc/kubernetes/admin.conf
   register: kubeadm
   become: yes
 
