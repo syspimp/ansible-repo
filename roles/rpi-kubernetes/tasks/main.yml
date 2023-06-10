@@ -187,6 +187,11 @@
     mode: '0644'
   become: yes
 
+- name: Add gcp public key
+  shell:
+    apt-key add /usr/share/keyrings/kubernetes-archive-keyring.gpg
+  become: yes
+
 - name: Add the Kubernetes apt repository
   ansible.builtin.apt_repository:
     repo: "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main"
