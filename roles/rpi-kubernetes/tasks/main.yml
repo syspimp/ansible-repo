@@ -5,12 +5,14 @@
     cache_valid_time: 3600
     autoclean: yes
     autoremove: yes
+  become: yes
 
 - name: Check if a reboot is needed
   register: reboot_required_file
   stat:
     path: /var/run/reboot-required
     get_md5: no
+  become: yes
 
 - name: Reboot if needed
   ansible.builtin.reboot:
@@ -21,12 +23,14 @@
     post_reboot_delay: 30
     test_command: uptime
   when: reboot_required_file.stat.exists
+  become: yes
 
 - name: Install vim and aptitude
   ansible.builtin.apt:
     pkg:
       - vim
       - aptitude
+  become: yes
 
 - name: Create Aptitude config directory
   ansible.builtin.file:
@@ -36,6 +40,7 @@
     owner: root
     group: root
     mode: '0700'
+  become: yes
 
 - name: Configure Aptitude
   ansible.builtin.copy:
@@ -54,20 +59,24 @@
     owner: root
     group: root
     mode: '0644'
+  become: yes
 
 # disable swap
 
 - name: Check whether a package called dphys-swapfile is installed
   ansible.builtin.package_facts:
     manager: auto
+  become: yes
 
 - name: Turn off "dphys-swapfile"
   ansible.builtin.command: dphys-swapfile swapoff
   when: "'dphys-swapfile' in ansible_facts.packages"
+  become: yes
 
 - name: Uninstall "dphys-swapfile"
   ansible.builtin.command: dphys-swapfile uninstall
   when: "'dphys-swapfile' in ansible_facts.packages"
+  become: yes
 
 - name: Remove and purge "dphys-swapfile" package
   ansible.builtin.apt:
@@ -77,6 +86,7 @@
     autoclean: yes
     autoremove: yes
   when: "'dphys-swapfile' in ansible_facts.packages"
+  become: yes
 
 
 # Configure cgroup
@@ -87,6 +97,7 @@
     backrefs: yes
     regexp: '^console(.*) rootwait$'
     line: '\g<0> cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1'
+  become: yes
 
 
 # Install and configure Container Runtime
@@ -96,6 +107,7 @@
     pkg:
       - containerd
       - containernetworking-plugins
+  become: yes
 
 - name: Configure containerd
   ansible.builtin.copy:
@@ -114,6 +126,7 @@
     owner: root
     group: root
     mode: '0644'
+  become: yes
 
 
 # Forwarding IPv4 and letting iptables see bridged traffic
@@ -128,12 +141,15 @@
     owner: root
     group: root
     mode: '0644'
+  become: yes
 
 - name: modprobe overlay
   ansible.builtin.command: modprobe overlay
+  become: yes
 
 - name: modprobe br_netfilter
   ansible.builtin.command: modprobe br_netfilter
+  become: yes
 
 - name: Create /etc/sysctl.d/k8s.conf
   ansible.builtin.copy:
@@ -146,10 +162,11 @@
     owner: root
     group: root
     mode: '0644'
+  become: yes
 
 - name: sysctl --system
   ansible.builtin.command: sysctl --system
-
+  become: yes
 
 # Install kubeadm
 
@@ -159,6 +176,7 @@
       - apt-transport-https
       - ca-certificates
       - curl
+  become: yes
 
 - name: Download the Google Cloud public signing key
   ansible.builtin.get_url:
@@ -167,6 +185,7 @@
     owner: root
     group: root
     mode: '0644'
+  become: yes
 
 - name: Add the Kubernetes apt repository
   ansible.builtin.apt_repository:
@@ -174,6 +193,7 @@
     state: present
     filename: kubernetes
     update_cache: yes
+  become: yes
 
 - name: Install kubelet kubeadm kubectl
   ansible.builtin.apt:
@@ -181,21 +201,25 @@
       - kubelet
       - kubeadm
       - kubectl
+  become: yes
 
 - name: Hold kubelet
   dpkg_selections:
     name: kubelet
     selection: hold
+  become: yes
 
 - name: Hold kubeadm
   dpkg_selections:
     name: kubeadm
     selection: hold
+  become: yes
 
 - name: Hold kubectl
   dpkg_selections:
     name: kubectl
     selection: hold
+  become: yes
 
 
 # Download and install Flannel
@@ -207,6 +231,7 @@
     owner: root
     group: root
     mode: '0755'
+  become: yes
 
 - name: Create Flannel networks directory
   ansible.builtin.file:
@@ -216,10 +241,72 @@
     owner: root
     group: root
     mode: '0755'
-
+  become: yes
 
 # reboot
 
-- name: reboot
-  reboot:        
+- name: Reboot to apply changes
+  ansible.builtin.reboot:
+    msg: "Reboot initiated by Ansible to apply changes"
+    connect_timeout: 5
+    reboot_timeout: 300
+    pre_reboot_delay: 0
+    post_reboot_delay: 30
+    test_command: uptime
+  become: yes
 
+# host only commands
+- name: Create the network
+  shell:
+    kubeadm init --pod-network-cidr=10.244.0.0/16
+  regiser: kubeadm
+  become: yes
+
+- name: Show the kubeadmin add host command
+  debug:
+    var: kubeadm.stdout
+
+- name: Create Flannel networks directory
+  ansible.builtin.file:
+    path: "$HOME/.kube"
+    state: directory
+    recurse: no
+    mode: '0755'
+
+- name: Copy kubernetes admin.conf to local
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: "$HOME/.kube/config"
+    remote_src: yes
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Add flannel to cluster
+  shell:
+    kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+
+- name: Add Metallb Loadbalancer to cluster
+  shell:
+    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
+    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
+
+- name: Create /tmp/metallb-configmap.yml
+  ansible.builtin.copy:
+    content: |
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        namespace: metallb-system
+        name: config
+      data:
+        config: |
+          address-pools:
+          - name: default
+            protocol: layer2
+            addresses:
+            - 10.55.102.200-10.55.102.250
+    dest: /tmp/metallb-configmap.yml
+
+- name: Config Metallb Loadbalancer to cluster
+  shell:
+    kubectl apply -f /tmp/metallb-configmap.yml
