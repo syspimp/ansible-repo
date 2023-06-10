@@ -1,0 +1,7 @@
+---
+- name: Apply rpi-kubernetes roles
+  hosts: all
+  gather_facts: no
+  roles:
+    - rpi-kubernetes
+
