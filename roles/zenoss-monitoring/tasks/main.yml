@@ -83,8 +83,6 @@
   template:
     src: blank.key.j2
     dest: "openshift-zenoss4/{{ zenoss_sshkey }}"
-    owner: cloud-user
-    group: cloud-user
     mode: 0600
 
 - name: copy the ssh key to zenoss pod
@@ -232,6 +230,17 @@
     status_code: 200
     body_format: json
   loop: "{{ addme }}"
+
+- name: deploy firewalld rules
+  ignore_errors: yes
+  firewalld: 
+    immediate: yes
+    port: "{{ item }}"
+    state: enabled 
+    permanent: yes
+  with_items:
+  - 30080/tcp
+  - 80/tcp
 
 - name: monitor hosts in inventory groups
   ignore_errors: yes

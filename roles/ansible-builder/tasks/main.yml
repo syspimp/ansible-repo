@@ -63,16 +63,16 @@
 
     - name: "[builder] Log into registry.redhat.io"
       environment:
-        subuser: "{{ SUBUSER }}"
-        subpass: "{{ SUBPASS }}"
+        subuser: "{{ rhsm_username }}"
+        subpass: "{{ rhsm_password }}"
       shell: |
         podman login -u "${subuser}" -p "${subpass}" registry.redhat.io
       become: yes
 
     - name: "[builder] Log into docker.io"
       environment:
-        dockeruser: "{{ DOCKERUSER }}"
-        dockerpass: "{{ DOCKERPASS }}"
+        dockeruser: "{{ dockerio_user }}"
+        dockerpass: "{{ dockerio_pass }}"
       shell: |
         podman login -u "${dockeruser}" -p "${dockerpass}" docker.io
       become: yes
