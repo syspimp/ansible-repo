@@ -9,7 +9,7 @@ cockpit_rpms:
 - cockpit-packagekit
 - cockpit-session-recording
 - cockpit-pcp
-- cockpit-navigator
+#- cockpit-navigator
 
 sambashares: yes
 samba_rpms:
