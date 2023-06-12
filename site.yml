@@ -2,6 +2,7 @@
 - name: Firstboot configuration tasks
   hosts: all
   roles:
+    - firstboot-accounts
     - firstboot
 
 - name: Role specific tasks
