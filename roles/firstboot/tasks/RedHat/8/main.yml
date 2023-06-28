@@ -142,7 +142,7 @@
     
     - name: "Set up /etc/hosts file and hostname for Satellite"
       shell: |
-        grep "{{ sat6_fqdn }}" /etc/hosts || echo "{{ sat6_server }} {{ sat6_fqdn }}" >> /etc/hosts
+        grep "{{ sat6_fqdn }}" /etc/hosts || echo "{{ hostvars[sat6_server]['ansible_facts']['eth0']['ipv4']['address'] }} {{ sat6_fqdn }}" >> /etc/hosts
       become: true
       when: sat6_fqdn != "None"
       args:
