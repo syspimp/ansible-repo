@@ -28,7 +28,7 @@
     - satellite-clients
 
 - name: Monitoring roles
-  hosts: monitoring
+  hosts: monitoring*
   become: yes
   vars:
     metrics_graph_service: yes
