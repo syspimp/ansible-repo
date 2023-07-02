@@ -40,7 +40,7 @@
   tasks:
     - name: Set a fact with all the hosts to monitor
       ansible.builtin.set_fact:
-        monitored_hosts: "{{ monitored_hosts|default([])  + [ hostvars[item]['ansible_facts']['ansible_fqdn'] ]  }}"
+        monitored_hosts: "{{ monitored_hosts|default([])  + [ hostvars[item]['ansible_facts']['ansible_fqdn'] | default(item,True)  }}"
       loop: "{{ groups['all'] }}"
 
     - name: Include the rhel-system-roles role for pcp
