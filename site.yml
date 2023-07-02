@@ -31,11 +31,23 @@
   hosts: monitoring
   become: yes
   vars:
-    metrics_retention_days: 0
-    metrics_manage_firewall: true
-    metrics_manage_selinux: true
-  roles:
-    - rhel-system-roles.metrics
+    metrics_graph_service: yes
+    metrics_query_service: yes
+    metrics_retention_days: 10
+    metrics_monitored_hosts: ["database.example.com", "webserver.example.com"]
+    metrics_manage_firewall: yes
+    metrics_manage_selinux: yes
+  tasks:
+    - name: Set a fact with all the hosts to monitor
+      ansible.builtin.set_fact:
+        monitored_hosts: "{{ monitored_hosts|default([])  + [ hostvars[item]['ansible_facts']['ansible_fqdn'] ]  }}"
+      loop: "{{ groups['all'] }}"
+
+    - name: Include the rhel-system-roles role for pcp
+      vars:
+        metrics_monitored_hosts: "{{ monitored_hosts }}"
+      ansible.builtin.roles:
+        name: rhel-system-roles.metrics
 
 - name: Create ansible build environment
   hosts: builder*
