@@ -46,7 +46,7 @@
     - name: Include the rhel-system-roles role for pcp
       vars:
         metrics_monitored_hosts: "{{ monitored_hosts }}"
-      ansible.builtin.roles:
+      ansible.builtin.include_role:
         name: rhel-system-roles.metrics
 
 - name: Create ansible build environment
