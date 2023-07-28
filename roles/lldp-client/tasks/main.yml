@@ -1,45 +1,57 @@
 ---
-- name: Install the latest version of lldpd
-  ansible.builtin.package:
-    name: lldpd
-    state: latest
-  become: yes
+- name: "lldp check"
+  stat:
+    path: /opt/.lldpcheck
+  register: lldpcheckv
 
-- name: Start the service
-  ansible.builtin.service:
-    name: lldpd
-    state: started
-    enabled: yes
-  become: yes
+- name: "debug"
+  debug: var=lldpcheck
 
-- name: Wait a minute for info collection
-  pause:
-    minutes: 1
+- name: "lldp installation block"
+  block:
+  - name: Install the latest version of lldpd
+    ansible.builtin.package:
+      name: lldpd
+      state: latest
+    become: yes
 
-- name: Gather information from lldp
-  community.general.lldp:
-  retries: 5
-  delay: 2
-  register: lldpcheck
-  #until: lldpcheck.rc == 0
-  ignore_errors: yes
+  - name: Start the service
+    ansible.builtin.service:
+      name: lldpd
+      state: started
+      enabled: yes
+    become: yes
 
-- name: Dump the check
-  ansible.builtin.debug:
-   msg: "{{ lldpcheck }}"
-  ignore_errors: yes
+  - name: Wait a minute for info collection
+    pause:
+      minutes: 1
 
-#- name: Print each switch/port
-#  ansible.builtin.debug:
-#   msg: "{{ lldp[item]['chassis']['name'] }} / {{ lldp[item]['port']['ifname'] }}"
-#  with_items: "{{ lldp.keys() }}"
-#  when: lldp[item] is defined
-#  ignore_errors: yes
+  - name: Gather information from lldp
+    community.general.lldp:
+    retries: 5
+    delay: 2
+    register: lldpcheck
+    #until: lldpcheck.rc == 0
+    ignore_errors: yes
 
-- name: Dump it all
-  ansible.builtin.debug:
-   msg: "{{ item }}"
-  with_items: "{{ lldp }}"
-  #when: lldp[item] is defined
-  ignore_errors: yes
+  - name: Dump the check
+    ansible.builtin.debug:
+     msg: "{{ lldpcheck }}"
+    ignore_errors: yes
 
+  - name: Dump it all
+    ansible.builtin.debug:
+     msg: "{{ item }}"
+    with_items: "{{ lldp }}"
+    #when: lldp[item] is defined
+    ignore_errors: yes
+
+  - name: "lldp install complete"
+    file:
+      path: "/opt/.lldpcheck"
+      state: touch
+      mode: 0444
+    become: true
+  # end of block
+  when: lldpcheckv.stat.exists == false
+  
