@@ -54,7 +54,7 @@
       hostname --fqdn
     register: fqdnname
     delegate_to: "{{ sat6_server }}"
-    ignore_errors: yes
+    ignore_unreachable: true
     when:
         - ansible_local['roles'] is defined
   
