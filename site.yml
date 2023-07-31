@@ -28,12 +28,12 @@
     - firstboot
 
 - name: Role specific tasks
-  hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsule*:!monitoring
+  hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsule*
   roles:
     - assignedroles
 
 - name: Supporting roles
-  hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsule*:!monitoring
+  hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsule*
   become: yes
   roles:
     - insights
