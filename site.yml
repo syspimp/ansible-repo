@@ -1,25 +1,25 @@
 ---
-- name: Monitoring roles
-  hosts: monitoring*
-  become: yes
-  vars:
-    metrics_graph_service: yes
-    metrics_query_service: yes
-    metrics_retention_days: 10
-    metrics_monitored_hosts: ["database.example.com", "webserver.example.com"]
-    metrics_manage_firewall: yes
-    metrics_manage_selinux: yes
-  tasks:
-    - name: Set a fact with all the hosts to monitor
-      ansible.builtin.set_fact:
-        monitored_hosts: "{{ monitored_hosts|default([])  + [ hostvars[item]['ansible_facts']['ansible_fqdn'] | default(item,True) ] }}"
-      loop: "{{ groups['all'] }}"
-
-    - name: Include the rhel-system-roles role for pcp
-      vars:
-        metrics_monitored_hosts: "{{ monitored_hosts }}"
-      ansible.builtin.include_role:
-        name: rhel-system-roles.metrics
+#- name: Monitoring roles
+#  hosts: monitoring*
+#  become: yes
+#  vars:
+#    metrics_graph_service: yes
+#    metrics_query_service: yes
+#    metrics_retention_days: 10
+#    metrics_monitored_hosts: ["database.example.com", "webserver.example.com"]
+#    metrics_manage_firewall: yes
+#    metrics_manage_selinux: yes
+#  tasks:
+#    - name: Set a fact with all the hosts to monitor
+#      ansible.builtin.set_fact:
+#        monitored_hosts: "{{ monitored_hosts|default([])  + [ hostvars[item]['ansible_facts']['ansible_fqdn'] | default(item,True) ] }}"
+#      loop: "{{ groups['all'] }}"
+#
+#    - name: Include the rhel-system-roles role for pcp
+#      vars:
+#        metrics_monitored_hosts: "{{ monitored_hosts }}"
+#      ansible.builtin.include_role:
+#        name: rhel-system-roles.metrics
 
 - name: Firstboot configuration tasks
   hosts: all
