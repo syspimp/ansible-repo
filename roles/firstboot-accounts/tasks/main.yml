@@ -53,7 +53,7 @@
       dest: /etc/sssd/sssd.conf 
       owner: root 
       group: root 
-      mode: 0400
+      mode: 0600
     become: true
       
   - name: "session logging config"
@@ -62,7 +62,7 @@
       dest: /etc/sssd/conf.d/sssd-session-recording.conf 
       owner: root 
       group: root 
-      mode: 0400
+      mode: 0600
     become: true
 
   - name: "Installing terminal logging rpms"
@@ -77,7 +77,7 @@
       dest: /etc/tlog/tlog-rec-session.conf 
       owner: root 
       group: root 
-      mode: 0444
+      mode: 0644
     become: true
 
   - name: "restarting sssd service"
