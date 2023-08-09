@@ -84,3 +84,8 @@
     ansible.builtin.service:
       name: sssd
       state: restarted
+
+  - name: "running authselect to select sssd for authentication"
+    shell: |
+      authselect select sssd --force
+    become: true
