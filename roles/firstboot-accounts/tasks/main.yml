@@ -88,4 +88,5 @@
   - name: "running authselect to select sssd for authentication"
     shell: |
       authselect select sssd --force
+      authselect apply-changes
     become: true
