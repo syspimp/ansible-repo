@@ -44,6 +44,28 @@
       dest: "/etc/sudoers.d/{{ item.newusername }}"
       owner: root
       group: root
-      mode: '0440'
+      mode: '0400'
     loop: "{{ newusers }}"
 
+  - name: "sssd.conf local config"
+    template: 
+      src: sssd.conf.j2
+      dest: /etc/sssd/sssd.conf 
+      owner: root 
+      group: root 
+      mode: 0400
+    become: true
+      
+  - name: "terminal logging config"
+    template: 
+      src: sssd-session-recording.conf.j2
+      dest: /etc/sssd/conf.d/sssd-session-recording.conf 
+      owner: root 
+      group: root 
+      mode: 0400
+    become: true
+
+  - name: "restarting sssd service"
+    ansible.builtin.service:
+      name: sssd
+      state: restarted

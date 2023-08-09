@@ -1,0 +1,10 @@
+[sssd]
+config_file_version = 2
+services = pam
+domains = LOCAL
+enable_files_domain = true
+
+[domain/LOCAL]
+id_provider = files
+debug_level = 1
+
