@@ -65,6 +65,12 @@
       mode: 0400
     become: true
 
+  - name: "Installing terminal logging rpms"
+    yum:
+      name: "tlog"
+      state: latest
+    become: true
+
   - name: "terminal logging config"
     template: 
       src: tlog-rec-session.conf.j2
