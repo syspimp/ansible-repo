@@ -56,13 +56,22 @@
       mode: 0400
     become: true
       
-  - name: "terminal logging config"
+  - name: "session logging config"
     template: 
       src: sssd-session-recording.conf.j2
       dest: /etc/sssd/conf.d/sssd-session-recording.conf 
       owner: root 
       group: root 
       mode: 0400
+    become: true
+
+  - name: "terminal logging config"
+    template: 
+      src: tlog-rec-session.conf.j2
+      dest: /etc/tlog/tlog-rec-session.conf 
+      owner: root 
+      group: root 
+      mode: 0444
     become: true
 
   - name: "restarting sssd service"
