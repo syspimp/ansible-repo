@@ -361,6 +361,13 @@
         restorecon -vR /opt/*
       become: true
 
+    - name: "Disable firewall"
+      service:
+        name: "firewalld"
+        state: "stopped"
+        enabled: no
+      become: true
+
     - name: "Reboot."
       shell: |
         shutdown -r +1 || true
