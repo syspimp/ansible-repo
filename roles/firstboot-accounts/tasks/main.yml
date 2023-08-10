@@ -88,5 +88,6 @@
   - name: "running authselect to select sssd for authentication"
     shell: |
       authselect select sssd --force
+      authselect enable-feature with-files-domain
       authselect apply-changes
     become: true
