@@ -49,6 +49,15 @@
           firewall-cmd --reload
         become: true
   
+      - name: "[Cockpit] remove motd to activate cockpit"
+        ansible.builtin.file:
+          src: "/dev/null"
+          dest: "/etc/motd.d/cockpit"
+          owner: root
+          group: root
+          state: link
+        become: true
+
       - name: "[Cockpit] update tracking dir"
         file:
           path: /root/.setup/cockpit-rpms
