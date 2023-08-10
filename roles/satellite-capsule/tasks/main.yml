@@ -381,7 +381,7 @@
 
     - name: "Find the id to the capsules/proxies"
       shell: |
-       hammer capsule list | grep 'Pulp Node' | grep '{{ shorthostname }}' | awk '{ print $1 }'
+       hammer capsule list | grep 'Container_Gateway' | grep '{{ shorthostname }}' | awk '{ print $1 }'
       become: true
       delegate_to: "{{ sat6_server }}"
       register: capsulelist
