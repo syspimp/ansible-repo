@@ -64,7 +64,7 @@ backend proxy-{{ service.name }}
    balance {{ service.balance }}
    {% for host in groups['capsules'] %}
    ================
-   server {{ host }} {{ hostvars[host] }}
+   server {{ host }} {{ hostvars[host] | json }}
    ================
    {% endfor %}
 
