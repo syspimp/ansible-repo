@@ -171,14 +171,14 @@
     - "(sat6_server is defined) and (sat6_server != 'None')"
 
   always:
-  - name: "Start openscap initial scan from Satellite for host"
-    shell: |
-      hammer job-invocation create --search-query {{ ansible_fqdn }} --job-template "Run OpenSCAP scans" --async
-    delegate_to: "{{ sat6_server }}"
-    ignore_errors: yes
-    become: yes
-    when:
-    - "(sat6_server is defined) and (sat6_server != 'None')"
+#  - name: "Start openscap initial scan from Satellite for host"
+#    shell: |
+#      hammer job-invocation create --search-query {{ ansible_fqdn }} --job-template "Run OpenSCAP scans" --async
+#    delegate_to: "{{ sat6_server }}"
+#    ignore_errors: yes
+#    become: yes
+#    when:
+#    - "(sat6_server is defined) and (sat6_server != 'None')"
 
   - name: "Apply ansible roles defined in Satellite for oscap scanning"
     shell: |
