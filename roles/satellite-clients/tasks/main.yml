@@ -181,6 +181,12 @@
     when:
     - "(sat6_server is defined) and (sat6_server != 'None')"
       
+  - debug:
+      msg: "Waiting 2 mins for ansible roles to apply"
+
+  - pause:
+      minutes: "2"
+
   - name: "Queue openscap initial scan from Satellite for host"
     shell: |
       hammer job-invocation create --search-query {{ ansible_fqdn }} --job-template "Run OpenSCAP scans" --async
