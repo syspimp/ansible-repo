@@ -10,3 +10,4 @@ newusers:
   # provide path to a public keyfile or paste in the pub key
   public_key: lookup('file', '/home/dataylor/ansiblesvc.pub')
   #public_key: "ssh-rsa AAAAB3Nz ...blah... 03Ug30uAv8= you@there.com"
+excluded_from_tty_logging: dataylor
