@@ -116,7 +116,9 @@
     
     - name: "Enable satellite-capsule dnf module"
       shell: |
-        dnf module enable satellite-capsule:el8 -y
+        dnf module reset postgresql
+        dnf module reset ruby
+        dnf module enable satellite-capsule:el8 postgresql:12 ruby:2.7
       become: true
 
 #    - name: "Enable satellite-capsule dnf module"
