@@ -1,4 +1,19 @@
 ---
+  - name: "[selinux] mapping user_u as default selinux user"
+    shell: |
+      semanage login -m -s user_u  -r s0  __default__
+    become: yes
+
+  - name: "[selinux] disable user exec in home and /tmp for regular users"
+    shell: |
+      setsebool -P user_exec_content off
+    become: yes
+
+  - name: "[selinux] allow sysadm_u selinux user to ssh"
+    shell: |
+      setsebool -P ssh_sysadm_login on
+    become: yes
+
   - name: error handling for adding automation users
     block:
     - name: "Test adding the automation user '{{ item.newusername }}' to wheel group"
@@ -6,6 +21,7 @@
         name: "{{ item.newusername }}"
         comment: "Built By Ansible Automation"
         groups: "{{ item.newgroups }}"
+        seuser: sysadm_u
         expires: -1
         append: yes
       loop: "{{ newusers }}"
@@ -16,6 +32,7 @@
         name: "{{ item.newusername }}"
         comment: "Built By Ansible Automation"
         groups: "{{ item.newgroups.replace('wheel','sudo') }}"
+        seuser: sysadm_u
         expires: -1
         append: yes
       loop: "{{ newusers }}"
@@ -27,6 +44,7 @@
         name: "{{ item.newusername }}"
         comment: "Built By Ansible Automation"
         groups: "{{ item.newgroups.replace('wheel','sudo') }}"
+        seuser: sysadm_u
         expires: -1
         append: yes
       loop: "{{ newusers }}"
