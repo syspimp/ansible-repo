@@ -108,6 +108,15 @@
   args:
     creates: /opt/.zenoss-configed2
 
+- name: Loop over kubectl get pods until zenoss nginx pod is running
+  shell: kubectl get pods -n {{ zenoss_namespace }} | grep zenoss4-nginx || true
+  #args:
+  #  creates: /opt/.zenoss-configed2
+  register: kubectltasks
+  retries: "120"
+  delay: "2"
+  until: "'Running' in kubectltasks.stdout"
+
 - name: start zenoss port forward service
   service:
     name: zenoss
