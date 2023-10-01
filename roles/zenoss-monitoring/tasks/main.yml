@@ -28,6 +28,12 @@
   args:
     creates: /opt/.zenoss-configed
 
+- name: create the {{ zenoss_namespace }} as default namespace
+  shell: kubectl config set-context --current --namespace={{ zenoss_namespace }}
+  when: "'{{ zenoss_namespace }}' not in namespaces.stdout"
+  args:
+    creates: /opt/.zenoss-configed
+
 - name: put the template in place
   template:
     src: zenoss4-nginx-service.yaml.j2
