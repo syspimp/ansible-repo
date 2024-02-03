@@ -57,6 +57,8 @@
   hosts: capsule-lb*
   roles:
     - haproxy
+    - snmp-client
+    - rsyslog-client
 
 - name: Configure Cloudforms Management Engine
   hosts: cloudforms*:cfme*
