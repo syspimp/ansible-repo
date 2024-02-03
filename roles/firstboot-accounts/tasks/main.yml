@@ -85,9 +85,12 @@
 
   - name: "Installing terminal logging rpms"
     yum:
-      name: "tlog"
+      name: "{{ item }}"
       state: latest
     become: true
+    loop:
+      - tlog
+      - aide
 
   - name: "terminal logging config"
     template: 
@@ -102,6 +105,11 @@
     ansible.builtin.service:
       name: sssd
       state: restarted
+
+  - name: "running aide --init to generate known good configuration"
+    shell: |
+      /usr/sbin/aide --init
+    become: true
 
   - name: "running authselect to select sssd for authentication"
     shell: |
