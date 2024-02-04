@@ -111,6 +111,16 @@
       /usr/sbin/aide --init
     become: true
 
+  - name: "copy the db to the config location"
+    shell: |
+      cp /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+    become: true
+
+  - name: "restorecon on /var/lib/aid.db.gz"
+    shell: |
+      restorecon -av /var/lib/aide/
+    become: true
+
   - name: "running authselect to select sssd for authentication"
     shell: |
       authselect select sssd --force
