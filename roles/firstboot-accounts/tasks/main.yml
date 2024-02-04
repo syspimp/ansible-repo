@@ -127,7 +127,7 @@
 
   - name: "restorecon on /var/lib/aid.db.gz"
     shell: |
-      restorecon -av /var/lib/aide/
+      restorecon -rv /var/lib/aide/
     become: true
 
   - name: "running authselect to select sssd for authentication"
