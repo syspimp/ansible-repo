@@ -1,6 +1,8 @@
 ---
 - name: "Register a host with the correct Satellite 6 Load balancer"
-  hosts: all:!satellite-server:!capsules:!capsule-lb
+  vars:
+    sat6_clients: "all:!satellite-server:!capsules:!capsule-lb"
+  hosts: "{{ sat6_clients }}"
   become: yes
   roles:
     - satellite-clients
