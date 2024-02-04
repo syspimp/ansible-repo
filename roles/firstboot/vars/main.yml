@@ -10,9 +10,11 @@ rh8_enabled_repos: ['ansible-2.9-for-rhel-8-x86_64-rpms','rhel-8-for-x86_64-apps
 rh_disabled_repos: ['*']
 redhat_packages: ['sos','libselinux-python','rhel-system-roles','puppet','nspr','deltarpm','bash-completion','vim-enhanced','ntp','ntpdate','git','wget','bind-utils','nfs-utils','openscap-scanner','rubygem-foreman_scap_client','cockpit','cockpit-dashboard','firewalld']
 redhat8_packages: ['python3','git','firewalld','bind-utils','rhel-system-roles']
+redhat9_packages: ['firewalld','bind-utils','rhel-system-roles']
 centos_packages: ['deltarpm','bash-completion','vim-enhanced','ntp','ntpdate','git','wget','bind-utils']
 fedora_packages: "deltarpm bash-completion ntp ntpdate git wget rsyslog bind-utils"
 enabled_svcs: ['sshd','rsyslog','NetworkManager']
+rhel9_enabled_svcs: ['sshd','rsyslog','NetworkManager','firewalld']
 disabled_svcs: ['']
 #disabled_svcs: ['NetworkManager']
 rh_satellite_url: https://subscription.rhn.redhat.com
