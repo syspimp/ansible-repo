@@ -235,7 +235,7 @@
         name: "{{ item }}"
         #state: restarted
         enabled: yes
-      with_items: "{{ enabled_svcs }}"
+      with_items: "{{ rhel9_enabled_svcs }}"
       become: true
     
     - name: "Restart NetworkManager"
@@ -305,14 +305,14 @@
       become: true
       ignore_errors: yes
     
-#    - name: "try to install python for rhel8 real quick"
-#      yum:
-#        name: "{{ item }}"
-#        state: latest
-#      loop: "{{ redhat8_packages }}"
-#      become: true
-#      when:
-#      - ansible_distribution_major_version == '9'
+    - name: "try to install python for rhel8 real quick"
+      yum:
+        name: "{{ item }}"
+        state: latest
+      loop: "{{ redhat9_packages }}"
+      become: true
+      when:
+      - ansible_distribution_major_version == '9'
 
     - name: "Add auditd rules to detect login log tampering to pass pci dss"
       ansible.builtin.lineinfile:
