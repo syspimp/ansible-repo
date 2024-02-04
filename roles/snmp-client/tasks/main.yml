@@ -39,6 +39,6 @@
 - name: "Allow port 161/udp in firewalld rules"
   firewalld:
     immediate: yes
-    port: 161/upd
+    port: 161/udp
     state: enabled
     permanent: yes
