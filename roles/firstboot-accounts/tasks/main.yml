@@ -121,6 +121,7 @@
       name: "file integrity check"
       minute: "0"
       hour: "23"
+      weekday: "6"
       job: "/usr/sbin/aide --check"
     become: true
 
