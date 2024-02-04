@@ -116,6 +116,14 @@
       cp /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
     become: true
 
+  - name: "adding aide cron"
+    ansible.builtin.cron:
+      name: "file integrity check"
+      minute: "0"
+      hour: "23"
+      job: "/usr/sbin/aide --check"
+    become: true
+
   - name: "restorecon on /var/lib/aid.db.gz"
     shell: |
       restorecon -av /var/lib/aide/
