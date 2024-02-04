@@ -1,3 +1,8 @@
 -w /var/log/tallylog -p wa -k logins
 -w /var/log/faillock -p wa -k logins
 -w /var/log/lastlog -p wa -k logins
+-a always,exit -F arch=b64 -S chmod -F auid>=1000 -F auid!=unset -F key=perm_mod
+-a always,exit -F arch=b64 -S chown -F auid>=1000 -F auid!=unset -F key=perm_mod
+-a always,exit -F arch=b64 -S rename -F auid>=1000 -F auid!=unset -F key=delete
+-a always,exit -F arch=b64 -S rmdir -F auid>=1000 -F auid!=unset -F key=delete
+-a always,exit -F arch=b64 -S unlink -F auid>=1000 -F auid!=unset -F key=delete
