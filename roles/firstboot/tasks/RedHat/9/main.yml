@@ -230,6 +230,15 @@
         key: "{{ automation_user_pub_key }}"
       become: true
     
+    - name: "try to install python for rhel9 real quick"
+      yum:
+        name: "{{ item }}"
+        state: latest
+      loop: "{{ redhat9_packages }}"
+      become: true
+      when:
+      - ansible_distribution_major_version == '9'
+
     - name: "Enabling and restarting services {{ enabled_svcs }}"
       service:
         name: "{{ item }}"
@@ -305,15 +314,6 @@
       become: true
       ignore_errors: yes
     
-    - name: "try to install python for rhel8 real quick"
-      yum:
-        name: "{{ item }}"
-        state: latest
-      loop: "{{ redhat9_packages }}"
-      become: true
-      when:
-      - ansible_distribution_major_version == '9'
-
     - name: "Add auditd rules to detect login log tampering to pass pci dss"
       ansible.builtin.lineinfile:
         path: /etc/audit/rules.d/audit.rules
