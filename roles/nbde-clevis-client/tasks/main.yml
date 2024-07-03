@@ -90,6 +90,8 @@
     lineinfile:
       path: /etc/crypttab
       line: "{{ encrypted['device_name'] }}  /dev/{{ encrypted['device'] }}p1  none   _netdev"
+      create: true
+      state: present
     become: yes
   
   - name: "Configure /etc/fstab"
