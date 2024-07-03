@@ -5,12 +5,12 @@
     dest: /tmp/minikube-latest.x86_64.rpm
     mode: '0440'
 
-- name: kubectl repo file
-  template:
-    src: kube.repo.j2
-    dest: /etc/yum.repos.d/kube.repo
-  become: yes
-
+#- name: kubectl repo file
+#  template:
+#    src: kube.repo.j2
+#    dest: /etc/yum.repos.d/kube.repo
+#  become: yes
+#
 - name: minikube.service file
   template:
     src: minikube.service.j2
