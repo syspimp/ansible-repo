@@ -2,5 +2,5 @@
 # this line requires 1 of the tang servers to be available
 cfg=$'{"t":1,"pins":{"tang":[{% for host in tang_servers %}{"url":"http://{{ host.name }}"},{% endfor %}'
 export cfg=$(echo $cfg | sed -e "s/},$/}]}}/g")
-echo "cmd: clevis luks bind -f -d {{ encrypted['device'] }}{{ encrypted['device_partition'] }} sss $cfg"
-clevis luks bind -f -d /dev/nvme1n1p1 sss $cfg && touch /root/.setup/encryptedsetup
+echo "cmd: clevis luks bind -f -d {{ encrypted['device_block'] }}{{ encrypted['device_partition'] }} sss $cfg"
+clevis luks bind -f -d {{ encrypted['device_block'] }}{{ encrypted['device_partition'] }} sss $cfg && touch /root/.setup/encryptedsetup
