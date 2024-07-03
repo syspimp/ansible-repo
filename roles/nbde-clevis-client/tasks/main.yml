@@ -50,13 +50,13 @@
 - name: encryption block
   block:
   - name: encrypt the partion
-    shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksFormat /dev/{{ encrypted['device'] }}p1 --batch-mode -
+    shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksFormat /dev/{{ encrypted['device'] }}1 --batch-mode -
     become: yes
     args:
       creates: /root/.setup/encrypt3
 
   - name: name the encrypted partition
-    shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksOpen /dev/{{ encrypted['device'] }}p1 {{ encrypted['device_name'] }} --batch-mode - && touch /root/.setup/encrypt3
+    shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksOpen /dev/{{ encrypted['device'] }}1 {{ encrypted['device_name'] }} --batch-mode - && touch /root/.setup/encrypt3
     become: yes
     args:
       creates: /root/.setup/encrypt3
