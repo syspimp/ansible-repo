@@ -115,7 +115,8 @@
     shell: |
       cp /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
     become: true
-    creates: /var/lib/aide/aide.db.gz
+    args:
+      creates: /var/lib/aide/aide.db.gz
 
   - name: "adding aide cron"
     ansible.builtin.cron:
