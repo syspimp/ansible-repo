@@ -16,6 +16,12 @@
     - clevis-dracut
     - clevis
 
+- name: "tracking directory"
+  file:
+    path: "/root/.setup"
+    state: directory
+  become: true
+
 - name: partitioning block
   block:
   - name: make sure the disk is present
