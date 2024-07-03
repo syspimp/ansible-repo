@@ -50,13 +50,13 @@
 - name: encryption block
   block:
   - name: encrypt the partion
-    shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksFormat /dev/{{ encrypted['device'] }}1 --batch-mode -
+    shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksFormat /dev/{{ encrypted['device'] }}{{ encrypted['device_partition'] }} --batch-mode -
     become: yes
     args:
       creates: /root/.setup/encrypt3
 
   - name: name the encrypted partition
-    shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksOpen /dev/{{ encrypted['device'] }}1 {{ encrypted['device_name'] }} --batch-mode - && touch /root/.setup/encrypt3
+    shell: echo -n '{{ encrypted['passphrase'] }}' | cryptsetup luksOpen /dev/{{ encrypted['device'] }}{{ encrypted['device_partition'] }} {{ encrypted['device_name'] }} --batch-mode - && touch /root/.setup/encrypt3
     become: yes
     args:
       creates: /root/.setup/encrypt3
@@ -89,7 +89,7 @@
   - name: "Configure /etc/crypttab"
     lineinfile:
       path: /etc/crypttab
-      line: "{{ encrypted['device_name'] }}  /dev/{{ encrypted['device'] }}p1  none   _netdev"
+      line: "{{ encrypted['device_name'] }}  /dev/{{ encrypted['device'] }}{{ encrypted['device_partition'] }}  none   _netdev"
       create: true
       state: present
     become: yes

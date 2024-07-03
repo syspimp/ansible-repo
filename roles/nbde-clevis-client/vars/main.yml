@@ -1,6 +1,7 @@
 encrypted:
   device: sdb
   device_block: /dev/sdb
+  device_partition: 1
   device_name: encrypteddisk
   device_mountpoint: /mnt/encrypted
   device_fs: xfs
