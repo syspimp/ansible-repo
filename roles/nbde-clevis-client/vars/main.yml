@@ -1,6 +1,6 @@
 encrypted:
-  device: nvme1n1
-  device_block: /dev/nvme1n1
+  device: sdb
+  device_block: /dev/sdb
   device_name: encrypteddisk
   device_mountpoint: /mnt/encrypted
   device_fs: xfs
