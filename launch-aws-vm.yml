@@ -53,6 +53,8 @@
     aws_security_group_allow_cidr: "0.0.0.0/0"
     aws_region: us-east-1
     aws_number_of_vms: 1
+    #fedora 40
+    fedora40_ami_id: ami-0aca2ed5c7b247386
     #RHEL 6 AMI
     rhel6_ami_id: ami-1643ff7e
     # CentOS 7
@@ -122,6 +124,11 @@
       set_fact:
         aws_image_ami: "{{ rhel8_ami_id }}"
       when: "'rhel8' in aws_ostype"
+
+    - name: Set the AMI to Fedora
+      set_fact:
+        aws_image_ami: "{{ fedora40_ami_id }}"
+      when: "'fedora40' in aws_ostype"
 
     - name: Set the VM roles
       set_fact:
