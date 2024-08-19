@@ -53,8 +53,10 @@
     aws_security_group_allow_cidr: "0.0.0.0/0"
     aws_region: us-east-1
     aws_number_of_vms: 1
-    #fedora 40
-    fedora40_ami_id: ami-0aca2ed5c7b247386
+    #fedora 40 west
+    #fedora40_ami_id: ami-0aca2ed5c7b247386
+    #fedora 40 east
+    fedora40_ami_id: ami-004f552bba0e5f64f
     #RHEL 6 AMI
     rhel6_ami_id: ami-1643ff7e
     # CentOS 7
