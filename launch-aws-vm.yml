@@ -431,15 +431,15 @@
           msg: "This is normal for records not to exist."
   
       always:
-        - name: create A records
-          community.aws.route53:
-            command: create
-            zone: "{{ dns_zone }}"
-            record: "{{ aws_vmname }}.{{ dns_zone }}"
-            type: "{{ type }}"
-            ttl: "{{ ttl }}"
-            value: "{{ ec2results.instances[0].public_ip }}"
-            wait: yes
+      - name: create A records
+        community.aws.route53:
+          command: create
+          zone: "{{ dns_zone }}"
+          record: "{{ aws_vmname }}.{{ dns_zone }}"
+          type: "{{ type }}"
+          ttl: "{{ ttl }}"
+          value: "{{ ec2results.instances[0].public_ip }}"
+          wait: yes
 
       - name: create txt records
         community.aws.route53:
