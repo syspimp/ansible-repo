@@ -72,14 +72,14 @@
 
 - name: wrapper to install samba
   block:
-  - name: "sssd.conf local config"
-    template: 
-      src: sssd.conf.j2
-      dest: /etc/sssd/sssd.conf 
-      owner: root 
-      group: root 
-      mode: 0444
-    become: true
+#  - name: "sssd.conf local config"
+#    template: 
+#      src: sssd.conf.j2
+#      dest: /etc/sssd/sssd.conf 
+#      owner: root 
+#      group: root 
+#      mode: 0444
+#    become: true
 
   - name: "[Samba] Installing rpms"
     yum:
