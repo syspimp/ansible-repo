@@ -14,7 +14,6 @@
   hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsule*
   become: yes
   roles:
-    - insights
     - webconsole
     - leapp-upgrade
     - rsyslog-client
@@ -26,6 +25,7 @@
   become: yes
   roles:
     - satellite-clients
+    - insights
 
 - name: Create ansible build environment
   hosts: builder*

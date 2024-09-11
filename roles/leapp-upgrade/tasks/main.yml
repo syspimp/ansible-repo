@@ -1,5 +1,5 @@
 ---
-- name: "Add leapp upgrade tool when Redhat version < 8"
+- name: "Add leapp upgrade tool for RHEL 7 and 8"
   block:
   - name: "Check if leapp is installed"
     shell: "rpm -qa | grep leapp || true"
@@ -19,7 +19,22 @@
     retries: 3
     until: subscriberepos.stdout.find("is enabled") != -1
     become: true
-    when: item not in repolist.stdout
+    when:
+      - item not in repolist.stdout
+      - "ansible_distribution == 'RedHat'"
+      - "ansible_distribution_major_version|int < 8"
+
+  - name: "Enabling needed repos for leapp"
+    shell: "subscription-manager repos --enable={{ item }}"
+    loop: "{{ leapp_repos8 }}"
+    register: subscriberepos
+    retries: 3
+    until: subscriberepos.stdout.find("is enabled") != -1
+    become: true
+    when:
+      - item not in repolist.stdout
+      - "ansible_distribution == 'RedHat'"
+      - "ansible_distribution_major_version|int == 8"
 
   - name: "Install leapp dependencies if not installed"
     yum:
@@ -27,8 +42,21 @@
       state: "present"
     become: yes
     when:
-    - "item not in isinstalled.stdout"
+      - "item not in isinstalled.stdout"
+      - "ansible_distribution == 'RedHat'"
+      - "ansible_distribution_major_version|int < 8"
     loop: "{{ leapp_rpms }}"
+  
+  - name: "Install leapp dependencies if not installed"
+    yum:
+      name: "{{ item }}"
+      state: "present"
+    become: yes
+    when:
+      - "item not in isinstalled.stdout"
+      - "ansible_distribution == 'RedHat'"
+      - "ansible_distribution_major_version|int == 8"
+    loop: "{{ leapp_rpms8 }}"
   
   - name: "Extract the leapp dataset from https://access.redhat.com/articles/3664871"
     ansible.builtin.unarchive:
@@ -36,6 +64,6 @@
       dest: /etc/leapp/files/
       creates: /etc/leapp/files/pes-events.json
     become: yes
-  when:
-  - "ansible_distribution == 'RedHat'"
-  - "ansible_distribution_major_version|int < 8"
+    when:
+      - "ansible_distribution == 'RedHat'"
+      - "ansible_distribution_major_version|int < 8"

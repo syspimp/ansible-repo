@@ -2,6 +2,11 @@
 leapp_repos:
 - rhel-7-server-rpms
 - rhel-7-server-extras-rpms
+leapp_repos8:
+- rhel-8-for-x86_64-appstream-rpms
 leapp_rpms:
 - leapp
 - leapp-repository
+leapp_rpms8:
+- leapp
+- leapp-upgrade-el8toel9
