@@ -109,6 +109,8 @@
   - name: "running aide --init to generate known good configuration"
     shell: |
       /usr/sbin/aide --init
+    args:
+      creates: /var/lib/aide/aide.db.gz
     become: true
 
   - name: "copy the db to the config location"
