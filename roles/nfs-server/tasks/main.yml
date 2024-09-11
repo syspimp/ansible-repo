@@ -99,8 +99,8 @@
     shell:  "wget -O - https://raw.githubusercontent.com/enira/cockpit-smb-plugin/master/install.sh | bash"
     become: true
     #command_warnings: False
-  #when: "sambashares == 'yes'"
-  #
+  when: "sambashares == 'yes'"
+  
   rescue:
   - name:
     debug:

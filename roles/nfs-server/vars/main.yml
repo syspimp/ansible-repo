@@ -1,1 +1,6 @@
 nfs_mountpoint: /nfs_share
+sambashares: yes
+samba_rpms:
+- samba
+- wget
+
