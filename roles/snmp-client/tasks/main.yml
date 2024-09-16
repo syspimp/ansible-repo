@@ -26,13 +26,6 @@
   shell: restorecon /etc/snmp/snmpd.conf
   become: yes
 
-- name: "Allow port 161/udp in firewalld rules"
-  firewalld:
-    immediate: yes
-    port: 161/udp
-    state: enabled
-    permanent: yes
-
 - name: "Start snmpd and firewalld service"
   systemd:
     state: started
@@ -42,4 +35,20 @@
   loop:
     - firewalld
     - snmpd
+
+- name: "Allow port 161/udp in firewalld rules"
+  firewalld:
+    immediate: yes
+    port: 161/udp
+    state: enabled
+    permanent: yes
+
+- name: "Start snmpd and firewalld service"
+  systemd:
+    state: restarted
+    name: "{{ item }}.service"
+    enabled: yes
+    force: yes
+  loop:
+    - firewalld
 
