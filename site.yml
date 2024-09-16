@@ -5,6 +5,14 @@
     - firstboot-accounts
     - firstboot
 
+- name: Monitoring roles
+  hosts: all
+  become: yes
+  roles:
+    - rsyslog-client
+    - lldp-client
+    - snmp-client
+
 - name: Role specific tasks
   hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsule*
   roles:
@@ -16,12 +24,9 @@
   roles:
     - webconsole
     - leapp-upgrade
-    - rsyslog-client
-    - lldp-client
-    - snmp-client
 
 - name: Satellite clients
-  hosts: all:!sat6*:!satellite*:!management*
+  hosts: all:!sat6*:!satellite*:!management*:!capsule*
   become: yes
   roles:
     - satellite-clients
