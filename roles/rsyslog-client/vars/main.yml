@@ -1,3 +1,3 @@
 monitoring:
-  server: aap24-demo.tfound.org
-  logging_port: 601
+  server: 10.55.102.76
+  logging_port: 30514
