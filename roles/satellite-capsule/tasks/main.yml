@@ -421,3 +421,12 @@
   - name: "Failure"
     debug:
       msg: "There is no satellite server. Run again after setting up the Satellite Server"
+
+- name: "Enable proxyied services"
+  firewalld:
+    immediate: yes
+    port: "{{ item.port }}/{{ item.mode }}"
+    state: enabled
+    permanent: yes
+  loop: "{{ satellite_services }}"
+
