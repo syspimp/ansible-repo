@@ -66,6 +66,14 @@
       enabled: yes
     become: yes
 
+  - name: "Enable proxyied services"
+    firewalld:
+      immediate: yes
+      port: "{{ item.port }}/{{ item.mode }}"
+      state: enabled
+      permanent: yes
+    loop: "{{ haproxy_services }}"
+
   rescue:
   - name: "You will need to rerun this playbook"
     debug:
