@@ -171,13 +171,29 @@
         path: /etc/aide.conf
         line: "{{ item }}"
       loop:
-        - /usr/sbin/auditctl p+i+n+u+g+s+b+acl+xattrs+sha512
-        - /usr/sbin/auditd p+i+n+u+g+s+b+acl+xattrs+sha512
-        - /usr/sbin/ausearch p+i+n+u+g+s+b+acl+xattrs+sha512
-        - /usr/sbin/aureport p+i+n+u+g+s+b+acl+xattrs+sha512
-        - /usr/sbin/autrace p+i+n+u+g+s+b+acl+xattrs+sha512
-        - /usr/sbin/augenrules p+i+n+u+g+s+b+acl+xattrs+sha512
-        - /usr/sbin/rsyslogd p+i+n+u+g+s+b+acl+xattrs+sha512
+        - "/usr/sbin/auditctl p+i+n+u+g+s+b+acl+xattrs+sha512"
+        - "/usr/sbin/auditd p+i+n+u+g+s+b+acl+xattrs+sha512"
+        - "/usr/sbin/ausearch p+i+n+u+g+s+b+acl+xattrs+sha512"
+        - "/usr/sbin/aureport p+i+n+u+g+s+b+acl+xattrs+sha512"
+        - "/usr/sbin/autrace p+i+n+u+g+s+b+acl+xattrs+sha512"
+        - "/usr/sbin/augenrules p+i+n+u+g+s+b+acl+xattrs+sha512"
+        - "/usr/sbin/rsyslogd p+i+n+u+g+s+b+acl+xattrs+sha512"
+
+    - name: "Monitor the auditing tools"
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/journald.conf
+        line: "{{ item }}"
+      loop:
+        - "Storage=persistent"
+        - "Compress=yes"
+
+    - name: "Config coredumps"
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/coredump.conf 
+        line: "{{ item }}"
+      loop:
+        - "ProcessSizeMax=0"
+        - "Storage=none"
 
     - name: "Fix the DNS in ifcfg-eth0"
       ansible.builtin.lineinfile:
@@ -273,14 +289,15 @@
       ignore_errors: yes
       args:
         creates: /opt/.firstboot
-     #   - name: "Stopping and disabling services {{ disabled_svcs }}"
-     #     service:
-     #       name: "{{ item }}"
-     #       state: stopped
-     #       enabled: no
-     #     with_items: "{{ disabled_svcs }}"
-     #     ignore_errors: yes
-     #     become: true
+
+    - name: "Stopping and disabling services {{ rhel9_disabled_svcs }}"
+      service:
+        name: "{{ item }}"
+        state: stopped
+        enabled: no
+      with_items: "{{ rhel9_disabled_svcs }}"
+      ignore_errors: yes
+      become: true
     
     - name: "update dns with the real hostname given in openstack"
       template:

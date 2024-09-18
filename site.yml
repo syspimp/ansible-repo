@@ -4,6 +4,7 @@
   roles:
     - firstboot-accounts
     - firstboot
+    - audit-pci
 
 - name: Monitoring roles
   hosts: all
