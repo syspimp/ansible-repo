@@ -15,7 +15,7 @@ centos_packages: ['deltarpm','bash-completion','vim-enhanced','ntp','ntpdate','g
 fedora_packages: "deltarpm bash-completion ntp ntpdate git wget rsyslog bind-utils"
 enabled_svcs: ['sshd','rsyslog','NetworkManager']
 rhel9_enabled_svcs: ['sshd','rsyslog','NetworkManager','firewalld']
-rhel9_disabled_svcs: ['nftables','systemd-journal-remote.socket']
+rhel9_disabled_svcs: ['nftables','systemd-journal-remote.socket','nfs-server.service','rpcbind.service']
 #disabled_svcs: ['NetworkManager']
 rh_satellite_url: https://subscription.rhn.redhat.com
 rh_satellite_org: None

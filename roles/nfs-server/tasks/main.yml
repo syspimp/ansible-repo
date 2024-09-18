@@ -58,6 +58,17 @@
    restorecon -R {{ nfs_mountpoint }}
   become: yes
  
+- name: "Unmask nfs services"
+  shell: |
+    systemctl unmask {{ item }}
+  ignore_errors: yes
+  become: yes
+  loop:
+  - rpcbind
+  - nfs-mountd
+  - nfs-idmapd
+  - nfs-server
+
 - name: "Enable and start nfs services"
   service:
     name: "{{ item }}"

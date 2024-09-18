@@ -211,6 +211,19 @@
         path: /etc/issue.net
         line: "\nI've read & consent to terms in IS user agreem't. Authorized use only."
 
+    - name: "Disable ssh access with no password"
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: "{{ item }}"
+      loop:
+        - "Banner /etc/issue.net"
+        - "PermitEmptyPasswords no"
+        - "LoginGraceTime 60"
+        - "LogLevel VERBOSE"
+        - "MaxAuthTries 4"
+        - "MaxSessions 10"
+        - "MaxStartups 10:30:60"
+
     - name: "Fix the DNS in ifcfg-eth0"
       ansible.builtin.lineinfile:
         path: /etc/sysconfig/network-scripts/ifcfg-eth0
@@ -310,6 +323,15 @@
       service:
         name: "{{ item }}"
         state: stopped
+        enabled: no
+      with_items: "{{ rhel9_disabled_svcs }}"
+      ignore_errors: yes
+      become: true
+    
+    - name: "Masking disabled services {{ rhel9_disabled_svcs }}"
+      service:
+        name: "{{ item }}"
+        state: mask
         enabled: no
       with_items: "{{ rhel9_disabled_svcs }}"
       ignore_errors: yes
