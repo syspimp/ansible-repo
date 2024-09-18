@@ -329,11 +329,9 @@
       become: true
     
     - name: "Masking disabled services {{ rhel9_disabled_svcs }}"
-      service:
-        name: "{{ item }}"
-        state: mask
-        enabled: no
-      with_items: "{{ rhel9_disabled_svcs }}"
+      shell: |
+        systemctl mask {{ item }}
+      loop: "{{ rhel9_disabled_svcs }}"
       ignore_errors: yes
       become: true
     
