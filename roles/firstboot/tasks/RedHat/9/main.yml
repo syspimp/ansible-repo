@@ -389,6 +389,11 @@
         mode: 0644
       become: true
 
+    - name: "reload sysctl"
+      shell:
+        sysctl -p
+      become: true
+
     - name: "update system crypto policy to NO:SHA1"
       shell:
         update-crypto-policies --set DEFAULT:NO-SHA1
@@ -410,6 +415,27 @@
       - "-w /var/log/tallylog -p wa -k logins"
       - "-w /var/log/faillock -p wa -k logins"
       - "-w /var/log/lastlog -p wa -k logins"
+
+    - name: "bashrc umask limits"
+      ansible.builtin.lineinfile:
+        path: /etc/bashrc
+        line: "{{ item }}"
+      loop:
+      - "umask 027"
+
+    - name: "profile umask limits"
+      ansible.builtin.lineinfile:
+        path: /etc/profile
+        line: "{{ item }}"
+      loop:
+      - "umask 027"
+
+    - name: "login.defs  umask limits"
+      ansible.builtin.lineinfile:
+        path: /etc/login.defs
+        line: "{{ item }}"
+      loop:
+      - "umask 027"
 
     - name: "Add custom rules to detect login log tampering to pass pci dss"
       template: 
