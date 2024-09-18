@@ -204,12 +204,12 @@
     - name: "Enable /etc/issue with consent"
       lineinfile:
         path: /etc/issue
-        line: "I've read & consent to terms in IS user agreem't"
+        line: "\nI've read & consent to terms in IS user agreem't Authorized use only"
 
     - name: "Enable /etc/issue.net with consent"
       lineinfile:
         path: /etc/issue.net
-        line: "I've read & consent to terms in IS user agreem't"
+        line: "\nI've read & consent to terms in IS user agreem't. Authorized use only."
 
     - name: "Fix the DNS in ifcfg-eth0"
       ansible.builtin.lineinfile:
