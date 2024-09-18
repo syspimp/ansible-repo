@@ -138,5 +138,6 @@
     shell: |
       authselect select sssd --force
       authselect enable-feature with-files-domain
+      authselect enable-feature without-nullok
       authselect apply-changes
     become: true
