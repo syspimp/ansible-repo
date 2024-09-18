@@ -195,6 +195,22 @@
         - "ProcessSizeMax=0"
         - "Storage=none"
 
+    - name: "Enable logfile option in /etc/sudoers"
+      lineinfile:
+        path: /etc/sudoers
+        line: Defaults logfile=/var/log/sudo.log/
+        validate: /usr/sbin/visudo -cf %s
+
+    - name: "Enable /etc/issue with consent"
+      lineinfile:
+        path: /etc/issue
+        line: "I've read & consent to terms in IS user agreem't"
+
+    - name: "Enable /etc/issue with consent"
+      lineinfile:
+        path: /etc/issue.net
+        line: "I've read & consent to terms in IS user agreem't"
+
     - name: "Fix the DNS in ifcfg-eth0"
       ansible.builtin.lineinfile:
         path: /etc/sysconfig/network-scripts/ifcfg-eth0
@@ -344,9 +360,19 @@
         mode: 0644
       become: true
     
+    - name: "Updating MOTD"
+      template: 
+        src: sysctl.conf.j2
+        dest: /etc/sysctl.conf
+        owner: root 
+        group: root 
+        mode: 0644
+      become: true
+
     - name: "Put the role in the MOTD"
       shell: |
         cat /etc/ansible/facts.d/roles.fact >> /etc/motd
+        echo "Authorized use only" >> /etc/motd
       become: true
       ignore_errors: yes
     
