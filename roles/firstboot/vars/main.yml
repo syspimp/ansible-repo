@@ -9,8 +9,8 @@ rh7_enabled_repos: ['rhel-7-server-optional-rpms','rhel-7-server-rpms','rhel-7-s
 rh8_enabled_repos: ['ansible-2.9-for-rhel-8-x86_64-rpms','rhel-8-for-x86_64-appstream-rpms','rhel-8-for-x86_64-baseos-rpms']
 rh_disabled_repos: ['*']
 redhat_packages: ['sos','libselinux-python','rhel-system-roles','puppet','nspr','deltarpm','bash-completion','vim-enhanced','ntp','ntpdate','git','wget','bind-utils','nfs-utils','openscap-scanner','rubygem-foreman_scap_client','cockpit','cockpit-dashboard','firewalld']
-redhat8_packages: ['python3','git','firewalld','bind-utils','rhel-system-roles']
-redhat9_packages: ['python3','firewalld','bind-utils','rhel-system-roles']
+redhat8_packages: ['python3','git','firewalld','bind-utils','rhel-system-roles','selinux-policy']
+redhat9_packages: ['python3','firewalld','bind-utils','rhel-system-roles','selinux-policy']
 centos_packages: ['deltarpm','bash-completion','vim-enhanced','ntp','ntpdate','git','wget','bind-utils']
 fedora_packages: "deltarpm bash-completion ntp ntpdate git wget rsyslog bind-utils"
 enabled_svcs: ['sshd','rsyslog','NetworkManager']
