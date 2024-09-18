@@ -160,6 +160,25 @@
         regexp: "^max_log_file"
         line: "max_log_file = 8"
 
+    - name: "make sure aide is installed"
+      yum:
+        name: "aide"
+        state: latest
+      become: true
+
+    - name: "Monitor the auditing tools"
+      ansible.builtin.lineinfile:
+        path: /etc/aide.conf
+        line: "{{ item }}"
+      loop:
+        - /usr/sbin/auditctl p+i+n+u+g+s+b+acl+xattrs+sha512
+        - /usr/sbin/auditd p+i+n+u+g+s+b+acl+xattrs+sha512
+        - /usr/sbin/ausearch p+i+n+u+g+s+b+acl+xattrs+sha512
+        - /usr/sbin/aureport p+i+n+u+g+s+b+acl+xattrs+sha512
+        - /usr/sbin/autrace p+i+n+u+g+s+b+acl+xattrs+sha512
+        - /usr/sbin/augenrules p+i+n+u+g+s+b+acl+xattrs+sha512
+        - /usr/sbin/rsyslogd p+i+n+u+g+s+b+acl+xattrs+sha512
+
     - name: "Fix the DNS in ifcfg-eth0"
       ansible.builtin.lineinfile:
         path: /etc/sysconfig/network-scripts/ifcfg-eth0
