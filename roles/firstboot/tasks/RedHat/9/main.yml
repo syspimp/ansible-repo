@@ -198,7 +198,7 @@
     - name: "Enable logfile option in /etc/sudoers"
       lineinfile:
         path: /etc/sudoers
-        line: Defaults logfile=/var/log/sudo.log/
+        line: Defaults logfile=/var/log/sudo.log
         validate: /usr/sbin/visudo -cf %s
 
     - name: "Enable /etc/issue with consent"
@@ -206,7 +206,7 @@
         path: /etc/issue
         line: "I've read & consent to terms in IS user agreem't"
 
-    - name: "Enable /etc/issue with consent"
+    - name: "Enable /etc/issue.net with consent"
       lineinfile:
         path: /etc/issue.net
         line: "I've read & consent to terms in IS user agreem't"
@@ -367,6 +367,11 @@
         owner: root 
         group: root 
         mode: 0644
+      become: true
+
+    - name: "update system crypto policy to NO:SHA1"
+      shell:
+        update-crypto-policies --set DEFAULT:NO-SHA1
       become: true
 
     - name: "Put the role in the MOTD"
