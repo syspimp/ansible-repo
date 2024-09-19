@@ -1,14 +1,9 @@
 ---
-- name: "list the rpms installed"
-  shell: rpm -qa
-  register: rpmlist
-
 - name: "Installing snmp related rpms"
   yum:
     name: "{{ item }}"
     state: latest
   become: true
-  #when: item not in rpmlist.stdout
   loop:
   - net-snmp
   - net-snmp-devel

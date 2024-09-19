@@ -335,6 +335,15 @@
       ignore_errors: yes
       become: true
     
+    - name: "Start firewalld service"
+      systemd:
+        state: started
+        name: "{{ item }}.service"
+        enabled: yes
+        force: yes
+      loop:
+        - firewalld
+          
     - name: "Restricking loopback lo traffic"
       shell: |
         firewall-cmd --permanent --zone=trusted --add-interface=lo
