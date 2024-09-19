@@ -34,7 +34,7 @@
     when:
       - item not in repolist.stdout
       - "ansible_distribution == 'RedHat'"
-      - "ansible_distribution_major_version|int == 8"
+      - "ansible_distribution_major_version|int >= 8"
 
   - name: "Install leapp dependencies if not installed"
     yum:
@@ -55,8 +55,9 @@
     when:
       - "item not in isinstalled.stdout"
       - "ansible_distribution == 'RedHat'"
-      - "ansible_distribution_major_version|int == 8"
+      - "ansible_distribution_major_version|int >= 8"
     loop: "{{ leapp_rpms8 }}"
+    ignore_errors: yes
   
   - name: "Extract the leapp dataset from https://access.redhat.com/articles/3664871"
     ansible.builtin.unarchive:
