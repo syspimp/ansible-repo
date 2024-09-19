@@ -1,0 +1,8 @@
+---
+- name: "Start lldp service"
+  ansible.builtin.service:
+    name: lldpd
+    state: started
+    enabled: yes
+  become: yes
+

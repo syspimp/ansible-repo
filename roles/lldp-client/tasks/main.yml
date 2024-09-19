@@ -4,9 +4,6 @@
     path: /opt/.lldpcheck
   register: lldpcheckv
 
-- name: "debug"
-  debug: var=lldpcheck
-
 - name: "lldp installation block"
   block:
   - name: Install the latest version of lldpd
@@ -14,17 +11,8 @@
       name: lldpd
       state: latest
     become: yes
-
-  - name: Start the service
-    ansible.builtin.service:
-      name: lldpd
-      state: started
-      enabled: yes
-    become: yes
-
-  - name: Wait a minute for info collection
-    pause:
-      minutes: 1
+    notify:
+      - "Start lldp service"
 
   - name: Gather information from lldp
     community.general.lldp:
@@ -32,18 +20,6 @@
     delay: 2
     register: lldpcheck
     #until: lldpcheck.rc == 0
-    ignore_errors: yes
-
-  - name: Dump the check
-    ansible.builtin.debug:
-     msg: "{{ lldpcheck }}"
-    ignore_errors: yes
-
-  - name: Dump it all
-    ansible.builtin.debug:
-     msg: "{{ item }}"
-    with_items: "{{ lldp }}"
-    #when: lldp[item] is defined
     ignore_errors: yes
 
   - name: "lldp install complete"

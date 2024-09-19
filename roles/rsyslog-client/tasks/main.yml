@@ -1,12 +1,27 @@
 ---
-- name: "Update /etc/rsyslog.d with template"
-  template:
-    src: zenoss.conf.j2
-    dest: /etc/rsyslog.d/zenoss.conf
-    mode: '0600'
-  notify:
-    - restart rsyslogd
+- name: "rsyslog check"
+  stat:
+    path: /opt/.rsyslogcheck
+  register: rsyslogcheck
 
-- name: "Restore selinux context on /etc/rsyslog.d"
-  shell: restorecon -R /etc/rsyslog.d
-  become: yes
+- name: "rsylog installation block"
+  block:
+  - name: "Update /etc/rsyslog.d with template"
+    template:
+      src: zenoss.conf.j2
+      dest: /etc/rsyslog.d/zenoss.conf
+      mode: '0600'
+    notify:
+      - restart rsyslogd
+
+  - name: "Restore selinux context on /etc/rsyslog.d"
+    shell: restorecon -R /etc/rsyslog.d
+    become: yes
+
+  - name: "rsyslog install complete"
+    file:
+      path: "/opt/.rsyslogcheck"
+      state: touch
+      mode: 0444
+    become: true
+  when: rsyslogcheck.stat.exists == false
