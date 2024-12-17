@@ -1,0 +1,41 @@
+---
+- name: "delete security videos older than 2 years"
+  hosts: lab-services
+  gather_facts: no
+  vars:
+    dir2clean: "/mnt/mycloud2/ring_video_clips"
+    # 2 years is 730 days
+    howlongtokeep: "+730"
+  tasks:
+  - name: "current space consumed by vids"
+    shell: |
+      du -hs {{ dir2clean }}
+    register: consumed1
+
+  - name: "list space consumbed"
+    debug:
+      var: consumed1.stdout
+
+  - name: "find vids older than 2 years"
+    shell: |
+      find {{ dir2clean }} -mtime {{ howlongtokeep }} -name '*.mp4' -print
+    register: filestodelete
+
+  - name: "list vids older than 2 years"
+    debug:
+      var: filestodelete.stdout
+
+  - name: "delete vids older than 2 years"
+    shell: |
+      find {{ dir2clean }} -mtime {{ howlongtokeep }} -name '*.mp4' -exec rm {} \;
+    become: yes
+
+  - name: "space consumed by vids after cleanup"
+    shell: |
+      du -hs {{ dir2clean }}
+    register: consumed2
+
+  - name: "list space consumbed after cleanup"
+    debug:
+      var: consumed2.stdout
+
