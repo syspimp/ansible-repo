@@ -1,6 +1,7 @@
 ---
 - name: "delete tesla security cam videos older than 2 years"
   hosts: lab-services
+  gather_facts: no
   tasks:
   - name: "current space consumed by tesla vids"
     shell: |
