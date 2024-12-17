@@ -1,0 +1,35 @@
+---
+- name: "delete tesla security cam videos older than 2 years"
+  hosts: lab-services
+  tasks:
+  - name: "current space consumed by tesla vids"
+    shell: |
+      du -hs /mnt/mycloud2/TeslaVids/
+    register: consumed1
+
+  - name: "list space consumbed"
+    debug:
+      var: consumed1.stdout
+
+  - name: "find vids older than 2 years"
+    shell: |
+      find /mnt/mycloud2/TeslaVids/ -mtime +730 -name '*.mp4' -print
+    register: filestodelete
+
+  - name: "list vids older than 2 years"
+    debug:
+      var: filestodelete.stdout
+
+  - name: "delete vids older than 2 years"
+    shell: |
+      find /mnt/mycloud2/TeslaVids/ -mtime +730 -name '*.mp4' -exec rm {} \;
+
+  - name: "space consumed by tesla vids after cleanup"
+    shell: |
+      du -hs /mnt/mycloud2/TeslaVids/
+    register: consumed2
+
+  - name: "list space consumbed after cleanup"
+    debug:
+      var: consumed2.stdout
+
