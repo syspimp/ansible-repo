@@ -1,0 +1,25 @@
+---
+- name: "Backup aap"
+  hosts: aap-install-host
+  gather_facts: no
+  vars:
+    sourcedir: "/root"
+    aap_distro: "ansible-automation-platform-setup-bundle-2.4-4-x86_64"
+    backupdir: "/mnt/backups/aap-backups"
+  tasks:
+  - name: "check if backup dir exists"
+    file:
+      state: directory
+      path: "{{ backupdir }}"
+    become: yes
+
+  - name: "Run backup via setup.sh"
+    shell: "./setup.sh  -e 'backup_dest={{ backupdir }}' -b"
+    args:
+      chdir: "{{ sourcedir }}/{{ aap_distro }}"
+    become: yes
+        
+ - name: "keep only 7 days of backups"
+   shell: |
+     find {{ backupdir }} -type f -mtime +6 -exec rm {} \;
+   become: yes
