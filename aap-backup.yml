@@ -1,6 +1,7 @@
 ---
 - name: "Backup aap"
-  hosts: aap-install-host
+  hosts: localhost
+  connection: local
   gather_facts: no
   vars:
     sourcedir: "/root"
@@ -19,7 +20,7 @@
       chdir: "{{ sourcedir }}/{{ aap_distro }}"
     become: yes
         
- - name: "keep only 7 days of backups"
+  - name: "keep only 7 days of backups"
    shell: |
      find {{ backupdir }} -type f -mtime +6 -exec rm {} \;
    become: yes
