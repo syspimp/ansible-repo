@@ -1,0 +1,14 @@
+---
+- hosts: all
+  tasks:
+  - name: Gather information from lldp
+    community.general.lldp:
+    retries: 5
+    delay: 2
+    register: lldpcheck
+    #until: lldpcheck.rc == 0
+    ignore_errors: yes
+
+  - name: dump it
+    debug:
+      var: lldpcheck
