@@ -62,7 +62,7 @@
 
   - name: "Find the id to the capsules/proxies"
     shell: |
-      hammer capsule list | grep 'Pulp Node' | awk '{ print $1 }'
+      hammer capsule list | grep 'capsule' | awk '{ print $1 }'
     register: capsulelist
 
   - name: "Synchronize the content to the capsule/proxy"
