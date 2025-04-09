@@ -1,5 +1,5 @@
 ---
-satellite_version: 6.11
+#satellite_version: 6.11
 openstack_version: 14
 openshift_version: 3.11
 rhel7latestversion: 7.9
