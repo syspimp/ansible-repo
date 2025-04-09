@@ -1,7 +1,7 @@
 ---
 #sat6_server: ip-11-22-33-182.prod.maskedadmins.com
-sat6_lb_config_shortname: capsule-lb
-satellite_version: 6.16
+#satellite_version: 6.16
+#sat6_lb_config_shortname: capsule_lb
 aap_group_name: capsules
 #capsules_inventory_group: 81
 rh_satellite_user: !vault |
