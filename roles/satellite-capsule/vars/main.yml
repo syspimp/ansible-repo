@@ -1,7 +1,6 @@
 ---
-capsule_loadbalancer_fqdn: capsule-lb.tfound.org
 #sat6_server: ip-11-22-33-182.prod.maskedadmins.com
-satellite_version: 6.11
+satellite_version: 6.16
 aap_group_name: capsules
 #capsules_inventory_group: 81
 rh_satellite_user: !vault |
@@ -26,15 +25,15 @@ rh_satellite_pool_id: !vault |
           3333323330313934350a633965643439323739313637356264633563643065326332346266646262
           63306430373863386535336563323064316138646336623433326438343438643132346334373164
           6634646634333230363338383138643064333230373563653834
-sat6:
-  user: "admin"
-  pass: "CHANGEPASS"
-  org: "{{ sat6_org }}"
-  hostgroup: "{{ sat6_hostgroup }}"
-  location: "{{ sat6_loc }}"
-  environment: "{{ sat6_env }}"
-  activation_key: "{{ sat6_org }}-{{ sat6_env }}-key"
-  lb_fqdn: "capsule-lb.{{ dns_domain }}"
+#sat6:
+#  user: "admin"
+#  pass: "CHANGEPASS"
+#  org: "{{ sat6_org }}"
+#  hostgroup: "{{ sat6_hostgroup }}"
+#  location: "{{ sat6_loc }}"
+#  environment: "{{ sat6_env }}"
+#  activation_key: "{{ sat6_org }}-{{ sat6_env }}-key"
+#  lb_fqdn: "capsule-lb.{{ dns_domain }}"
 satellite_services:
   - name: http
     port: 80
