@@ -106,19 +106,18 @@
     - name: "Enable satellite-capsule repos"
       shell: |
         subscription-manager repos \
-                           --enable satellite-capsule-{{ satellite_version }}-for-rhel-8-x86_64-rpms \
-                           --enable satellite-6.11-for-rhel-8-x86_64-rpms \
-                           --enable satellite-maintenance-6.11-for-rhel-8-x86_64-rpms \
-                           --enable=ansible-2.9-for-rhel-8-x86_64-rpms \
-                           --enable=rhel-8-for-x86_64-appstream-rpms \
-                           --enable=rhel-8-for-x86_64-baseos-rpms
+                           --enable satellite-capsule-{{ satellite_version }}-for-rhel-{{ ansible_distribution_major_version }}-x86_64-rpms \
+                           --enable satellite-{{ satellite_version }}-for-rhel-{{ ansible_distribution_major_version }}-x86_64-rpms \
+                           --enable satellite-maintenance-{{ satellite_version }}-for-rhel-{{ ansible_distribution_major_version }}-x86_64-rpms \
+                           --enable=rhel-{{ ansible_distribution_major_version }}-for-x86_64-appstream-rpms \
+                           --enable=rhel-{{ ansible_distribution_major_version }}-for-x86_64-baseos-rpms
       become: true
     
     - name: "Enable satellite-capsule dnf module"
       shell: |
         dnf module reset postgresql -y
         dnf module reset ruby -y
-        dnf module enable satellite-capsule:el8 postgresql:12 ruby:2.7 -y
+        #dnf module enable satellite-capsule:el8 postgresql:12 ruby:2.7 -y
       become: true
 
 #    - name: "Enable satellite-capsule dnf module"

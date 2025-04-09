@@ -5,7 +5,7 @@ sat6_loc: "ESXI_TFOUND"
 #sat6_loc: "Private_Cloud"
 sat6_hostgroup: "RHEL_{{ ansible_distribution_major_version }}_x86_64_Hostgroup for {{ dns_domain }}"
 sat6_lb_config_shortname: "capsule-lb"
-satellite_version: "6.16"
+satellite_version: 6.16
 sat6:
   user: "admin"
   pass: "CHANGEPASS"
