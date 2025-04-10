@@ -114,17 +114,20 @@
       become: true
     
     - name: "Enable satellite-capsule dnf module"
+      ansible.builtin.dnf:
+        name: '@satellite-capsule:el8'
+        state: present
+      become: true
+      ignore_errors: true
+
+    - name: "Enable satellite-capsule dnf module"
       shell: |
-        dnf module reset postgresql -y
-        dnf module reset ruby -y
+        #dnf module reset postgresql -y
+        #dnf module reset ruby -y
+        dnf module enable satellite-capsule:el8
         #dnf module enable satellite-capsule:el8 postgresql:12 ruby:2.7 -y
       become: true
-
-#    - name: "Enable satellite-capsule dnf module"
-#      ansible.builtin.dnf:
-#        name: '@satellite-capsule:el8'
-#        state: present
-#      become: true
+      ignore_errors: true
 
     - name: "Installing satellite-capsule rpms"
       yum:
