@@ -169,8 +169,7 @@
     become: yes
     when:
     - "(sat6_server is defined) and (sat6_server != 'None')"
-
-  always:
+#  always:
   - name: "Apply ansible roles defined in Satellite for oscap scanning"
     shell: |
       hammer host ansible-roles play --name {{ ansible_fqdn }}
