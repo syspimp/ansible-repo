@@ -10,6 +10,12 @@
       mode: 0400
     become: yes
 
+  - name: "add ssh-agent to bashrc"
+    ansible.builtin.lineinfile:
+      path: /root/.bashrc
+      line: "eval `ssh-agent`"
+    become: true
+
   - name: "Get short hostname"
     shell: |
       hostname --short
@@ -43,7 +49,6 @@
       
   - name: "Start install"
     shell: |
-      ssh-agent bash
       ssh-add /root/.ssh/ansiblesvc.key
       echo ./setup.sh
       ls
