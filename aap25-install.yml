@@ -49,9 +49,10 @@
       
   - name: "Start install"
     shell: |
+      echo "see /root/ansible-setup-output.log for details"
+      exec &> >(tee -a /root/ansible-setup-output.log)
       ssh-add /root/.ssh/ansiblesvc.key
-      echo ./setup.sh
-      ls
+      ./setup.sh
     become: true
     args:
       executable: /bin/bash
