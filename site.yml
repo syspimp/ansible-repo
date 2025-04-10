@@ -115,16 +115,3 @@
   roles:
     - nbde-tang-server
 
-- name: Hostname specific tasks and roles
-  hosts: all
-  tasks:
-    - name: "block to check if hostname specific tasks exist"
-      block:
-        - name: "Include hostname specific task if it exists"
-          ansible.builtin.include_tasks:
-            name: "hosts/{{ ansible_hostname }}.yml"
-
-      rescue:
-        - name: "no hostname specific tasks exists"
-          debug:
-            msg: "ignoring"
