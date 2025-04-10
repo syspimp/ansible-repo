@@ -8,12 +8,13 @@
     shell: "/root/download.sh -i aap25"
     become: yes
     args:
-      creates: "{{ tarbarll }}.tar.gz"    
+      creates: "{{ aaptarbarll }}.tar.gz"    
 
   - name: "extract the tarball"
     ansible.builtin.unarchive:
       src: "{{ aaptarball }}.tar.gz"
       dest: "{{ aaptarball }}"
+
   - name: "put in the aap25 template"
     ansible.builtin.template:
       src: aap25-inventory.j2
