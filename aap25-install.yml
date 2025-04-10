@@ -40,3 +40,20 @@
       timeout: 660
     delegate_to: localhost
     become: false
+      
+  - name: "Start ssh agent"
+    shell: |
+      echo "ssh-agent bash" >> /root/.bashrc
+      echo "ssh-add /root/.ssh/ansiblesvc.key" >> /root/.bashrc
+    become: true
+    args:
+      executable: /bin/bash
+
+  - name: "Start install"
+    shell: |
+      echo ./setup.sh
+      ls
+    become: true
+    args:
+      executable: /bin/bash
+      chdir: /root/ansible-automation-platform-setup-bundle-2.5-11-x86_64
