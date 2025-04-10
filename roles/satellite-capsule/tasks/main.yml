@@ -124,8 +124,8 @@
       shell: |
         #dnf module reset postgresql -y
         #dnf module reset ruby -y
-        dnf module enable satellite-capsule:el8
-        #dnf module enable satellite-capsule:el8 postgresql:12 ruby:2.7 -y
+        #dnf module enable satellite-capsule:el8
+        dnf module enable satellite-capsule:el8 postgresql:12 ruby:2.7 -y
       become: true
       ignore_errors: true
 
