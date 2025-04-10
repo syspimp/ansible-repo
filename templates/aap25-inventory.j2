@@ -1,0 +1,76 @@
+# This is the AAP installer inventory file intended for the RPM growth deployment topology.
+# Please consult the Ansible Automation Platform product documentation about this topology's tested hardware configuration.
+# https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/tested_deployment_models/rpm-topologies
+#
+# Please consult the docs if you're unsure what to add
+# For all optional variables please consult the Ansible Automation Platform documentation:
+# https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/rpm_installation
+
+# This section is for your AAP Gateway host(s)
+# -----------------------------------------------------
+[automationgateway]
+aap25-gw.tfound.org
+
+# This section is for your AAP Controller host(s)
+# -----------------------------------------------------
+[automationcontroller]
+aap25-controller.tfound.org
+
+[automationcontroller:vars]
+peers=execution_nodes
+
+# This section is for your AAP Execution host(s)
+# -----------------------------------------------------
+[execution_nodes]
+aap25-exec.tfound.org
+
+# This section is for your AAP Automation Hub host(s)
+# -----------------------------------------------------
+[automationhub]
+aap25-hub.tfound.org
+
+# This section is for your AAP EDA Controller host(s)
+# -----------------------------------------------------
+[automationedacontroller]
+aap15-eda.tfound.org
+
+# This section is for the AAP database
+# -----------------------------------------------------
+[database]
+aap25-db.tfound.org
+
+[all:vars]
+
+# Common variables
+# https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/rpm_installation/appendix-inventory-files-vars#ref-general-inventory-variables
+# -----------------------------------------------------
+
+redis_mode='standalone'
+
+# AAP Gateway
+# https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/rpm_installation/appendix-inventory-files-vars#ref-gateway-variables
+# -----------------------------------------------------
+automationgateway_admin_password=n0t1ck3t
+automationgateway_pg_host=aap25-db.tfound.org
+automationgateway_pg_password=n0t1ck3t
+
+# AAP Controller
+# https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/rpm_installation/appendix-inventory-files-vars#ref-controller-variables
+# -----------------------------------------------------
+admin_password=n0t1ck3t
+pg_host=aap25-db.tfound.org
+pg_password=n0t1ck3t
+
+# AAP Automation Hub
+# https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/rpm_installation/appendix-inventory-files-vars#ref-hub-variables
+# -----------------------------------------------------
+automationhub_admin_password=n0t1ck3t
+automationhub_pg_host=aap25-db.tfound.org
+automationhub_pg_password=n0t1ck3t
+
+# AAP EDA Controller
+# https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/rpm_installation/appendix-inventory-files-vars#event-driven-ansible-controller
+# -----------------------------------------------------
+automationedacontroller_admin_password=n0t1ck3t
+automationedacontroller_pg_host=aap25-db.tfound.org
+automationedacontroller_pg_password=n0t1ck3t

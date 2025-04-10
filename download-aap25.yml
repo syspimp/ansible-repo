@@ -1,9 +1,19 @@
 ---
 - hosts: aap25-controller*
+  vars:
+    aaptarball: /root/ansible-automation-platform-setup-bundle-2.5-11-x86_64
   tasks:
   - name: "download aap25 from redhat cdn"
     shell: "/root/download.sh -i aap25"
     become: yes
     args:
-      creates: "/root/ansible-automation-platform-setup-bundle-2.5-11-x86_64.tar.gz"    
+      creates: "{{ tarbarll }}.tar.gz"    
 
+  - name: "extract the tarball"
+    ansible.builtin.unarchive:
+      src: "{{ aaptarball }}.tar.gz"
+      dest: "{{ aaptarball }}"
+  - name: "put in the aap25 template"
+    ansible.builtin.template:
+      src: aap25-inventory.j2
+      dest: "{{ aaptarball }}/inventory"
