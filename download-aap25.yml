@@ -1,0 +1,9 @@
+---
+- hosts: aap25-controller*
+  tasks:
+  - name: "download aap25 from redhat cdn"
+    shell: "/root/download.sh -i aap25"
+    become: yes
+    args:
+      creates: "/root/ansible-automation-platform-setup-bundle-2.5-11-x86_64.tar.gz"    
+
