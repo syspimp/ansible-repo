@@ -1,6 +1,7 @@
 ---
 - hosts: aap25-controller*
   vars:
+    aappass: "{{ tower_pass }}"
     aaptarball: /root/ansible-automation-platform-setup-bundle-2.5-11-x86_64
   tasks:
   - name: "download aap25 from redhat cdn"

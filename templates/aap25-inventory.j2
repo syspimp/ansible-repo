@@ -50,27 +50,27 @@ redis_mode='standalone'
 # AAP Gateway
 # https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/rpm_installation/appendix-inventory-files-vars#ref-gateway-variables
 # -----------------------------------------------------
-automationgateway_admin_password=n0t1ck3t
+automationgateway_admin_password={{ aappass }}
 automationgateway_pg_host=aap25-db.tfound.org
-automationgateway_pg_password=n0t1ck3t
+automationgateway_pg_password={{ aappass }}
 
 # AAP Controller
 # https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/rpm_installation/appendix-inventory-files-vars#ref-controller-variables
 # -----------------------------------------------------
-admin_password=n0t1ck3t
+admin_password={{ aappass }}
 pg_host=aap25-db.tfound.org
-pg_password=n0t1ck3t
+pg_password={{ aappass }}
 
 # AAP Automation Hub
 # https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/rpm_installation/appendix-inventory-files-vars#ref-hub-variables
 # -----------------------------------------------------
-automationhub_admin_password=n0t1ck3t
+automationhub_admin_password={{ aappass }}
 automationhub_pg_host=aap25-db.tfound.org
-automationhub_pg_password=n0t1ck3t
+automationhub_pg_password={{ aappass }}
 
 # AAP EDA Controller
 # https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/rpm_installation/appendix-inventory-files-vars#event-driven-ansible-controller
 # -----------------------------------------------------
-automationedacontroller_admin_password=n0t1ck3t
+automationedacontroller_admin_password={{ aappass }}
 automationedacontroller_pg_host=aap25-db.tfound.org
-automationedacontroller_pg_password=n0t1ck3t
+automationedacontroller_pg_password={{ aappass }}
