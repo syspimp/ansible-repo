@@ -10,6 +10,15 @@
       mode: 0400
     become: yes
 
+  - name: "Config ssh client"
+    template:
+      src: ssh-config.j2
+      dest: "/root/.ssh/config"
+      owner: root
+      group: root
+      mode: 0400
+    become: yes
+
   - name: "add ssh-agent to bashrc"
     ansible.builtin.lineinfile:
       path: /root/.bashrc
