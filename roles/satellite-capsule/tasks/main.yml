@@ -64,11 +64,11 @@
       args:
         executable: /bin/bash
 
-    - name: "Perform a yum clean all"
-      shell:  yum clean all
-      when: rebootneeded.changed | bool == True
-      become: true
-
+#    - name: "Perform a yum clean all"
+#      shell:  yum clean all
+#      when: rebootneeded.changed | bool == True
+#      become: true
+#
     - name: "Reboot."
       shell: |
         shutdown -r +1 || true
