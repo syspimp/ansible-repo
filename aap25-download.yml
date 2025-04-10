@@ -8,7 +8,7 @@
     shell: "/root/download.sh -i aap25"
     become: yes
     args:
-      creates: "{{ aaptarbarll }}.tar.gz"    
+      creates: "{{ aaptarball }}.tar.gz"    
 
   - name: "extract the tarball"
     ansible.builtin.unarchive:
