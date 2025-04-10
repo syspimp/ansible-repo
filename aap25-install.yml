@@ -41,16 +41,10 @@
     delegate_to: localhost
     become: false
       
-  - name: "Start ssh agent"
-    shell: |
-      echo "ssh-agent bash" >> /root/.bashrc
-      echo "ssh-add /root/.ssh/ansiblesvc.key" >> /root/.bashrc
-    become: true
-    args:
-      executable: /bin/bash
-
   - name: "Start install"
     shell: |
+      ssh-agent bash
+      ssh-add /root/.ssh/ansiblesvc.key
       echo ./setup.sh
       ls
     become: true
