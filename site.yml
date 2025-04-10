@@ -2,8 +2,22 @@
 - name: Firstboot configuration tasks
   hosts: all
   roles:
+    - firstboot-selinux
     - firstboot-accounts
+
+- name: Satellite clients
+  hosts: all:!sat6*:!satellite*:!management*:!capsule*:!aap25*
+  become: yes
+  roles:
+    - satellite-clients
+    - insights
+
+- name: Firstboot configuration tasks
+  hosts: all:!aap25*
+  roles:
     - firstboot
+    - firstboot-monitor-filesystem
+    - firstboot-terminallogging
 
 - name: Monitoring roles
   hosts: all
@@ -14,23 +28,17 @@
     - snmp-client
 
 - name: Role specific tasks
-  hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsule*
+  hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsule*:!aap25*
   roles:
     - assignedroles
 
 - name: Supporting roles
-  hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsule*
+  hosts: all:!sat6*:!satellite*:haproxy*:openfire*:minikube*:!management*:!capsule*:!aap25*
   become: yes
   roles:
     - webconsole
     - leapp-upgrade
 
-- name: Satellite clients
-  hosts: all:!sat6*:!satellite*:!management*:!capsule*
-  become: yes
-  roles:
-    - satellite-clients
-    - insights
 
 - name: Create ansible build environment
   hosts: builder*
@@ -107,3 +115,16 @@
   roles:
     - nbde-tang-server
 
+- name: Hostname specific tasks and roles
+  hosts: all
+  tasks:
+    - name: "block to check if hostname specific tasks exist"
+      block:
+        - name: "Include hostname specific task if it exists"
+          ansible.builtin.include_tasks:
+            name: "hosts/{{ ansible_hostname }}.yml"
+
+      rescue:
+        - name: "no hostname specific tasks exists"
+          debug:
+            msg: "ignoring"

@@ -1,0 +1,16 @@
+---
+  - name: "[selinux] mapping user_u as default selinux user"
+    shell: |
+      semanage login -m -s user_u  -r s0  __default__
+    become: yes
+
+  - name: "[selinux] disable user exec in home and /tmp for regular users"
+    shell: |
+      setsebool -P user_exec_content off
+    become: yes
+
+  - name: "[selinux] allow sysadm_u selinux user to ssh"
+    shell: |
+      setsebool -P ssh_sysadm_login on
+    become: yes
+

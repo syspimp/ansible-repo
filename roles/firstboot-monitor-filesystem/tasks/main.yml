@@ -1,0 +1,38 @@
+---
+  - name: "Installing aide rpms"
+    yum:
+      name: "{{ item }}"
+      state: latest
+    become: true
+    loop:
+      - aide
+
+  - name: "running aide --init to generate known good configuration"
+    shell: |
+      /usr/sbin/aide --init
+    args:
+      creates: /var/lib/aide/aide.db.gz
+    become: true
+
+  - name: "copy the db to the config location"
+    shell: |
+      cp /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+    become: true
+    args:
+      creates: /var/lib/aide/aide.db.gz
+
+  - name: "restorecon on /var/lib/aid.db.gz"
+    shell: |
+      restorecon -rv /var/lib/aide/
+    become: true
+    args:
+      creates: /var/lib/aide/aide.db.gz
+
+  - name: "adding aide cron"
+    ansible.builtin.cron:
+      name: "file integrity check"
+      minute: "0"
+      hour: "23"
+      weekday: "6"
+      job: "/usr/sbin/aide --check"
+    become: true

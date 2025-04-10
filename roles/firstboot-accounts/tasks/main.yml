@@ -1,21 +1,7 @@
 ---
-  - name: "[selinux] mapping user_u as default selinux user"
-    shell: |
-      semanage login -m -s user_u  -r s0  __default__
-    become: yes
-
-  - name: "[selinux] disable user exec in home and /tmp for regular users"
-    shell: |
-      setsebool -P user_exec_content off
-    become: yes
-
-  - name: "[selinux] allow sysadm_u selinux user to ssh"
-    shell: |
-      setsebool -P ssh_sysadm_login on
-    become: yes
-
   - name: error handling for adding automation users
     block:
+    # RHEL and non Ubuntu distros that use wheel instead of sudo for administrators
     - name: "Test adding the automation user '{{ item.newusername }}' to wheel group"
       user:
         name: "{{ item.newusername }}"
@@ -27,6 +13,7 @@
       loop: "{{ newusers }}"
       when: ansible_distribution != "Ubuntu"
 
+    # Ubuntu distros that use sudo instead of wheel for administrators
     - name: "Ubuntu: Add the automation user '{{ item.newusername }}' to sudo group"
       user:
         name: "{{ item.newusername }}"
@@ -39,6 +26,7 @@
       when: ansible_distribution == "Ubuntu"
 
     rescue:
+    # unknown distros that use sudo instead of wheel for administrators
     - name: "Fallback: Add the automation user '{{ item.newusername }}' to sudo group"
       user:
         name: "{{ item.newusername }}"
@@ -56,7 +44,7 @@
       key: "{{ item.public_key }}"
     loop: "{{ newusers }}"
 
-  - name: Set the sudo template
+  - name: Set the sudo template to allow users privileged commands
     template:
       src: "sudo-template.j2"
       dest: "/etc/sudoers.d/{{ item.newusername }}"
@@ -65,79 +53,3 @@
       mode: '0400'
     loop: "{{ newusers }}"
 
-  - name: "sssd.conf local config"
-    template: 
-      src: sssd.conf.j2
-      dest: /etc/sssd/sssd.conf 
-      owner: root 
-      group: root 
-      mode: 0600
-    become: true
-      
-  - name: "session logging config"
-    template: 
-      src: sssd-session-recording.conf.j2
-      dest: /etc/sssd/conf.d/sssd-session-recording.conf 
-      owner: root 
-      group: root 
-      mode: 0600
-    become: true
-
-  - name: "Installing terminal logging rpms"
-    yum:
-      name: "{{ item }}"
-      state: latest
-    become: true
-    loop:
-      - tlog
-      - aide
-
-  - name: "terminal logging config"
-    template: 
-      src: tlog-rec-session.conf.j2
-      dest: /etc/tlog/tlog-rec-session.conf 
-      owner: root 
-      group: root 
-      mode: 0644
-    become: true
-
-  - name: "restarting sssd service"
-    ansible.builtin.service:
-      name: sssd
-      state: restarted
-
-  - name: "running aide --init to generate known good configuration"
-    shell: |
-      /usr/sbin/aide --init
-    args:
-      creates: /var/lib/aide/aide.db.gz
-    become: true
-
-  - name: "copy the db to the config location"
-    shell: |
-      cp /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
-    become: true
-    args:
-      creates: /var/lib/aide/aide.db.gz
-
-  - name: "adding aide cron"
-    ansible.builtin.cron:
-      name: "file integrity check"
-      minute: "0"
-      hour: "23"
-      weekday: "6"
-      job: "/usr/sbin/aide --check"
-    become: true
-
-  - name: "restorecon on /var/lib/aid.db.gz"
-    shell: |
-      restorecon -rv /var/lib/aide/
-    become: true
-
-  - name: "running authselect to select sssd for authentication"
-    shell: |
-      authselect select sssd --force
-      authselect enable-feature with-files-domain
-      authselect enable-feature without-nullok
-      authselect apply-changes
-    become: true

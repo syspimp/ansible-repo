@@ -1,0 +1,48 @@
+---
+  - name: "Installing terminal logging rpms"
+    yum:
+      name: "{{ item }}"
+      state: latest
+    become: true
+    loop:
+      - tlog
+
+  - name: "sssd.conf local config"
+    template: 
+      src: sssd.conf.j2
+      dest: /etc/sssd/sssd.conf 
+      owner: root 
+      group: root 
+      mode: 0600
+    become: true
+      
+  - name: "session logging config"
+    template: 
+      src: sssd-session-recording.conf.j2
+      dest: /etc/sssd/conf.d/sssd-session-recording.conf 
+      owner: root 
+      group: root 
+      mode: 0600
+    become: true
+
+  - name: "terminal logging config"
+    template: 
+      src: tlog-rec-session.conf.j2
+      dest: /etc/tlog/tlog-rec-session.conf 
+      owner: root 
+      group: root 
+      mode: 0644
+    become: true
+
+  - name: "restarting sssd service"
+    ansible.builtin.service:
+      name: sssd
+      state: restarted
+
+  - name: "running authselect to select sssd for authentication"
+    shell: |
+      authselect select sssd --force
+      authselect enable-feature with-files-domain
+      authselect enable-feature without-nullok
+      authselect apply-changes
+    become: true
