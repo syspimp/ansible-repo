@@ -1,8 +1,13 @@
 ---
 - name: Firstboot configuration tasks
-  hosts: all
+  hosts: all:!aap25*
   roles:
     - firstboot-selinux
+    - firstboot-accounts
+
+- name: Firstboot configuration tasks
+  hosts: aap25*
+  roles:
     - firstboot-accounts
 
 - name: Satellite clients to access content
