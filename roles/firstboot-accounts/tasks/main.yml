@@ -53,9 +53,23 @@
     mode: '0400'
   loop: "{{ newusers }}"
 
+- name: Set download.sh with redhat offline token
+  template:
+    src: "download.sh.j2"
+    dest: "/root/download.sh"
+    owner: root
+    group: root
+    mode: '0744'
+
 - name: "Enable logfile option in /etc/sudoers"
   lineinfile:
     path: /etc/sudoers
     line: Defaults logfile=/var/log/sudo.log
     validate: /usr/sbin/visudo -cf %s
 
+- name: "create sudo log"
+  file:
+    path: "/var/log/sudo.log"
+    state: touch
+    mode: 0644
+  become: true
