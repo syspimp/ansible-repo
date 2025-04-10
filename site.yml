@@ -6,7 +6,7 @@
     - firstboot-accounts
 
 - name: Satellite clients
-  hosts: all:!sat6*:!satellite*:!management*:!capsule*:!aap25*
+  hosts: all:!sat6*:!satellite*:!management*:!capsule*
   become: yes
   roles:
     - satellite-clients
