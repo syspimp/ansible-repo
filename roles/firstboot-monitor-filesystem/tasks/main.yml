@@ -7,6 +7,19 @@
     loop:
       - aide
 
+- name: "Monitor the auditing tools"
+  ansible.builtin.lineinfile:
+    path: /etc/aide.conf
+    line: "{{ item }}"
+  loop:
+    - "/usr/sbin/auditctl p+i+n+u+g+s+b+acl+xattrs+sha512"
+    - "/usr/sbin/auditd p+i+n+u+g+s+b+acl+xattrs+sha512"
+    - "/usr/sbin/ausearch p+i+n+u+g+s+b+acl+xattrs+sha512"
+    - "/usr/sbin/aureport p+i+n+u+g+s+b+acl+xattrs+sha512"
+    - "/usr/sbin/autrace p+i+n+u+g+s+b+acl+xattrs+sha512"
+    - "/usr/sbin/augenrules p+i+n+u+g+s+b+acl+xattrs+sha512"
+    - "/usr/sbin/rsyslogd p+i+n+u+g+s+b+acl+xattrs+sha512"
+
   - name: "running aide --init to generate known good configuration"
     shell: |
       /usr/sbin/aide --init
@@ -36,3 +49,18 @@
       weekday: "6"
       job: "/usr/sbin/aide --check"
     become: true
+
+- name: "Update auditd.conf log file size"
+  ansible.builtin.lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: "^max_log_file"
+    line: "max_log_file = 8"
+
+- name: "Configure journal logging tools"
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf
+    line: "{{ item }}"
+  loop:
+    - "Storage=persistent"
+    - "Compress=yes"
+

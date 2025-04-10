@@ -5,18 +5,23 @@
     - firstboot-selinux
     - firstboot-accounts
 
-- name: Satellite clients
+- name: Satellite clients to access content
   hosts: all:!sat6*:!satellite*:!management*:!capsule*
   become: yes
   roles:
     - satellite-clients
     - insights
 
-- name: Firstboot configuration tasks
+- name: Firstboot network and filesystem tasks
+  hosts: all
+  roles:
+    - firstboot-network
+    - firstboot-monitor-filesystem
+
+- name: Firstboot final tasks
   hosts: all:!aap25*
   roles:
     - firstboot
-    - firstboot-monitor-filesystem
     - firstboot-terminallogging
 
 - name: Monitoring roles

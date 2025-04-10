@@ -1,0 +1,37 @@
+#!/bin/bash
+zone="{{ dns_domain }}"
+hostname="$(hostname --short)"
+{% if ( 'EC2' not in ansible_system_vendor ) and ( 'Xen' not in ansible_system_vendor )  %}
+key="{{ dhcp_server_key }}"
+server="{{ dhcp_server }}"
+reverse=$(echo {{ ansible_default_ipv4['address'] }} | awk -F. '{print $4"."$3"." $2"."$1}')
+reversezone=$(echo {{ ansible_default_ipv4['address'] }} | awk -F. '{print $3"." $2"."$1}')
+temp=/tmp.$$
+touch $temp
+cat > ${temp} <<EOF
+server ${server}
+key dhcpupdate ${key}
+zone ${reversezone}.in-addr.arp
+update delete ${reverse}.in-addr.arpa. PTR
+update add ${reverse}.in-addr.arpa. 300 IN PTR ${hostname}.${zone}.
+send
+zone ${zone}
+update delete ${hostname}.${zone}. A
+update add ${hostname}.${zone}. 300 IN A {{ ansible_default_ipv4['address'] }}
+send
+EOF
+nsupdate -v ${temp}
+echo "$*" >> /tmp/dnsmasq.updater.txt
+rm -f ${temp}
+# for old vpn address, which uses 10.55.110 subnet
+# removed this variable {{ ansible_default_ipv4['address'].replace('102','110') }}
+extravars="{\\\"fqdn\\\":\\\"${hostname}.${zone}\\\",\\\"zone\\\":\\\"${zone}\\\",\\\"public_ip\\\":\\\"{{ ansible_default_ipv4['address'] }}\\\"}"
+curl -s -f -k -H 'Content-Type: application/json' -XPOST -d "{\"extra_vars\":\"${extravars}\"}" --user '{{ tower_user }}:{{ tower_pass }}' https://{{ tower_server }}:443/api/v2/job_templates/20/launch/
+{% else %}
+ipaddress=$(curl -s http://169.254.169.254/2019-10-01/meta-data/local-ipv4)
+extravars="{\\\"fqdn\\\":\\\"${hostname}.${zone}\\\",\\\"zone\\\":\\\"${zone}\\\",\\\"public_ip\\\":\\\"${ipaddress}\\\"}"
+curl -s -f -k -H 'Content-Type: application/json' -XPOST -d "{\"extra_vars\":\"${extravars}\"}" --user '{{ tower_user }}:{{ tower_pass }}' https://{{ tower_server }}:443/api/v2/job_templates/20/launch/
+ipaddress=$(curl -s http://169.254.169.254/2019-10-01/meta-data/public-ipv4)
+extravars="{\\\"fqdn\\\":\\\"${hostname}-pub.${zone}\\\",\\\"zone\\\":\\\"${zone}\\\",\\\"public_ip\\\":\\\"${ipaddress}\\\"}"
+curl -s -f -k -H 'Content-Type: application/json' -XPOST -d "{\"extra_vars\":\"${extravars}\"}" --user '{{ tower_user }}:{{ tower_pass }}' https://{{ tower_server }}:443/api/v2/job_templates/20/launch/
+{% endif %}
