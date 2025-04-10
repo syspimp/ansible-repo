@@ -13,7 +13,7 @@
   - name: "extract the tarball"
     ansible.builtin.unarchive:
       src: "{{ aaptarball }}.tar.gz"
-      dest: "{{ aaptarball }}"
+      dest: "/root/"
       remote_src: yes
 
   - name: "put in the aap25 template"
