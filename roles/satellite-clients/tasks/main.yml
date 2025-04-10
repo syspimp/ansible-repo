@@ -181,10 +181,10 @@
     - "(sat6_server is defined) and (sat6_server != 'None')"
       
   - debug:
-      msg: "Waiting 2 mins for ansible roles to apply"
+      msg: "Waiting 1 min for ansible roles to apply"
 
   - pause:
-      minutes: "2"
+      minutes: "1"
 
   - name: "Queue openscap initial scan from Satellite for host"
     shell: |
