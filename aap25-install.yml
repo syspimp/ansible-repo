@@ -28,7 +28,7 @@
     set_fact:
       shorthostname: "{{ shortname.stdout }}"
 
-  - name: "Start install"
+  - name: "Start install, probably will fail"
     shell: |
       echo "see /root/ansible-setup-output.log for details"
       exec &> >(tee -a /root/ansible-setup-output.log)
@@ -40,12 +40,12 @@
       executable: /bin/bash
       chdir: /root/ansible-automation-platform-setup-bundle-2.5-11-x86_64
 
-  - name: "Retart install"
+  - name: "Retart install, should succeed"
     shell: |
       echo "see /root/ansible-setup-output.log for details"
       exec &> >(tee -a /root/ansible-setup-output.log)
       # bug: the certs need to be accepted
-      for i in gw controller hub eda exec;
+      for i in gw controller hub eda exec db;
       do
         scp /etc/pki/ca-trust/source/anchors/ansible-automation-platform-managed-ca-cert.crt root@aap25-${i}:/etc/pki/ca-trust/source/anchors/
         ssh root@aap25-${i} "update-ca-trust extract"; 
