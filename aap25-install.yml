@@ -19,12 +19,6 @@
       mode: 0400
     become: yes
 
-#  - name: "add ssh-agent to bashrc"
-#    ansible.builtin.lineinfile:
-#      path: /root/.bashrc
-#      line: "eval `ssh-agent`"
-#    become: true
-#
   - name: "Get short hostname"
     shell: |
       hostname --short
@@ -34,33 +28,10 @@
     set_fact:
       shorthostname: "{{ shortname.stdout }}"
 
-#  - name: "yum update -y"
-#    shell: "yum update -y"
-#    become: true
-#
-#  - name: "Reboot in one minute"
-#    shell: |
-#      shutdown -r +1 || true
-#    become: true
-#    args:
-#      executable: /bin/bash
-#
-#  - name: "Wait 2 to 11 mins for host to reboot"
-#    wait_for:
-#      port: 22
-#      host: "{{ shorthostname}}.{{ dns_domain }}"
-#      #host: "{{ ansible_ssh_host | default(inventory_hostname) }}"
-#      #search_regex: OpenSSH
-#      delay: 120
-#      timeout: 660
-#    delegate_to: localhost
-#    become: false
-##      
   - name: "Start install"
     shell: |
       echo "see /root/ansible-setup-output.log for details"
       exec &> >(tee -a /root/ansible-setup-output.log)
-      ssh-add /root/.ssh/ansiblesvc.key
       ./setup.sh
     become: true
     args:

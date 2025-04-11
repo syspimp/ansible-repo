@@ -1,0 +1,8 @@
+---
+- hosts: aap25-*
+  tasks:
+  - name: "Stop firewalld service"
+    systemd:
+      state: stopped
+      name: "firewalld.service"
+    become: true
