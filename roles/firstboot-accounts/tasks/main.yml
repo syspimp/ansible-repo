@@ -1,75 +1,85 @@
 ---
-- name: error handling for adding automation users
+- name: "new users check"
+  stat:
+    path: /opt/.usercheck
+  register: usercheckv
+
+- name: wrapper for installation
   block:
-  # RHEL and non Ubuntu distros that use wheel instead of sudo for administrators
-  - name: "Test adding the automation user '{{ item.newusername }}' to wheel group"
-    user:
-      name: "{{ item.newusername }}"
-      comment: "Built By Ansible Automation"
-      groups: "{{ item.newgroups }}"
-      seuser: sysadm_u
-      expires: -1
-      append: yes
+  - name: error handling for adding automation users
+    block:
+    # RHEL and non Ubuntu distros that use wheel instead of sudo for administrators
+    - name: "Test adding the automation user '{{ item.newusername }}' to wheel group"
+      user:
+        name: "{{ item.newusername }}"
+        comment: "Built By Ansible Automation"
+        groups: "{{ item.newgroups }}"
+        seuser: sysadm_u
+        expires: -1
+        append: yes
+      loop: "{{ newusers }}"
+      when: ansible_distribution != "Ubuntu"
+
+    # Ubuntu distros that use sudo instead of wheel for administrators
+    - name: "Ubuntu: Add the automation user '{{ item.newusername }}' to sudo group"
+      user:
+        name: "{{ item.newusername }}"
+        comment: "Built By Ansible Automation"
+        groups: "{{ item.newgroups.replace('wheel','sudo') }}"
+        seuser: sysadm_u
+        expires: -1
+        append: yes
+      loop: "{{ newusers }}"
+      when: ansible_distribution == "Ubuntu"
+
+    rescue:
+    # unknown distros that use sudo instead of wheel for administrators
+    - name: "Fallback: Add the automation user '{{ item.newusername }}' to sudo group"
+      user:
+        name: "{{ item.newusername }}"
+        comment: "Built By Ansible Automation"
+        groups: "{{ item.newgroups.replace('wheel','sudo') }}"
+        seuser: sysadm_u
+        expires: -1
+        append: yes
+      loop: "{{ newusers }}"
+    # end of block
+
+  - name: Set authorized key taken from file
+    ansible.posix.authorized_key:
+      user: "{{ item.newusername }}"
+      state: present
+      key: "{{ item.public_key }}"
     loop: "{{ newusers }}"
-    when: ansible_distribution != "Ubuntu"
 
-  # Ubuntu distros that use sudo instead of wheel for administrators
-  - name: "Ubuntu: Add the automation user '{{ item.newusername }}' to sudo group"
-    user:
-      name: "{{ item.newusername }}"
-      comment: "Built By Ansible Automation"
-      groups: "{{ item.newgroups.replace('wheel','sudo') }}"
-      seuser: sysadm_u
-      expires: -1
-      append: yes
-    loop: "{{ newusers }}"
-    when: ansible_distribution == "Ubuntu"
-
-  rescue:
-  # unknown distros that use sudo instead of wheel for administrators
-  - name: "Fallback: Add the automation user '{{ item.newusername }}' to sudo group"
-    user:
-      name: "{{ item.newusername }}"
-      comment: "Built By Ansible Automation"
-      groups: "{{ item.newgroups.replace('wheel','sudo') }}"
-      seuser: sysadm_u
-      expires: -1
-      append: yes
+  - name: Set the sudo template to allow users privileged commands
+    template:
+      src: "sudo-template.j2"
+      dest: "/etc/sudoers.d/{{ item.newusername }}"
+      owner: root
+      group: root
+      mode: '0400'
     loop: "{{ newusers }}"
 
-- name: Set authorized key taken from file
-  ansible.posix.authorized_key:
-    user: "{{ item.newusername }}"
-    state: present
-    key: "{{ item.public_key }}"
-  loop: "{{ newusers }}"
+  - name: Set download.sh with redhat offline token
+    template:
+      src: "download.sh.j2"
+      dest: "/root/download.sh"
+      owner: root
+      group: root
+      mode: '0744'
 
-- name: Set the sudo template to allow users privileged commands
-  template:
-    src: "sudo-template.j2"
-    dest: "/etc/sudoers.d/{{ item.newusername }}"
-    owner: root
-    group: root
-    mode: '0400'
-  loop: "{{ newusers }}"
+  - name: "Enable logfile option in /etc/sudoers"
+    lineinfile:
+      path: /etc/sudoers
+      line: Defaults logfile=/var/log/sudo.log
+      validate: /usr/sbin/visudo -cf %s
 
-- name: Set download.sh with redhat offline token
-  template:
-    src: "download.sh.j2"
-    dest: "/root/download.sh"
-    owner: root
-    group: root
-    mode: '0744'
-
-- name: "Enable logfile option in /etc/sudoers"
-  lineinfile:
-    path: /etc/sudoers
-    line: Defaults logfile=/var/log/sudo.log
-    validate: /usr/sbin/visudo -cf %s
-
-- name: "create sudo log"
-  file:
-    path: "/var/log/sudo.log"
-    state: touch
-    mode: 0644
-  become: true
+  - name: "create sudo log"
+    file:
+      path: "/var/log/sudo.log"
+      state: touch
+      mode: 0644
+    become: true
+    # end of block
+  when: usercheckv.stat.exists == false
