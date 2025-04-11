@@ -46,6 +46,7 @@
       ssh root@aap25-gw "systemctl start firewalld; firewall-cmd --add-port 8443/tcp --permanent --reload"
       ./setup.sh
     become: true
+    ignore_errors: true
     args:
       executable: /bin/bash
       chdir: /root/ansible-automation-platform-setup-bundle-2.5-11-x86_64
@@ -63,6 +64,7 @@
       done
       ./setup.sh && touch /root/ansible-automation-platform-setup-bundle-2.5-11-x86_64/.installsuccess
     become: true
+    ignore_errors: true
     args:
       executable: /bin/bash
       chdir: /root/ansible-automation-platform-setup-bundle-2.5-11-x86_64
