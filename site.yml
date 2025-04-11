@@ -1,5 +1,10 @@
 ---
 - name: Firstboot configuration tasks
+  hosts: all
+  roles:
+    - firstboot-setup
+
+- name: Firstboot configuration tasks
   hosts: all:!aap25*
   roles:
     - firstboot-selinux
