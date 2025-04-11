@@ -59,6 +59,7 @@
         echo "see /root/ansible-setup-output.log for details"
         exec &> >(tee -a /root/ansible-setup-output.log)
         # bug: the certs need to be accepted
+        # https://access.redhat.com/solutions/7102437
         for i in gw hub eda exec db;
         do
           scp /etc/pki/ca-trust/source/anchors/ansible-automation-platform-managed-ca-cert.crt root@aap25-${i}:/etc/pki/ca-trust/source/anchors/
