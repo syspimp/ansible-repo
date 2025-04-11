@@ -10,7 +10,7 @@
     block:
     # RHEL and non Ubuntu distros that use wheel instead of sudo for administrators
     - name: "Test adding the automation user '{{ item.newusername }}' to wheel group"
-      user:
+      ansible.builtin.user:
         name: "{{ item.newusername }}"
         comment: "Built By Ansible Automation"
         groups: "{{ item.newgroups }}"
@@ -18,12 +18,12 @@
         expires: -1
         append: yes
       loop: "{{ newusers }}"
-      nolog: true
+      no_log: true
       when: ansible_distribution != "Ubuntu"
 
     # Ubuntu distros that use sudo instead of wheel for administrators
     - name: "Ubuntu: Add the automation user '{{ item.newusername }}' to sudo group"
-      user:
+      ansible.builtin.user:
         name: "{{ item.newusername }}"
         comment: "Built By Ansible Automation"
         groups: "{{ item.newgroups.replace('wheel','sudo') }}"
@@ -31,13 +31,13 @@
         expires: -1
         append: yes
       loop: "{{ newusers }}"
-      nolog: true
+      no_log: true
       when: ansible_distribution == "Ubuntu"
 
     rescue:
     # unknown distros that use sudo instead of wheel for administrators
     - name: "Fallback: Add the automation user '{{ item.newusername }}' to sudo group"
-      user:
+      ansible.builtin.user:
         name: "{{ item.newusername }}"
         comment: "Built By Ansible Automation"
         groups: "{{ item.newgroups.replace('wheel','sudo') }}"
@@ -45,7 +45,7 @@
         expires: -1
         append: yes
       loop: "{{ newusers }}"
-      nolog: true
+      no_log: true
     # end of block
 
   - name: Set authorized key taken from file
@@ -53,21 +53,21 @@
       user: "{{ item.newusername }}"
       state: present
       key: "{{ item.public_key }}"
-    nolog: true
+    no_log: true
     loop: "{{ newusers }}"
 
   - name: Set the sudo template to allow users privileged commands
-    template:
+    ansible.builtin.template:
       src: "sudo-template.j2"
       dest: "/etc/sudoers.d/{{ item.newusername }}"
       owner: root
       group: root
       mode: '0400'
-    nolog: true
+    no_log: true
     loop: "{{ newusers }}"
 
   - name: Set download.sh with redhat offline token
-    template:
+    ansible.builtin.template:
       src: "download.sh.j2"
       dest: "/root/download.sh"
       owner: root
@@ -75,20 +75,20 @@
       mode: '0744'
 
   - name: "Enable logfile option in /etc/sudoers"
-    lineinfile:
+    ansible.builtin.lineinfile:
       path: /etc/sudoers
       line: Defaults logfile=/var/log/sudo.log
       validate: /usr/sbin/visudo -cf %s
 
   - name: "create sudo log"
-    file:
+    ansible.builtin.file:
       path: "/var/log/sudo.log"
       state: touch
       mode: 0644
     become: true
 
   - name: "user install complete"
-    file:
+    ansible.builtin.file:
       path: "/opt/.usercheck"
       state: touch
       mode: 0444
