@@ -19,7 +19,7 @@
     become: true
 
   - name: "rpms complete"
-    ansible.builltin.file:
+    ansible.builtin.file:
       path: /opt/setup/oscap-rpms
       state: touch
       mode: 0444
