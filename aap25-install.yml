@@ -38,8 +38,8 @@
       src: "/root/ansible-automation-platform-setup-bundle-2.5-11-x86_64/manifest.zip"
     register: manifest_file
 
-  - block:
-    name: wrapper for installation
+  - name: wrapper for installation
+    block:
     - name: "Check /root/ansible-setup-output.log Start install, probably will fail after 23 mins, may finish after 45 and start populating EE and collections"
       shell: |
         echo "see /root/ansible-setup-output.log for details"
