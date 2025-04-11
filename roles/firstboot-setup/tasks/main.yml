@@ -1,6 +1,8 @@
 ---
-- name: "make directory to track setup progress"
-  shell: "mkdir /opt/setup"
+- name: "make setup tracking dir"
+  ansible.builtin.file:
+    path: /opt/setup
+    state: directory
+    mode: 0755
   become: true
-        
 

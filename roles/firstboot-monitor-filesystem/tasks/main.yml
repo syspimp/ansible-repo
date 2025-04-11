@@ -1,7 +1,7 @@
 ---
 - name: "monitor filesystem check"
   stat:
-    path: /opt/.monfscheck
+    path: /opt/setup/monfscheck
   register: monfscheckv
 
 - name: wrapper for installation
@@ -71,7 +71,7 @@
 
   - name: "monitor filesystem install complete"
     file:
-      path: "/opt/.monfscheck"
+      path: "/opt/setup/monfscheck"
       state: touch
       mode: 0444
     become: true

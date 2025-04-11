@@ -1,7 +1,7 @@
 ---
 - name: "network check"
   stat:
-    path: /opt/.netcheck
+    path: /opt/setup/netcheck
   register: netcheckv
 
 - name: wrapper for installation
@@ -124,7 +124,7 @@
 
   - name: "network install complete"
     file:
-      path: "/opt/.netcheck"
+      path: "/opt/setup/netcheck"
       state: touch
       mode: 0444
     become: true

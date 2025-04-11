@@ -1,311 +1,307 @@
 ---
-- name: "Satellite Oscap setup check"
-  shell: |
-    if [ -e "/root/.setup/oscap-rpms" ]
-    then
-      echo "true"
-    else
-      echo "false"
-    fi
-  register: oscapsetup
-  become: true
+- name: "capsule oscap rpms check"
+  ansible.builtin.stat:
+    path: /opt/setup/oscap-rpms
+  register: oscaprpmscheckv
 
-- name: "Block to perform initial setup"
+- name: wrapper for installation
   block:
-    - name: "make setup tracking dir"
-      file:
-        path: /root/.setup
-        state: directory
-        mode: 0755
-      become: true
-  
-    - name: "Enable satellite tools repos"
-      shell: |
-        subscription-manager repos \
-        --enable satellite-tools-6.10-for-rhel-8-x86_64-rpms
-#        --enable rhel-7-server-satellite-tools-{{ satellite_version }}-rpms \
-#        --enable=rhel-7-server-extras-rpms
-      become: true
+  - name: "Enable satellite tools repos"
+    shell: |
+      subscription-manager repos \
+      --enable satellite-tools-6.10-for-rhel-8-x86_64-rpms
+    become: true
 
-    - name: "Installing oscap rpms"
-      yum:
-        name: ['openscap-scanner','scap-security-guide']
-        state: latest
-      become: true
+  - name: "Installing oscap rpms"
+    yum:
+      name: ['openscap-scanner','scap-security-guide']
+      state: latest
+    become: true
 
-    - name: "rpms complete"
-      file:
-        path: /root/.setup/oscap-rpms
-        state: touch
-        mode: 0444
-      become: true
+  - name: "rpms complete"
+    ansible.builltin.file:
+      path: /opt/setup/oscap-rpms
+      state: touch
+      mode: 0444
+    become: true
+  when: oscaprpmscheckv.stat.exists == false
+  # end of block
 
-  when: oscapsetup.stdout == "false"
-
-- name: "Oscap profile setup check"
-  shell: |
-    if [ -e "/root/.setup/oscap-configed" ]
-    then
-      echo "true"
-    else
-      echo "false"
-    fi
+- name: "capsule oscap rpms check"
+  ansible.builtin.stat:
+    path: /opt/setup/oscap-setup
   register: oscapsetup
-  become: true
 
 - name: "Block to perform satellie-capsule setup"
   block:
-    - name: "Find Group Inventory for 'satellite-server'"
-      uri:
-        url: "https://{{ tower_server }}/api/v2/groups/?search=satellite-server"
-        validate_certs: no
-        method: GET
-        user: "{{ tower_user }}"
-        password: "{{ tower_pass }}"
-        force_basic_auth: yes
-        status_code: [200,202,204]
-        body_format: json
-      register: groupidcheck
+  - name: "Find Group Inventory for 'satellite-server'"
+    uri:
+      url: "https://{{ tower_server }}/api/v2/groups/?search=satellite-server"
+      validate_certs: no
+      method: GET
+      user: "{{ tower_user }}"
+      password: "{{ tower_pass }}"
+      force_basic_auth: yes
+      status_code: [200,202,204]
+      body_format: json
+    register: groupidcheck
 
-    - name: "Set the host_id fact"
-      set_fact:
-        satgroup_host_id: "{{ groupidcheck.json.results[0].id }}"
+  - name: "Set the host_id fact"
+    set_fact:
+      satgroup_host_id: "{{ groupidcheck.json.results[0].id }}"
+
+  - name: "Find the name of the satellite-server"
+    uri:
+      url: "https://{{ tower_server }}/api/v2/groups/{{ satgroup_host_id }}/hosts"
+      validate_certs: no
+      method: GET
+      user: "{{ tower_user }}"
+      password: "{{ tower_pass }}"
+      force_basic_auth: yes
+      status_code: [200,202,204]
+      body_format: json
+    register: hostidcheck
+
+  - name: "Set the host_id fact"
+    set_fact:
+      sat6_server: "{{ hostidcheck.json.results[0].name }}"
+
+  - name: "Save info on the RHEL 7 Standard Security Profile"
+    shell: |
+      oscap info /usr/share/xml/scap/ssg/content/ssg-rhel7-ds.xml
+    register: profileinfo
+    become: true
+
+  - name: "Get short hostname"
+    shell: |
+      hostname --short
+    register: shortname
   
-    - name: "Find the name of the satellite-server"
-      uri:
-        url: "https://{{ tower_server }}/api/v2/groups/{{ satgroup_host_id }}/hosts"
-        validate_certs: no
-        method: GET
-        user: "{{ tower_user }}"
-        password: "{{ tower_pass }}"
-        force_basic_auth: yes
-        status_code: [200,202,204]
-        body_format: json
-      register: hostidcheck
+  - name: "Set the short hostname fact"
+    set_fact:
+      shorthostname: "{{ shortname.stdout }}"
+  - name: "Save the proxy id for the capsule"
+    shell: |
+      hammer --csv capsule list | grep {{ shorthostname }} | cut -f1 -d,
+    delegate_to: "{{ sat6_server }}"
+    become: true
+    register: proxyid
+
+  - name: "Save the location id for the capsule"
+    shell: |
+      hammer --csv location list | grep "{{ sat6_default_location }}" | cut -f1 -d,
+    delegate_to: "{{ sat6_server }}"
+    become: true
+    register: locid
+
+  - name: "Output the RHEL 7 Standard Security Profile info"
+    debug:
+      var: profileinfo.stdout
+
+  - name: "Generate html with the RHEL 7 Standard Security Profile info"
+    shell: |
+      oscap xccdf generate guide \
+      --profile xccdf_org.ssgproject.content_profile_standard \
+      /usr/share/xml/scap/ssg/content/ssg-rhel7-ds.xml > /var/www/html/pub/rhel7-security-profile.html
+    args:
+      creates: /var/www/html/pub/rhel7-security-profile.html
+    become: true
   
-    - name: "Set the host_id fact"
-      set_fact:
-        sat6_server: "{{ hostidcheck.json.results[0].name }}"
+  - name: "Generate html with the RHEL 8 Standard Security Profile info"
+    shell: |
+      oscap xccdf generate guide \
+      --profile xccdf_org.ssgproject.content_profile_pci-dss \
+      /usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml > /var/www/html/pub/rhel8-security-profile.html
+    args:
+      creates: /var/www/html/pub/rhel8-security-profile.html
+    become: true
 
-    - name: "Save info on the RHEL 7 Standard Security Profile"
-      shell: |
-        oscap info /usr/share/xml/scap/ssg/content/ssg-rhel7-ds.xml
-      register: profileinfo
-      become: true
+  - name: "Configure Satellite to use the security profiles"
+    shell: |
+      foreman-rake foreman_openscap:bulk_upload:default && \
+      touch /opt/.foremanrake
+    args:
+      creates: /opt/.foremanrake
+    become: true
+    delegate_to: "{{ sat6_server }}"
+  
+  - name: "Do we have to install rpms check"
+    become: true
+    shell: "rpm -qa rhel-system-roles"
+    ignore_errors: yes
+    register: rolecheck
 
-    - name: "Get short hostname"
-      shell: |
-        hostname --short
-      register: shortname
-    
-    - name: "Set the short hostname fact"
-      set_fact:
-        shorthostname: "{{ shortname.stdout }}"
-    - name: "Save the proxy id for the capsule"
-      shell: |
-        hammer --csv capsule list | grep {{ shorthostname }} | cut -f1 -d,
-      delegate_to: "{{ sat6_server }}"
-      become: true
-      register: proxyid
+  - name: "Install the Ansible System Roles"
+    shell: |
+      satellite-maintain packages install -y rhel-system-roles
+    become: true
+    when: "'rhel-system-roles' not in rolecheck.stdout"
 
-    - name: "Save the location id for the capsule"
-      shell: |
-        hammer --csv location list | grep "{{ sat6_default_location }}" | cut -f1 -d,
-      delegate_to: "{{ sat6_server }}"
-      become: true
-      register: locid
+  # https://nvd.nist.gov/ncp/checklist/909
+  - name: "Grab Openscap guides from the Redhat CDN"
+    unarchive:
+      src: "https://access.redhat.com/sites/default/files/attachments/{{ item }}"
+      dest: "/tmp"
+      remote_src: yes
+    become: yes
+    delegate_to: "{{ sat6_server }}"
+    loop:
+    - scap-security-guide-0.1.50-scap-1.3-rhel8.zip
+    - scap-security-guide-0.1.50-scap-1.3-rhel7.zip
 
-    - name: "Output the RHEL 7 Standard Security Profile info"
-      debug:
-        var: profileinfo.stdout
+  # org is hardcoded as an exercise for the reader to correct
+  - name: "Upload the Openscap xml files to create the scans"
+    ignore_errors: yes
+    shell: |
+      hammer scap-content create --location-id {{ locid.stdout }} --organization-id 1 --title "{{ item.title }}" --scap-file {{ item.file }} && \
+      touch /opt/.scapuploaded
+    become: yes
+    delegate_to: "{{ sat6_server }}"
+    args:
+      creates: /opt/.scapuploaded
+    loop:
+    - title: RHEL 8 SCAP ds-1.2
+      file: /tmp/scap-security-guide-0.1.50-scap-1.3-rhel8/ssg-rhel8-ds-1.2.xml
+    - title: RHEL 7 SCAP ds-1.2
+      file: /tmp/scap-security-guide-0.1.50-scap-1.3-rhel7/ssg-rhel7-ds-1.2.xml
 
-    - name: "Generate html with the RHEL 7 Standard Security Profile info"
+  - name: "Install the foreman scap client role"
+    shell: |
+      ansible-galaxy role install -p /etc/ansible/roles theforeman.foreman_scap_client
+    become: yes
+
+  - name: "Install the ansible roles to remediate PCI DSS"
+    shell: |
+      ansible-galaxy role install -p /etc/ansible/roles {{ item }}
+    become: yes
+    loop:
+    - redhatofficial.rhel8_pci_dss
+    - redhatofficial.rhel7_pci_dss
+
+  - name: "Install the ansible roles to remediate Health Insurance Portability and Accountability Act (HIPAA)"
+    shell: |
+      ansible-galaxy role install -p /etc/ansible/roles {{ item }}
+    become: yes
+    loop:
+    - redhatofficial.rhel8_hipaa
+    - redhatofficial.rhel7_hipaa
+
+  - name: "Install the ansible roles to remediate FBI Criminal Justice Information Services (FBI CJIS)"
+    shell: |
+      ansible-galaxy role install -p /etc/ansible/roles {{ item }}
+    become: yes
+    loop:
+    - redhatofficial.rhel8_cjis
+    - redhatofficial.rhel7_cjis
+
+  - name: "Install the ansible roles to remediate NIST 800-171 (Controlled Unclassified Information)"
+    shell: |
+      ansible-galaxy role install -p /etc/ansible/roles {{ item }}
+    become: yes
+    loop:
+    - redhatofficial.rhel8_cui
+    - redhatofficial.rhel7_cui
+
+  - name: "Install the ansible roles to remediate NIST National Checklist for RHEL 7.x/8.x"
+    shell: |
+      ansible-galaxy role install -p /etc/ansible/roles {{ item }}
+    become: yes
+    loop:
+    - redhatofficial.rhel8_ospp
+    - redhatofficial.rhel7_ospp
+
+  - name: block for the sat server
+    block:
+    - name: "Import the ansible roles into Satellite"
       shell: |
-        oscap xccdf generate guide \
-        --profile xccdf_org.ssgproject.content_profile_standard \
-        /usr/share/xml/scap/ssg/content/ssg-rhel7-ds.xml > /var/www/html/pub/rhel7-security-profile.html
+        hammer ansible roles import --location-id {{ locid.stdout }} --organization-id 1 --proxy-id {{ proxyid.stdout }} && touch /opt/setup/oscap-ansible
       args:
-        creates: /var/www/html/pub/rhel7-security-profile.html
-      become: true
-    
-    - name: "Generate html with the RHEL 8 Standard Security Profile info"
+        creates: /opt/setup/oscap-ansible
+      #delegate_to: "{{ sat6_server }}"
+      become: yes
+
+    - name: "Import the ansible variables into Satellite"
       shell: |
-        oscap xccdf generate guide \
-        --profile xccdf_org.ssgproject.content_profile_pci-dss \
-        /usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml > /var/www/html/pub/rhel8-security-profile.html
+        hammer ansible variables import --location-id {{ locid.stdout }} --organization-id 1 --proxy-id {{ proxyid.stdout }} && touch /opt/setup/oscap-ansible1
       args:
-        creates: /var/www/html/pub/rhel8-security-profile.html
-      become: true
+        creates: /opt/setup/oscap-ansible1
+      #delegate_to: "{{ sat6_server }}"
+      become: yes
 
-    - name: "Configure Satellite to use the security profiles"
+    - name: "Find the Hostgroups"
       shell: |
-        foreman-rake foreman_openscap:bulk_upload:default && \
-        touch /opt/.foremanrake
+        hammer --output csv hostgroup list | grep -v "Id,"| cut -f1 -d,
+      register: hostgroupids
       args:
-        creates: /opt/.foremanrake
-      become: true
-      delegate_to: "{{ sat6_server }}"
-    
-    - name: "Do we have to install rpms check"
-      become: true
-      shell: "rpm -qa rhel-system-roles"
-      ignore_errors: yes
-      register: rolecheck
-
-    - name: "Install the Ansible System Roles"
-      shell: |
-        satellite-maintain packages install -y rhel-system-roles
-      become: true
-      when: "'rhel-system-roles' not in rolecheck.stdout"
-
-    # https://nvd.nist.gov/ncp/checklist/909
-    - name: "Grab Openscap guides from the Redhat CDN"
-      unarchive:
-        src: "https://access.redhat.com/sites/default/files/attachments/{{ item }}"
-        dest: "/tmp"
-        remote_src: yes
+        creates: /opt/setup/oscap-ansible4
+      #delegate_to: "{{ sat6_server }}"
       become: yes
-      delegate_to: "{{ sat6_server }}"
-      loop:
-      - scap-security-guide-0.1.50-scap-1.3-rhel8.zip
-      - scap-security-guide-0.1.50-scap-1.3-rhel7.zip
 
-    # org is hardcoded as an exercise for the reader to correct
-    - name: "Upload the Openscap xml files to create the scans"
-      ignore_errors: yes
+    - name: "Assign foreman_scap role to Hostgroups for reports"
       shell: |
-        hammer scap-content create --location-id {{ locid.stdout }} --organization-id 1 --title "{{ item.title }}" --scap-file {{ item.file }} && \
-        touch /opt/.scapuploaded
-      become: yes
-      delegate_to: "{{ sat6_server }}"
+        hammer hostgroup ansible-roles assign --ansible-role-ids=1 --id={{ item }}
+      loop: "{{ hostgroupids.stdout.split() }}"
       args:
-        creates: /opt/.scapuploaded
-      loop:
-      - title: RHEL 8 SCAP ds-1.2
-        file: /tmp/scap-security-guide-0.1.50-scap-1.3-rhel8/ssg-rhel8-ds-1.2.xml
-      - title: RHEL 7 SCAP ds-1.2
-        file: /tmp/scap-security-guide-0.1.50-scap-1.3-rhel7/ssg-rhel7-ds-1.2.xml
+        creates: /opt/setup/oscap-ansible2
+      #delegate_to: "{{ sat6_server }}"
+      become: yes
+      
+    - name: "Ansible step complete"
+      shell: touch /opt/setup/oscap-ansible2
+      become: true
+      args:
+        creates: /opt/setup/oscap-ansible2
+      #delegate_to: "{{ sat6_server }}"
 
-    - name: "Install the foreman scap client role"
+    - name: "Create Oscap RHEL7 DSS Policy"
+      ignore_errors: true
       shell: |
-        ansible-galaxy role install -p /etc/ansible/roles theforeman.foreman_scap_client
+        hammer policy create --hostgroup-ids {{ item }} --location-id 2 --organization-id 1 --period weekly --weekday friday --scap-content-id 4 --scap-content-profile-id 33 --deploy-by ansible --name "SCAP RHEL7 DSS Policy"
+      loop: "{{ hostgroupids.stdout.split() }}"
+      when: ( ansible_local['roles'] is defined and ansible_local['roles']['default']['role'] == 'satellite-server') or ( esxirole is defined and esxirole.stdout == 'satellite-server' )
+      args:
+        creates: /opt/setup/oscap-ansible3
+      #delegate_to: "{{ sat6_server }}"
       become: yes
 
-    - name: "Install the ansible roles to remediate PCI DSS"
-      shell: |
-        ansible-galaxy role install -p /etc/ansible/roles {{ item }}
-      become: yes
-      loop:
-      - redhatofficial.rhel8_pci_dss
-      - redhatofficial.rhel7_pci_dss
+    - name: "Ansible step complete"
+      shell: touch /opt/setup/oscap-ansible3
+      become: true
+      when: ( ansible_local['roles'] is defined and ansible_local['roles']['default']['role'] == 'satellite-server') or ( esxirole is defined and esxirole.stdout == 'satellite-server' )
+      args:
+        creates: /opt/setup/oscap-ansible3
+      #delegate_to: "{{ sat6_server }}"
 
-    - name: "Install the ansible roles to remediate Health Insurance Portability and Accountability Act (HIPAA)"
+    - name: "Add Oscap capsule to Hostgroups"
       shell: |
-        ansible-galaxy role install -p /etc/ansible/roles {{ item }}
+        hammer hostgroup update --id {{ item }} --openscap-proxy-id 1
+      loop: "{{ hostgroupids.stdout.split() }}"
+      args:
+        creates: /opt/setup/oscap-ansible4
+      #delegate_to: "{{ sat6_server }}"
       become: yes
-      loop:
-      - redhatofficial.rhel8_hipaa
-      - redhatofficial.rhel7_hipaa
 
-    - name: "Install the ansible roles to remediate FBI Criminal Justice Information Services (FBI CJIS)"
-      shell: |
-        ansible-galaxy role install -p /etc/ansible/roles {{ item }}
-      become: yes
-      loop:
-      - redhatofficial.rhel8_cjis
-      - redhatofficial.rhel7_cjis
+    - name: "Ansible step complete"
+      shell: touch /opt/setup/oscap-ansible4
+      args:
+        creates: /opt/setup/oscap-ansible4
+      become: true
+      #delegate_to: "{{ sat6_server }}"
+    when: ( ansible_local['roles'] is defined and ansible_local['roles']['default']['role'] == 'satellite-server') or  ( esxirole is defined and esxirole.stdout == 'satellite-server' )
+    # end of block
 
-    - name: "Install the ansible roles to remediate NIST 800-171 (Controlled Unclassified Information)"
-      shell: |
-        ansible-galaxy role install -p /etc/ansible/roles {{ item }}
-      become: yes
-      loop:
-      - redhatofficial.rhel8_cui
-      - redhatofficial.rhel7_cui
+  - name: "capsule oscap install complete"
+    ansible.builtin.file:
+      path: "/opt/.capsuleoscapcheck"
+      state: touch
+      mode: 0444
+    become: true
 
-    - name: "Install the ansible roles to remediate NIST National Checklist for RHEL 7.x/8.x"
-      shell: |
-        ansible-galaxy role install -p /etc/ansible/roles {{ item }}
-      become: yes
-      loop:
-      - redhatofficial.rhel8_ospp
-      - redhatofficial.rhel7_ospp
-
-    - name: block for the sat server
-      block:
-      - name: "Import the ansible roles into Satellite"
-        shell: |
-          hammer ansible roles import --location-id {{ locid.stdout }} --organization-id 1 --proxy-id {{ proxyid.stdout }} && touch /root/.setup/oscap-ansible
-        args:
-          creates: /root/.setup/oscap-ansible
-        #delegate_to: "{{ sat6_server }}"
-        become: yes
-  
-      - name: "Import the ansible variables into Satellite"
-        shell: |
-          hammer ansible variables import --location-id {{ locid.stdout }} --organization-id 1 --proxy-id {{ proxyid.stdout }} && touch /root/.setup/oscap-ansible1
-        args:
-          creates: /root/.setup/oscap-ansible1
-        #delegate_to: "{{ sat6_server }}"
-        become: yes
-  
-      - name: "Find the Hostgroups"
-        shell: |
-          hammer --output csv hostgroup list | grep -v "Id,"| cut -f1 -d,
-        register: hostgroupids
-        args:
-          creates: /root/.setup/oscap-ansible4
-        #delegate_to: "{{ sat6_server }}"
-        become: yes
-  
-      - name: "Assign foreman_scap role to Hostgroups for reports"
-        shell: |
-          hammer hostgroup ansible-roles assign --ansible-role-ids=1 --id={{ item }}
-        loop: "{{ hostgroupids.stdout.split() }}"
-        args:
-          creates: /root/.setup/oscap-ansible2
-        #delegate_to: "{{ sat6_server }}"
-        become: yes
-        
-      - name: "Ansible step complete"
-        shell: touch /root/.setup/oscap-ansible2
-        become: true
-        args:
-          creates: /root/.setup/oscap-ansible2
-        #delegate_to: "{{ sat6_server }}"
-  
-      - name: "Create Oscap RHEL7 DSS Policy"
-        ignore_errors: true
-        shell: |
-          hammer policy create --hostgroup-ids {{ item }} --location-id 2 --organization-id 1 --period weekly --weekday friday --scap-content-id 4 --scap-content-profile-id 33 --deploy-by ansible --name "SCAP RHEL7 DSS Policy"
-        loop: "{{ hostgroupids.stdout.split() }}"
-        when: ( ansible_local['roles'] is defined and ansible_local['roles']['default']['role'] == 'satellite-server') or ( esxirole is defined and esxirole.stdout == 'satellite-server' )
-        args:
-          creates: /root/.setup/oscap-ansible3
-        #delegate_to: "{{ sat6_server }}"
-        become: yes
-  
-      - name: "Ansible step complete"
-        shell: touch /root/.setup/oscap-ansible3
-        become: true
-        when: ( ansible_local['roles'] is defined and ansible_local['roles']['default']['role'] == 'satellite-server') or ( esxirole is defined and esxirole.stdout == 'satellite-server' )
-        args:
-          creates: /root/.setup/oscap-ansible3
-        #delegate_to: "{{ sat6_server }}"
-  
-      - name: "Add Oscap capsule to Hostgroups"
-        shell: |
-          hammer hostgroup update --id {{ item }} --openscap-proxy-id 1
-        loop: "{{ hostgroupids.stdout.split() }}"
-        args:
-          creates: /root/.setup/oscap-ansible4
-        #delegate_to: "{{ sat6_server }}"
-        become: yes
-  
-      - name: "Ansible step complete"
-        shell: touch /root/.setup/oscap-ansible4
-        args:
-          creates: /root/.setup/oscap-ansible4
-        become: true
-        #delegate_to: "{{ sat6_server }}"
-      when: ( ansible_local['roles'] is defined and ansible_local['roles']['default']['role'] == 'satellite-server') or  ( esxirole is defined and esxirole.stdout == 'satellite-server' )
+  - name: "oscap setup complete"
+    ansible.builltin.file:
+      path: /opt/setup/oscap-setup
+      state: touch
+      mode: 0444
+    become: true
+  when: oscapsetup.stat.exists == false
+  # end of block

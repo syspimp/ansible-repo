@@ -1,7 +1,7 @@
 ---
 - name: "tlog check"
   stat:
-    path: /opt/.tlogcheck
+    path: /opt/setup/tlogcheck
   register: tlogcheckv
 
 - name: wrapper for installation
@@ -57,7 +57,7 @@
 
   - name: "tlog install complete"
     file:
-      path: "/opt/.tlogcheck"
+      path: "/opt/setup/tlogcheck"
       state: touch
       mode: 0444
     become: true

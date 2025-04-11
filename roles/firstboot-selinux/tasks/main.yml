@@ -1,7 +1,7 @@
 ---
 - name: "selinux check"
   stat:
-    path: /opt/.selinuxcheck
+    path: /opt/setup/selinuxcheck
   register: selinuxcheckv
 
 - name: wrapper for installation
@@ -23,7 +23,7 @@
 
   - name: "selinux install complete"
     file:
-      path: "/opt/.selinuxcheck"
+      path: "/opt/setup/selinuxcheck"
       state: touch
       mode: 0444
     become: true
