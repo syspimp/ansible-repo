@@ -1,0 +1,17 @@
+---
+- name: "firstboot-network restart services"
+  systemd:
+    state: restarted
+    name: "{{ item }}"
+    enabled: yes
+  become: true
+  loop:
+    - "NetworkManager.service"
+    - "firewalld.service"
+    - "sshd.service"
+
+- name: "firstboot-network update dns"
+  shell: |
+    /usr/sbin/ifup-local
+  become: true
+
