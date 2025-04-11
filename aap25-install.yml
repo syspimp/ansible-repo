@@ -73,7 +73,7 @@
 
   - name: Post manifest file and accept the EULA
     uri:
-      url: https://aap25-gw.tfound.org/api/v2/config/
+      url: https://aap25-gw.tfound.org/api/controller/v2/config/
       method: POST
       user: admin
       password: "{{ tower_pass }}"
