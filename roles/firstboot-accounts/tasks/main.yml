@@ -81,5 +81,12 @@
       state: touch
       mode: 0644
     become: true
+
+  - name: "user install complete"
+    file:
+      path: "/opt/.usercheck"
+      state: touch
+      mode: 0444
+    become: true
   # end of block
   when: usercheckv.stat.exists == false
