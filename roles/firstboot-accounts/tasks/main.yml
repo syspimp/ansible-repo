@@ -18,6 +18,7 @@
         expires: -1
         append: yes
       loop: "{{ newusers }}"
+      nolog: true
       when: ansible_distribution != "Ubuntu"
 
     # Ubuntu distros that use sudo instead of wheel for administrators
@@ -30,6 +31,7 @@
         expires: -1
         append: yes
       loop: "{{ newusers }}"
+      nolog: true
       when: ansible_distribution == "Ubuntu"
 
     rescue:
@@ -43,6 +45,7 @@
         expires: -1
         append: yes
       loop: "{{ newusers }}"
+      nolog: true
     # end of block
 
   - name: Set authorized key taken from file
@@ -50,6 +53,7 @@
       user: "{{ item.newusername }}"
       state: present
       key: "{{ item.public_key }}"
+    nolog: true
     loop: "{{ newusers }}"
 
   - name: Set the sudo template to allow users privileged commands
@@ -59,6 +63,7 @@
       owner: root
       group: root
       mode: '0400'
+    nolog: true
     loop: "{{ newusers }}"
 
   - name: Set download.sh with redhat offline token
