@@ -415,4 +415,5 @@
     state: enabled
     permanent: yes
   loop: "{{ satellite_services }}"
+  ignore_errors: yes
 
