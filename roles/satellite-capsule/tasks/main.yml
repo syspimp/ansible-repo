@@ -114,14 +114,6 @@
       become: true
     
     - name: "Enable satellite-capsule dnf module"
-      ansible.builtin.dnf:
-        name: '@satellite-capsule:el8'
-        state: present
-        force: true
-      become: true
-      ignore_errors: true
-
-    - name: "Enable satellite-capsule dnf module"
       shell: |
         dnf module enable satellite-capsule:el8 -y
       become: true
