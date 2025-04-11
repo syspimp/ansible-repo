@@ -1,0 +1,6 @@
+---
+- name: "make directory to track setup progress"
+  shell: "mkdir /opt/setup"
+  become: true
+        
+

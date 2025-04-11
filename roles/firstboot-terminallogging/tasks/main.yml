@@ -1,11 +1,16 @@
 ---
+- name: "tlog check"
+  stat:
+    path: /opt/.tlogcheck
+  register: tlogcheckv
+
+- name: wrapper for installation
+  block:
   - name: "Installing terminal logging rpms"
     yum:
-      name: "{{ item }}"
+      name: tlog
       state: latest
     become: true
-    loop:
-      - tlog
 
   - name: "sssd.conf local config"
     template: 
@@ -15,6 +20,8 @@
       group: root 
       mode: 0600
     become: true
+    notify:
+      - "restarting sssd service"
       
   - name: "session logging config"
     template: 
@@ -24,6 +31,8 @@
       group: root 
       mode: 0600
     become: true
+    notify:
+      - "restarting sssd service"
 
   - name: "terminal logging config"
     template: 
@@ -33,11 +42,8 @@
       group: root 
       mode: 0644
     become: true
-
-  - name: "restarting sssd service"
-    ansible.builtin.service:
-      name: sssd
-      state: restarted
+    notify:
+      - "restarting sssd service"
 
   - name: "running authselect to select sssd for authentication"
     shell: |
@@ -46,3 +52,14 @@
       authselect enable-feature without-nullok
       authselect apply-changes
     become: true
+    notify:
+      - "restarting sssd service"
+
+  - name: "tlog install complete"
+    file:
+      path: "/opt/.tlogcheck"
+      state: touch
+      mode: 0444
+    become: true
+  # end of block
+  when: tlogcheckv.stat.exists == false
