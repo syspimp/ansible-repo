@@ -24,13 +24,13 @@
     notify:
       - "Enable and start snmpd services"
 
-    - name: "snmp install complete"
-      file:
-        path: "/opt/.snmpcheck"
-        state: touch
-        mode: 0444
-      become: true
-    # end of block
+  - name: "snmp install complete"
+    file:
+      path: "/opt/.snmpcheck"
+      state: touch
+      mode: 0444
+    become: true
+  # end of block
   when: snmpcheckv.stat.exists == false
   always:
   - name: "Update /etc/snmp/snmpd.conf"
