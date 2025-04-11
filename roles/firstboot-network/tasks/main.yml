@@ -1,123 +1,133 @@
 ---
-- name: "Configure the time services"
-  shell: |
-    ntpdate server {{ ntp_server }} iburst
-    timedatectl set-ntp true
-    systemctl restart chronyd
-  poll: 0
-  async: 1
-  become: true
-  ignore_errors: yes
+- name: "network check"
+  stat:
+    path: /opt/.netcheck
+  register: netcheckv
 
-- name: "install network packages"
-  yum:
-    name: "{{ item }}"
-    state: latest
-  loop:
-    - firewalld
-    - bind-utils
+- name: wrapper for installation
+  block:
+  - name: "Configure the time services"
+    shell: |
+      ntpdate server {{ ntp_server }} iburst
+      timedatectl set-ntp true
+      systemctl restart chronyd
+    poll: 0
+    async: 1
+    become: true
+    ignore_errors: yes
 
-- name: "Fix the DNS in ifcfg-eth0"
-  ansible.builtin.lineinfile:
-    path: /etc/sysconfig/network-scripts/ifcfg-eth0
-    regexp: '^DNS1='
-    line: "DNS1={{ dns_server }}"
+  - name: "install network packages"
+    yum:
+      name: "{{ item }}"
+      state: latest
+    loop:
+      - firewalld
+      - bind-utils
 
-- name: "Fix the DNS in ifcfg-eth0"
-  ansible.builtin.lineinfile:
-    path: /etc/sysconfig/network-scripts/ifcfg-eth0
-    regexp: '^DNS2='
-    line: "DNS2={{ dns2_server }}"
+  - name: "Fix the DNS in ifcfg-eth0"
+    ansible.builtin.lineinfile:
+      path: /etc/sysconfig/network-scripts/ifcfg-eth0
+      regexp: '^DNS1='
+      line: "DNS1={{ dns_server }}"
+    notify:
+      - "firstboot-network restart services"
 
-- name: "Configure DNS via NetworkManager"
-  shell: |
-    nmcli con load /etc/sysconfig/network-scripts/ifcfg-eth0
-  become: yes
-  
-- name: "Template for motd"
-  template: 
-    src: tiger.ascii.j2
-    dest: /etc/motd 
-    owner: root 
-    group: root 
-    mode: 0644
-  become: true
+  - name: "Fix the DNS in ifcfg-eth0"
+    ansible.builtin.lineinfile:
+      path: /etc/sysconfig/network-scripts/ifcfg-eth0
+      regexp: '^DNS2='
+      line: "DNS2={{ dns2_server }}"
+    notify:
+      - "firstboot-network restart services"
 
-- name: "Set kernel network parameters in sysctl.conf"
-  template: 
-    src: sysctl.conf.j2
-    dest: /etc/sysctl.conf
-    owner: root 
-    group: root 
-    mode: 0644
-  become: true
+  - name: "Configure DNS via NetworkManager"
+    shell: |
+      nmcli con load /etc/sysconfig/network-scripts/ifcfg-eth0
+    become: yes
+    notify:
+      - "firstboot-network restart services"
+      - "firstboot-network update dns"
+    
+  - name: "Template for motd"
+    template: 
+      src: tiger.ascii.j2
+      dest: /etc/motd 
+      owner: root 
+      group: root 
+      mode: 0644
+    become: true
 
-- name: "reload kernel with new network parameters"
-  shell:
-    sysctl -p
-  become: true
+  - name: "Set kernel network parameters in sysctl.conf"
+    template: 
+      src: sysctl.conf.j2
+      dest: /etc/sysctl.conf
+      owner: root 
+      group: root 
+      mode: 0644
+    become: true
 
-- name: "Start firewalld service"
-  systemd:
-    state: restarted
-    name: "firewalld.service"
-    enabled: yes
-    force: yes
-  become: true
-      
-- name: "Allowing loopback lo traffic"
-  shell: |
-    firewall-cmd --permanent --zone=trusted --add-interface=lo
-    firewall-cmd --permanent --zone=trusted --add-rich-rule='rule family=ipv4 source address="127.0.0.1" destination not address="127.0.0.1" drop'
-    firewall-cmd --permanent --zone=trusted --add-rich-rule='rule family=ipv6 source address="::1" destination not address="::1" drop'
-  ignore_errors: yes
-  become: true
+  - name: "reload kernel with new network parameters"
+    shell:
+      sysctl -p
+    become: true
 
-- name: "update dns with hostname when network restarts"
-  template:
-    src: dns-updater.sh.j2
-    dest: /usr/sbin/ifup-local
-    owner: root
-    group: root
-    mode: 0755
-  become: true
+  - name: "Start firewalld service"
+    systemd:
+      state: started
+      name: "firewalld.service"
+      enabled: yes
+      force: yes
+    become: true
+        
+  - name: "Allowing loopback lo traffic"
+    shell: |
+      firewall-cmd --permanent --zone=trusted --add-interface=lo
+      firewall-cmd --permanent --zone=trusted --add-rich-rule='rule family=ipv4 source address="127.0.0.1" destination not address="127.0.0.1" drop'
+      firewall-cmd --permanent --zone=trusted --add-rich-rule='rule family=ipv6 source address="::1" destination not address="::1" drop'
+    become: true
 
-- name: "Run the dns helper"
-  shell: |
-    /usr/sbin/ifup-local
-  become: true
+  - name: "update dns with hostname when network restarts"
+    template:
+      src: dns-updater.sh.j2
+      dest: /usr/sbin/ifup-local
+      owner: root
+      group: root
+      mode: 0755
+    become: true
+    notify:
+      - "firstboot-network update dns"
 
-- name: "Disable ssh access with no password"
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    line: "{{ item }}"
-  loop:
-    - "Banner /etc/issue.net"
-    - "PermitEmptyPasswords no"
-    - "LoginGraceTime 60"
-    - "LogLevel VERBOSE"
-    - "MaxAuthTries 4"
-    - "MaxSessions 10"
-    - "MaxStartups 10:30:60"
+  - name: "Disable ssh access with no password"
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      line: "{{ item }}"
+    notify:
+      - "firstboot-network restart services"
+    loop:
+      - "Banner /etc/issue.net"
+      - "PermitEmptyPasswords no"
+      - "LoginGraceTime 60"
+      - "LogLevel VERBOSE"
+      - "MaxAuthTries 4"
+      - "MaxSessions 10"
+      - "MaxStartups 10:30:60"
 
-- name: "Enable /etc/issue with consent"
-  lineinfile:
-    path: /etc/issue
-    line: "\nYou consent to be monitored. [Authorized use only.]"
+  - name: "Enable /etc/issue with consent"
+    lineinfile:
+      path: /etc/issue
+      line: "\nYou consent to be monitored. [Authorized use only.]"
 
-- name: "Enable /etc/issue.net with consent"
-  lineinfile:
-    path: /etc/issue.net
-    line: "\nYou consent to be monitored. [Authorized use only.]"
+  - name: "Enable /etc/issue.net with consent"
+    lineinfile:
+      path: /etc/issue.net
+      line: "\nYou consent to be monitored. [Authorized use only.]"
 
-- name: "Restart Services"
-  systemd:
-    state: restarted
-    name: "{{ item }}"
-    enabled: yes
-  become: true
-  loop:
-    - "NetworkManager.service"
-    - "firewalld.service"
-    - "sshd.service"
+  - name: "network install complete"
+    file:
+      path: "/opt/.netcheck"
+      state: touch
+      mode: 0444
+    become: true
+  # end of block
+  when: netcheckv.stat.exists == false
       
