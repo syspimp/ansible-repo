@@ -32,18 +32,13 @@
     become: true
   # end of block
   when: snmpcheckv.stat.exists == false
-  always:
-  - name: "Update /etc/snmp/snmpd.conf"
-    template:
-      src: snmpd.conf.j2
-      dest: /etc/snmp/snmpd.conf
-      mode: '0644'
-    become: true
-    notify:
-      - "Enable and start snmpd services"
 
-  - name: "Restore selinux context on  /etc/snmp/snmpd.conf"
-    shell: restorecon /etc/snmp/snmpd.conf
-    become: yes
-    notify:
-      - "Enable and start snmpd services"
+- name: "Update /etc/snmp/snmpd.conf"
+  template:
+    src: snmpd.conf.j2
+    dest: /etc/snmp/snmpd.conf
+    mode: '0644'
+  become: true
+  notify:
+    - "Enable and start snmpd services"
+    - "estore selinux context on  /etc/snmp/snmpd.conf"

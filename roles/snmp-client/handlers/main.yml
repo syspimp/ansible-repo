@@ -8,3 +8,7 @@
   loop:
     - firewalld
     - snmpd
+
+- name: "Restore selinux context on  /etc/snmp/snmpd.conf"
+  shell: restorecon /etc/snmp/snmpd.conf
+  become: yes
