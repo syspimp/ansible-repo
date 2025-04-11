@@ -28,7 +28,17 @@
     set_fact:
       shorthostname: "{{ shortname.stdout }}"
 
-  - name: "Start install, probably will fail"
+  - name: "copy up the entitlement manifest"
+    copy:
+      src: manifest.zip
+      dest: /root/ansible-automation-platform-setup-bundle-2.5-11-x86_64/manifest.zip
+
+  - name: Load vault decrypted manifest into variable
+    slurp:
+      src: "/root/ansible-automation-platform-setup-bundle-2.5-11-x86_64/manifest.zip"
+    register: manifest_file
+
+  - name: "Start install, probably will fail after 23 mins"
     shell: |
       echo "see /root/ansible-setup-output.log for details"
       exec &> >(tee -a /root/ansible-setup-output.log)
@@ -39,19 +49,33 @@
     args:
       executable: /bin/bash
       chdir: /root/ansible-automation-platform-setup-bundle-2.5-11-x86_64
+      creates: /root/ansible-automation-platform-setup-bundle-2.5-11-x86_64/.installsuccess
 
-  - name: "Retart install, should succeed"
+  - name: "Retart install, populate EE and collections. gw will be accessible in 30 mins, should succeed after 120 mins"
     shell: |
       echo "see /root/ansible-setup-output.log for details"
       exec &> >(tee -a /root/ansible-setup-output.log)
       # bug: the certs need to be accepted
-      for i in gw controller hub eda exec db;
+      for i in gw hub eda exec db;
       do
         scp /etc/pki/ca-trust/source/anchors/ansible-automation-platform-managed-ca-cert.crt root@aap25-${i}:/etc/pki/ca-trust/source/anchors/
         ssh root@aap25-${i} "update-ca-trust extract"; 
       done
-      ./setup.sh
+      ./setup.sh && touch /root/ansible-automation-platform-setup-bundle-2.5-11-x86_64/.installsuccess
     become: true
     args:
       executable: /bin/bash
       chdir: /root/ansible-automation-platform-setup-bundle-2.5-11-x86_64
+      creates: /root/ansible-automation-platform-setup-bundle-2.5-11-x86_64/.installsuccess
+
+  - name: Post manifest file and accept the EULA
+    uri:
+      url: https://aap25-gw.tfound.org/api/v2/config/
+      method: POST
+      user: admin
+      password: "{{ tower_pass }}"
+      body: '{ "eula_accepted": true, "manifest": "{{ manifest_file.content }}" }'
+      body_format: json
+      validate_certs: false
+      force_basic_auth: true
+
