@@ -302,7 +302,7 @@
                     --no-enable-puppet \
                     --foreman-proxy-puppet false \
                     --foreman-proxy-puppetca false \
-                    --enable-foreman-proxy-plugin-remote-execution-ssh \
+                    --enable-foreman-proxy-plugin-remote-execution-script \
                     --enable-foreman-proxy-plugin-ansible \
                     --enable-foreman-proxy-plugin-openscap && \
                     touch /opt/.sat-install-finished
