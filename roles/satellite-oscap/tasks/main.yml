@@ -298,7 +298,7 @@
     become: true
 
   - name: "oscap setup complete"
-    ansible.builltin.file:
+    ansible.builtin.file:
       path: /opt/setup/oscap-setup
       state: touch
       mode: 0444
