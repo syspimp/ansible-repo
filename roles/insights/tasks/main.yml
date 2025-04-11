@@ -13,7 +13,7 @@
       become: true
 
     - name: "Register to the Red Hat Access Insights Service"
-      command: /usr/bin/insights-client --register
+      shell: /usr/bin/insights-client --register
       args:
         creates: /etc/insights-client/.registered
       register: reg_insights
