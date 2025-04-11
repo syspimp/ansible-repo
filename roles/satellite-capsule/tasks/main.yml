@@ -117,15 +117,13 @@
       ansible.builtin.dnf:
         name: '@satellite-capsule:el8'
         state: present
+        force: true
       become: true
       ignore_errors: true
 
     - name: "Enable satellite-capsule dnf module"
       shell: |
-        #dnf module reset postgresql -y
-        #dnf module reset ruby -y
-        #dnf module enable satellite-capsule:el8
-        dnf module enable satellite-capsule:el8 postgresql:12 ruby:2.7 -y
+        dnf module enable satellite-capsule:el8 -y
       become: true
       ignore_errors: true
 
