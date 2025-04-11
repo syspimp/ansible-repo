@@ -21,12 +21,12 @@
       setsebool -P ssh_sysadm_login on
     become: yes
 
-    - name: "selinux install complete"
-      file:
-        path: "/opt/.selinuxcheck"
-        state: touch
-        mode: 0444
-      become: true
-    # end of block
+  - name: "selinux install complete"
+    file:
+      path: "/opt/.selinuxcheck"
+      state: touch
+      mode: 0444
+    become: true
+  # end of block
   when: selinuxcheckv.stat.exists == false
 
