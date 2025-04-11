@@ -1,6 +1,16 @@
 ---
 - name: "Register to the correct Satellite Server"
   block:
+  - name: "Check if we are registered"
+    shell: "subscription-manager status"
+    become: yes
+
+  - name: "Make sure we are pointed to the correct satellite server"
+    shell:
+      subscription-manager config | grep "{{ sat6['lb_fqdn'] }}"
+    become: yes
+
+  rescue:
   - name: "Find Group Inventory for 'satellite-server'"
     uri:
       url: "https://{{ tower_server }}/api/v2/groups/?search=satellite-server"
@@ -60,32 +70,8 @@
 
   - name: "Set the sat6_server fact"
     set_fact:
-      sat6_server: "{{ hostipcheck.json.ansible_host }}"
+      sat6_server: "{{ hostipcheck.json.ansible_host | default('None',True) }}"
 
-
-  rescue:
-  - name: There is no satellite server
-    debug:
-      msg: There is no satellite server
-
-- name: "Register to the correct Satellite Server"
-  block:
-  - name: "Check if we are registered"
-    shell: "subscription-manager status"
-    become: yes
-
-  - name: "Make sure we are pointed to the correct satellite server"
-    shell:
-      subscription-manager config | grep "{{ sat6['lb_fqdn'] }}"
-    become: yes
-    #when:
-    #- (ansible_local['roles'] is defined) or (ansible_local['roles'] is defined)
-    #- ansible_local['roles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy']
-    #- ansible_local['roles']['default']['role'] not in ['satellite-capsule','satellite-server','satellite-haproxy','haproxy']
-  when:
-  - "(sat6_server is defined) and (sat6_server != 'None')"
-
-  rescue:
   - name: "Save the enabled yum repos"
     shell: subscription-manager repos --list-enabled | grep "Repo ID:" | awk '{print $3}'
     become: yes
