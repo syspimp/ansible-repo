@@ -1,5 +1,5 @@
 ---
-- name: "Enable and start snmpd service"
+- name: "Enable and start snmpd services"
   service:
     name: "{{ item }}.service"
     state: restarted

@@ -1,41 +1,49 @@
 ---
-- name: "Installing snmp related rpms"
-  yum:
-    name: "{{ item }}"
-    state: latest
-  become: true
-  loop:
-  - net-snmp
-  - net-snmp-devel
+- name: "snmp check"
+  stat:
+    path: /opt/.snmpcheck
+  register: snmpcheckv
 
-- name: "Update /etc/snmp/snmpd.conf"
-  template:
-    src: snmpd.conf.j2
-    dest: /etc/snmp/snmpd.conf
-    mode: '0644'
-  become: true
-  notify:
-    - "Enable and start snmpd service"
+- name: wrapper for installation
+  block:
+  - name: "Installing snmp related rpms"
+    yum:
+      name: "{{ item }}"
+      state: latest
+    become: true
+    loop:
+    - net-snmp
+    - net-snmp-devel
 
-- name: "Restore selinux context on  /etc/snmp/snmpd.conf"
-  shell: restorecon /etc/snmp/snmpd.conf
-  become: yes
+  - name: "Allow port 161/udp in firewalld rules"
+    firewalld:
+      immediate: yes
+      port: 161/udp
+      state: enabled
+      permanent: yes
+    notify:
+      - "Enable and start snmpd services"
 
-- name: "Start firewalld service"
-  systemd:
-    state: started
-    name: "{{ item }}.service"
-    enabled: yes
-    force: yes
-  loop:
-    - firewalld
+    - name: "snmp install complete"
+      file:
+        path: "/opt/.snmpcheck"
+        state: touch
+        mode: 0444
+      become: true
+    # end of block
+  when: snmpcheckv.stat.exists == false
+  always:
+  - name: "Update /etc/snmp/snmpd.conf"
+    template:
+      src: snmpd.conf.j2
+      dest: /etc/snmp/snmpd.conf
+      mode: '0644'
+    become: true
+    notify:
+      - "Enable and start snmpd services"
 
-- name: "Allow port 161/udp in firewalld rules"
-  firewalld:
-    immediate: yes
-    port: 161/udp
-    state: enabled
-    permanent: yes
-  notify:
-    - "Enable and start snmpd service"
-
+  - name: "Restore selinux context on  /etc/snmp/snmpd.conf"
+    shell: restorecon /etc/snmp/snmpd.conf
+    become: yes
+    notify:
+      - "Enable and start snmpd services"
