@@ -11,11 +11,15 @@ checksum=${aap25}
 
 # get offline token: https://access.redhat.com/management/api  
 offline_token="eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI0NzQzYTkzMC03YmJiLTRkZGQtOTgzMS00ODcxNGRlZDc0YjUifQ.eyJpYXQiOjE3MzM2NzQ2NzYsImp0aSI6ImJhOWMxYjliLTZhOTYtNDMwNC1hMzFjLWMwODBhZjVmOGRiNCIsImlzcyI6Imh0dHBzOi8vc3NvLnJlZGhhdC5jb20vYXV0aC9yZWFsbXMvcmVkaGF0LWV4dGVybmFsIiwiYXVkIjoiaHR0cHM6Ly9zc28ucmVkaGF0LmNvbS9hdXRoL3JlYWxtcy9yZWRoYXQtZXh0ZXJuYWwiLCJzdWIiOiJmOjUyOGQ3NmZmLWY3MDgtNDNlZC04Y2Q1LWZlMTZmNGZlMGNlNjpkYXZpZC5tLnRheWxvciIsInR5cCI6Ik9mZmxpbmUiLCJhenAiOiJyaHNtLWFwaSIsInNpZCI6IjM2ZDQ0YWFmLTc3YWUtNDM0OC04NDg4LTE4NDQyNWI0YjdmNiIsInNjb3BlIjoiYmFzaWMgcm9sZXMgd2ViLW9yaWdpbnMgY2xpZW50X3R5cGUucHJlX2tjMjUgb2ZmbGluZV9hY2Nlc3MifQ.eL3Cp_bX0GoQPmRqJhbRju0tDM-Ad32DLbxJ8IDDUraXXCxe6WZfxIl8Pjt1QocNpdgJpGvH2YA7sHxfYEcvUg"
-while getopts "d" OPTION
+while getopts "di:h" OPTION
 do
   case "$OPTION" in
     # debug
     d) set -x
+    ;;
+    i) eval checksum=\${$OPTARG}
+    ;;
+    h) echo "$0 -i [ aap25 | aap25 | rhel90 | rhel86 | rhel79 | <checksum from portal> ]"
     ;;
   esac
 done
