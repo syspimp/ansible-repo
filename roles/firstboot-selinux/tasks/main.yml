@@ -1,4 +1,11 @@
 ---
+- name: "selinux check"
+  stat:
+    path: /opt/.selinuxcheck
+  register: selinuxcheckv
+
+- name: wrapper for installation
+  block:
   - name: "[selinux] mapping user_u as default selinux user"
     shell: |
       semanage login -m -s user_u  -r s0  __default__
@@ -13,4 +20,13 @@
     shell: |
       setsebool -P ssh_sysadm_login on
     become: yes
+
+    - name: "selinux install complete"
+      file:
+        path: "/opt/.selinuxcheck"
+        state: touch
+        mode: 0444
+      become: true
+    # end of block
+  when: selinuxcheckv.stat.exists == false
 
