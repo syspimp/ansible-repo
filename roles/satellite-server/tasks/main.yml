@@ -870,7 +870,6 @@
     creates: /root/.setup/step23
 
 - name: "Add operating systems"
-  ignore_errors: yes
   shell: |
     hammer os list | grep "{{ item }}" || \
     hammer os create --name {{ item.split()[0] }} --major {{ item.split()[1] }} --architectures="x86_64"
