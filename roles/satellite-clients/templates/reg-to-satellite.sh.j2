@@ -2,7 +2,7 @@
 chmod +x /opt/bootstrap.py
 {% if ansible_distribution_major_version == '8' %}
 grep python3 /opt/bootstrap.py || sed -i -e 's/usr\/bin\/python/usr\/bin\/python3/g' /opt/bootstrap.py
-yum install python3 -y
+#yum install python3 -y
 {% endif %}
 /opt/bootstrap.py -l {{ sat6['user'] }} -p {{ sat6['pass'] }} \
 -s {{ sat6['lb_fqdn'] }} \
