@@ -38,7 +38,7 @@
     notify:
       - restart firewalld
 
-  - name: "make setup tracking dir"
+  - name: "haproxy setup complete"
     ansible.builtin.file:
       path: /opt/setup/haproxy-rpms
       state: touch
