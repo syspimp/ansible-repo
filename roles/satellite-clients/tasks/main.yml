@@ -121,6 +121,19 @@
     - "ansible_distribution == 'RedHat'"
     - "(sat6_server is defined) and (sat6_server != 'None')"
 
+  - name: "Register using community.general.redhat_subscription modulea"
+    community.general.redhat_subscription:
+      state: present
+      server_hostname: "{{ sat6['lb_fqdn'] }}"
+      server_insecure: true
+      username: "{{ sat6['user'] }}"
+      password: "{{ sat6['pass'] }}"
+      org_id: 1
+      environment: "{{ sat6['environment'] }}"
+      force_register: true
+      auto_attach: true
+    ignore_errors: true
+
   - name: "Run the satellite bootstrap script, ignoring errors"
     ignore_errors: yes
     shell: |
