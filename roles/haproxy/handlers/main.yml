@@ -1,6 +1,10 @@
 ---
-- name: restart haproxy
+- name: restart haproxy services
   service:
-    name: haproxy
+    name: "{{ item }}"
     state: restarted
+    enabled: true
   become: yes
+  loop:
+    - firewalld
+    - haproxy

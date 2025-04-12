@@ -1,7 +1,7 @@
 ---
 - name: "Haproxy Setup check"
   shell: |
-    if [ -e "/root/.setup/haproxy-rpms" ]
+    if [ -e "/opt/setup/haproxy-rpms" ]
     then
       echo "true"
     else
@@ -14,7 +14,7 @@
   block:
     - name: "make setup tracking dir"
       file:
-        path: /root/.setup
+        path: /opt/setup
         state: directory
         mode: 0755
       become: true
@@ -26,10 +26,12 @@
         name: ["haproxy"]
         state: latest
       become: true
+      notify:
+        - restart haproxy services
 
     - name: "make setup tracking dir"
       file:
-        path: /root/.setup/haproxy-rpms
+        path: /opt/setup/haproxy-rpms
         state: touch
         mode: 0440
       become: true
@@ -45,7 +47,8 @@
       group: root
       mode: 0644
     become: yes
-    notify: restart haproxy
+    notify:
+      - restart haproxy services
 
   - name: "Set selinux flag to allow haproxy connections"
     shell: |
@@ -60,12 +63,6 @@
     become: yes
     ignore_errors: yes
 
-  - name: "Enable and start haproxy"
-    service:
-      name: haproxy
-      enabled: yes
-    become: yes
-
   - name: "Enable proxyied services"
     firewalld:
       immediate: yes
@@ -73,6 +70,8 @@
       state: enabled
       permanent: yes
     loop: "{{ haproxy_services }}"
+    notify:
+      - restart haproxy services
 
   rescue:
   - name: "You will need to rerun this playbook"
