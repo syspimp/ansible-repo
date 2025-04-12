@@ -41,4 +41,4 @@
   become: true
   notify:
     - "Enable and start snmpd services"
-    - "estore selinux context on  /etc/snmp/snmpd.conf"
+    - "Restore selinux context on  /etc/snmp/snmpd.conf"
