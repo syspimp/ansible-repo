@@ -100,26 +100,26 @@
     when:
     - "(sat6_server is defined) and (sat6_server != 'None')"
 
-  - name: "Get the bootstrap python script"
-    get_url:
-      url: "http://{{ sat6_server }}/pub/bootstrap.py"
-      dest: /opt/bootstrap.py
-    become: yes
-    when:
-    - "(sat6_server is defined) and (sat6_server != 'None')"
-    - "ansible_distribution == 'RedHat'"
-
-  - name: "Save the command to register to satellite server"
-    template:
-      src: reg-to-satellite.sh.j2
-      dest: /opt/reg-to-satellite.sh
-      owner: root
-      group: root
-      mode: 0755
-    become: yes
-    when:
-    - "ansible_distribution == 'RedHat'"
-    - "(sat6_server is defined) and (sat6_server != 'None')"
+#  - name: "Get the bootstrap python script"
+#    get_url:
+#      url: "http://{{ sat6_server }}/pub/bootstrap.py"
+#      dest: /opt/bootstrap.py
+#    become: yes
+#    when:
+#    - "(sat6_server is defined) and (sat6_server != 'None')"
+#    - "ansible_distribution == 'RedHat'"
+#
+#  - name: "Save the command to register to satellite server"
+#    template:
+#      src: reg-to-satellite.sh.j2
+#      dest: /opt/reg-to-satellite.sh
+#      owner: root
+#      group: root
+#      mode: 0755
+#    become: yes
+#    when:
+#    - "ansible_distribution == 'RedHat'"
+#    - "(sat6_server is defined) and (sat6_server != 'None')"
 
   - name: "Get short hostname"
     shell: |
@@ -149,33 +149,14 @@
     delay: 5
     until: registered.changed == true
 
-  - name: "Register using community.general.redhat_subscription modulea"
-    community.general.redhat_subscription:
-      state: present
-      server_hostname: "{{ sat6['lb_fqdn'] }}"
-      server_insecure: true
-      #username: "{{ sat6['user'] }}"
-      #password: "{{ sat6['pass'] }}"
-      consumer_name: "{{ shorthostname }}.{{ dns_domain }}"
-      org_id: "{{ sat6['org'] }}"
-      activationkey: "{{ sat6['activation_key'] }}"
-      #environment: "{{ sat6['environment'] }}"
-      force_register: true
-      #auto_attach: true
-    #ignore_errors: true
-    retries: 3
-    delay: 5
-    register: registered
-    until: registered.changed == true
-
-  - name: "Run the satellite bootstrap script, ignoring errors"
-    ignore_errors: yes
-    shell: |
-      /opt/reg-to-satellite.sh
-    become: yes
-    when:
-    - "ansible_distribution == 'RedHat'"
-    - "(sat6_server is defined) and (sat6_server != 'None')"
+#  - name: "Run the satellite bootstrap script, ignoring errors"
+#    ignore_errors: yes
+#    shell: |
+#      /opt/reg-to-satellite.sh
+#    become: yes
+#    when:
+#    - "ansible_distribution == 'RedHat'"
+#    - "(sat6_server is defined) and (sat6_server != 'None')"
 
   - name: dump the saved repos
     debug:
