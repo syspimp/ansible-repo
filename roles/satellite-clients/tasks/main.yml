@@ -85,13 +85,13 @@
     when:
     - "(sat6_server is defined) and (sat6_server != 'None')"
 
-#  - name: "Unregister from the redhat cdn"
-#    ignore_errors: yes
-#    shell:
-#      subscription-manager clean
-#    become: yes
-#    when:
-#    - "(sat6_server is defined) and (sat6_server != 'None')"
+  - name: "Unregister from the redhat cdn"
+    ignore_errors: yes
+    shell:
+      subscription-manager clean
+    become: yes
+    when:
+    - "(sat6_server is defined) and (sat6_server != 'None')"
 
   - name: "Install the katello certificate"
     shell:
