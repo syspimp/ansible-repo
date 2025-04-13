@@ -126,13 +126,13 @@
       state: present
       server_hostname: "{{ sat6['lb_fqdn'] }}"
       server_insecure: true
-      username: "{{ sat6['user'] }}"
-      password: "{{ sat6['pass'] }}"
+      #username: "{{ sat6['user'] }}"
+      #password: "{{ sat6['pass'] }}"
       org_id: "{{ sat6['org'] }}"
       activationkey: "{{ sat6['activation_key'] }}"
-      environment: "{{ sat6['environment'] }}"
+      #environment: "{{ sat6['environment'] }}"
       force_register: true
-      auto_attach: true
+      #auto_attach: true
     ignore_errors: true
 
   - name: "Run the satellite bootstrap script, ignoring errors"
