@@ -143,6 +143,7 @@
       #environment: "{{ sat6['environment'] }}"
       force_register: true
       #auto_attach: true
+    register: registered
     ignore_errors: true
     retries: 3
     delay: 5
@@ -164,6 +165,7 @@
     #ignore_errors: true
     retries: 3
     delay: 5
+    register: registered
     until: registered.changed == true
 
   - name: "Run the satellite bootstrap script, ignoring errors"
