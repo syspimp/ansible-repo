@@ -143,9 +143,28 @@
       #environment: "{{ sat6['environment'] }}"
       force_register: true
       #auto_attach: true
+    ignore_errors: true
+    retries: 3
+    delay: 5
+    until: registered.changed == true
+
+  - name: "Register using community.general.redhat_subscription modulea"
+    community.general.redhat_subscription:
+      state: present
+      server_hostname: "{{ sat6['lb_fqdn'] }}"
+      server_insecure: true
+      #username: "{{ sat6['user'] }}"
+      #password: "{{ sat6['pass'] }}"
+      consumer_name: "{{ shorthostname }}.{{ dns_domain }}"
+      org_id: "{{ sat6['org'] }}"
+      activationkey: "{{ sat6['activation_key'] }}"
+      #environment: "{{ sat6['environment'] }}"
+      force_register: true
+      #auto_attach: true
     #ignore_errors: true
     retries: 3
     delay: 5
+    until: registered.changed == true
 
   - name: "Run the satellite bootstrap script, ignoring errors"
     ignore_errors: yes
