@@ -144,6 +144,8 @@
       force_register: true
       #auto_attach: true
     ignore_errors: true
+    retries: 3
+    delay: 5
 
   - name: "Run the satellite bootstrap script, ignoring errors"
     ignore_errors: yes
