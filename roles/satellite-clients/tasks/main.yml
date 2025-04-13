@@ -128,7 +128,7 @@
       server_insecure: true
       username: "{{ sat6['user'] }}"
       password: "{{ sat6['pass'] }}"
-      org_id: 1
+      org_id: "{{ sat6['org'] }}"
       environment: "{{ sat6['environment'] }}"
       force_register: true
       auto_attach: true
