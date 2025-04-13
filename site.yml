@@ -52,7 +52,7 @@
   become: yes
   roles:
     - webconsole
-    - leapp-upgrade
+#    - leapp-upgrade
 
 
 - name: Create ansible build environment
