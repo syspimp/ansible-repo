@@ -80,6 +80,7 @@
   - name: "Set the short hostname fact"
     set_fact:
       shorthostname: "{{ shortname.stdout }}"
+
   - name: "Save the proxy id for the capsule"
     shell: |
       hammer --csv capsule list | grep {{ shorthostname }} | cut -f1 -d,

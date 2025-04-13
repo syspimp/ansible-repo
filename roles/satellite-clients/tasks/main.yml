@@ -121,6 +121,15 @@
     - "ansible_distribution == 'RedHat'"
     - "(sat6_server is defined) and (sat6_server != 'None')"
 
+  - name: "Get short hostname"
+    shell: |
+      hostname --short
+    register: shortname
+  
+  - name: "Set the short hostname fact"
+    set_fact:
+      shorthostname: "{{ shortname.stdout }}"
+
   - name: "Register using community.general.redhat_subscription modulea"
     community.general.redhat_subscription:
       state: present
@@ -128,6 +137,7 @@
       server_insecure: true
       #username: "{{ sat6['user'] }}"
       #password: "{{ sat6['pass'] }}"
+      consumer_name: "{{ shorthostname }}.{{ dns_domain }}"
       org_id: "{{ sat6['org'] }}"
       activationkey: "{{ sat6['activation_key'] }}"
       #environment: "{{ sat6['environment'] }}"
