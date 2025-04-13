@@ -129,6 +129,7 @@
       username: "{{ sat6['user'] }}"
       password: "{{ sat6['pass'] }}"
       org_id: "{{ sat6['org'] }}"
+      activationkey: "{{ sat6['activation_key'] }}"
       environment: "{{ sat6['environment'] }}"
       force_register: true
       auto_attach: true
