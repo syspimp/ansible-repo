@@ -1,4 +1,7 @@
 nfs_mountpoint: /nfs_share
+other_mountpoints:
+- "{{ nfs_mountpoint }}/glance"
+- "{{ nfs_mountpoint }}/cinder"
 sambashares: "yes"
 samba_rpms:
 - samba

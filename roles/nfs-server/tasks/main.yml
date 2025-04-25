@@ -19,6 +19,14 @@
     state: directory
   become: yes
 
+- name: "Create the other nfs mount point"
+  file:
+    path: "{{ item }}"
+    mode: '0777'
+    state: directory
+  become: yes
+  loop: "{{ other_mountpoints }}"
+
 - name: "Update /etc/exports"
   template:
     src: exports.j2
