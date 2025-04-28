@@ -1,0 +1,65 @@
+---
+- hosts: localhost
+  connection: local
+  ignore_errors: yes
+  gather_facts: no
+  vars:
+    #tower_host: aap25-controller-aap.apps.compute7-cluster.tfound.org
+    #tower_pass: "vaDgDKwR0PzsJ0hKVH01ZIENGdpfA7KZ"
+    tower_host: aap25-controller.tfound.org
+    tower_pass: "{{ tower_pass }}"
+    tower_user: admin
+    oldtower: 10.55.102.51
+    backups: "/mnt/backups/{{ oldtower }}"
+    backupallinone: no
+    filetype: yml
+    backupprefix: "{{ oldtower }}"
+  environment:
+    #CONTROLLER_HOST: "https://{{ tower_host }}"
+    #CONTROLLER_USERNAME: "{{ tower_user }}"
+    #CONTROLLER_PASSWORD: "{{ tower_pass }}"
+    #CONTROLLER_VERIFY_SSL: false
+    TOWER_HOST: "https://{{ tower_host }}"
+    TOWER_USERNAME: "{{ tower_user }}"
+    TOWER_PASSWORD: "{{ tower_pass }}"
+    TOWER_VERIFY_SSL: false
+  collections:
+    - ansible.controller
+  tasks:
+  - name: Import all assets in one file from our export into new controller
+    ansible.controller.import:
+      assets: "{{ lookup('file', '{{ backups }}/{{ backupprefix }}-all.{{ filetype }}') | from_yaml()  }}"
+    when: 
+      - backupallinone | bool
+
+  - name: handle each object separately
+    block:
+    - name: Import orgs from our export into new controller
+      ansible.controller.import:
+        assets: "{{ lookup('file', '{{ backups }}/{{ backupprefix }}-organizations.{{ filetype }}') | from_yaml() }}"
+
+    - name: Import cred types from our export into new controller
+      ansible.controller.import:
+        assets: "{{ lookup('file', '{{ backups }}/{{ backupprefix }}-credential_types.{{ filetype }}') | from_yaml() }}"
+
+    - name: Import credential assets from template into new controller
+      ansible.controller.import:
+        assets: "{{ lookup('ansible.builtin.template', 'credentials.{{ filetype }}.j2') | from_yaml() }}"
+  
+    - name: Import assets from our export into new controller
+      ansible.controller.import:
+        assets: "{{ lookup('file', '{{ backups }}/{{ backupprefix }}-{{ item }}.{{ filetype }}') | from_yaml() }}"
+      loop:
+      - users
+      - teams
+      - notifiations_templates
+      - inventory
+      - inventory_sources
+      - projects
+      - execution_environments
+      - job_templates
+      - schedules
+      - workflow_job_templates
+      - applications
+
+    when: (backupallinone | bool) == False
