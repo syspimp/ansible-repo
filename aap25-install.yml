@@ -53,6 +53,11 @@
         chdir: /root/ansible-automation-platform-setup-bundle-2.5-11-x86_64
         creates: /root/ansible-automation-platform-setup-bundle-2.5-11-x86_64/.installsuccess
 
+    - name: "Fixing /etc/tower/conf.d/gateway.py so we can remotely manage certain settings"
+      shell: |
+        ssh root@aap25-controller "sed -i -e 's/ALLOW_LOCAL_RESOURCE_MANAGEMENT = False/ALLOW_LOCAL_RESOURCE_MANAGEMENT = True/g' /etc/tower/conf.d/gateway.py; automation-controller-setup restart"
+      become: true
+
     rescue:
     - name: "Check /root/ansible-setup-output.log SRetart install and finish populate EE and collections. gw will be accessible in 30 mins, should succeed after 120 mins"
       shell: |

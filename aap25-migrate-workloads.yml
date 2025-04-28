@@ -1,0 +1,41 @@
+---
+- hosts: localhost
+  connection: local
+  vars:
+    oldtower: 10.55.102.51
+    olduser: admin
+    oldpass: "{{ tower_pass }}"
+    newtower: aap25-controller.tfound.org
+    newduser: admin
+    newpass: "{{ new_tower_pass }}"
+  collections:
+    - ansible.controller
+  tasks:
+  - name: Export all assets from old controller
+    ansible.controller.export:
+      all: true
+    register: export_output
+    environment:
+      #CONTROLLER_HOST: "https://{{ tower_host }}"
+      #CONTROLLER_USERNAME: "{{ tower_user }}"
+      #CONTROLLER_PASSWORD: "{{ tower_pass }}"
+      #CONTROLLER_VERIFY_SSL: false
+      TOWER_HOST: "https://{{ oldtower }}"
+      TOWER_USERNAME: "{{ olduser }}"
+      TOWER_PASSWORD: "{{ oldpass }}"
+      TOWER_VERIFY_SSL: false
+
+  - name: Import all assets from our export into new controller
+    ansible.controller.import:
+      assets: "{{ export_output.assets }}"
+    environment:
+      #CONTROLLER_HOST: "https://{{ tower_host }}"
+      #CONTROLLER_USERNAME: "{{ tower_user }}"
+      #CONTROLLER_PASSWORD: "{{ tower_pass }}"
+      #CONTROLLER_VERIFY_SSL: false
+      TOWER_HOST: "https://{{ newtower }}"
+      TOWER_USERNAME: "{{ newuser }}"
+      TOWER_PASSWORD: "{{ newpass }}"
+      TOWER_VERIFY_SSL: false
+        
+
