@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  tasks:
+    - name: "display token for rhsm"
+      debug:
+        msg: "{{ dockerio_pass }}"
+        
+
