@@ -33,6 +33,7 @@
   roles:
     - firstboot
     - firstboot-terminallogging
+    - tmux
 
 - name: Monitoring roles
   hosts: all

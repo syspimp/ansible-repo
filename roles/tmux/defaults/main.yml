@@ -1,0 +1,6 @@
+---
+tmuxusers:
+  - name: root
+    home: /root
+#  - name: cloud-user
+#    home: /home/cloud-user

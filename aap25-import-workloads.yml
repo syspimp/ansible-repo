@@ -11,7 +11,7 @@
     tower_user: admin
     oldtower: 10.55.102.51
     backups: "/mnt/backups/{{ oldtower }}"
-    backupallinone: no
+    restoreallinone: no
     filetype: yml
     backupprefix: "{{ oldtower }}"
   environment:
@@ -30,7 +30,7 @@
     ansible.controller.import:
       assets: "{{ lookup('file', '{{ backups }}/{{ backupprefix }}-all.{{ filetype }}') | from_yaml()  }}"
     when: 
-      - backupallinone | bool
+      - restoreallinone | bool
 
   - name: handle each object separately
     block:
@@ -62,4 +62,4 @@
       - workflow_job_templates
       - applications
 
-    when: (backupallinone | bool) == False
+    when: (restoreallinone | bool) == False

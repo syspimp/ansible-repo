@@ -1,0 +1,17 @@
+---
+- name: "ensure tmux (terminal multiplexer) is installed and configured"
+  block:
+    - name: "TMUX sanity check"
+      shell: "rpm -q tmux"
+  rescue:
+    - name: "TMUX install the tmux package"
+      ansible.builtin.dnf:
+        name: tmux
+        state: present
+
+    - name: "TMUX update preference file ~/.tmux.conf for defined users"
+      ansible.builtin.template:
+        src: tmux.conf.j2
+        dest: "{{ item.home }}/.tmux.conf"
+      loop: "{{ tmuxusers }}"
+
