@@ -6,7 +6,7 @@
     olduser: admin
     oldpass: "{{ tower_pass }}"
     newtower: aap25-controller.tfound.org
-    newduser: admin
+    newuser: admin
     newpass: "{{ new_tower_pass }}"
   collections:
     - ansible.controller
