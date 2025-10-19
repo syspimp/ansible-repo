@@ -47,3 +47,5 @@
       - name: flows0
         inputs: [basic_input]
         outputs: [forward_output0, forward_output1]
+  notify:
+    - restart rsyslogd
