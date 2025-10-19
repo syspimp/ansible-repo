@@ -1,15 +1,4 @@
 ---
-- name: "Tower Inventory Setup check"
-  shell: |
-    if [ -e "/root/.setup/tower-configed" ]
-    then
-      echo "true"
-    else
-      echo "false"
-    fi
-  register: towersetup
-  become: true
-
 - name: "Block add to Ansible Tower inventory"
   block:
     - name: "Get host id to add to the 'log-collector' Group Inventory"
@@ -59,10 +48,3 @@
         status_code: [201,202,204]
         body_format: json
 
-    - name: "tower config complete"
-      file:
-        path: /root/.setup/tower-configed
-        state: touch
-        mode: 0444
-      become: yes
-  when: towersetup.stdout == "false"
