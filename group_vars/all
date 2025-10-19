@@ -1,4 +1,5 @@
 ---
+log_collector: "logging.tfound.org"
 sat6_org: "Redhat_Lab"
 sat6_env: "production"
 sat6_loc: "ESXI_TFOUND"
