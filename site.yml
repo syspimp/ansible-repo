@@ -35,8 +35,13 @@
     - firstboot-terminallogging
     - tmux
 
+- name: Firstboot configuration tasks
+  hosts: logging*
+  roles:
+    - log-collector
+
 - name: Monitoring roles
-  hosts: all
+  hosts: all:!logging*
   become: yes
   roles:
     - rsyslog-client

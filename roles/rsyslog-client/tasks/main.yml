@@ -1,27 +1,49 @@
 ---
-- name: "rsyslog check"
-  stat:
-    path: /opt/.rsyslogcheck
-  register: rsyslogcheck
-
-- name: "rsylog installation block"
-  block:
-  - name: "Update /etc/rsyslog.d with template"
-    template:
-      src: zenoss.conf.j2
-      dest: /etc/rsyslog.d/zenoss.conf
-      mode: '0600'
-    notify:
-      - restart rsyslogd
-
-  - name: "Restore selinux context on /etc/rsyslog.d"
-    shell: restorecon -R /etc/rsyslog.d
-    become: yes
-
-  - name: "rsyslog install complete"
-    file:
-      path: "/opt/.rsyslogcheck"
-      state: touch
-      mode: 0444
-    become: true
-  when: rsyslogcheck.stat.exists == false
+#- name: "rsyslog check"
+#  stat:
+#    path: /opt/.rsyslogcheck
+#  register: rsyslogcheck
+#
+#- name: "rsylog installation block"
+#  block:
+#  - name: "Update /etc/rsyslog.d with template"
+#    template:
+#      src: zenoss.conf.j2
+#      dest: /etc/rsyslog.d/zenoss.conf
+#      mode: '0600'
+#    notify:
+#      - restart rsyslogd
+#
+#  - name: "Restore selinux context on /etc/rsyslog.d"
+#    shell: restorecon -R /etc/rsyslog.d
+#    become: yes
+#
+#  - name: "rsyslog install complete"
+#    file:
+#      path: "/opt/.rsyslogcheck"
+#      state: touch
+#      mode: 0444
+#    become: true
+#  when: rsyslogcheck.stat.exists == false
+- name: Configure the server to output the logs to local files in directories named by remote host names
+  ansible.builtin.include_role:
+    name: redhat.rhel_system_roles.logging
+  vars:
+    logging_inputs:
+      - name: basic_input
+        type: basics
+    logging_outputs:
+      - name: forward_output0
+        type: forwards
+        severity: info
+        target: "{{ logging_server }}"
+        udp_port: 601
+      - name: forward_output1
+        type: forwards
+        facility: mail
+        target: "{{ logging_server }}"
+        tcp_port: 601
+    logging_flows:
+      - name: flows0
+        inputs: [basic_input]
+        outputs: [forward_output0, forward_output1]

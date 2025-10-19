@@ -1,0 +1,21 @@
+---
+- name: Configure the server to receive remote input
+  ansible.builtin.include_role:
+    name: redhat.rhel_system_roles.logging
+  vars:
+    logging_inputs:
+      - name: remote_udp_input
+        type: remote
+        udp_ports: [ 601 ]
+      - name: remote_tcp_input
+        type: remote
+        tcp_ports: [ 601 ]
+    logging_outputs:
+      - name: remote_files_output
+        type: remote_files
+    logging_flows:
+      - name: flow_0
+        inputs: [remote_udp_input, remote_tcp_input]
+        outputs: [remote_files_output]
+
+- include: "tower.yml"
