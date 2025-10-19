@@ -18,4 +18,4 @@
         inputs: [remote_udp_input, remote_tcp_input]
         outputs: [remote_files_output]
 
-- include: "tower.yml"
+- include_tasks: "tower.yml"
