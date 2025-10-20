@@ -39,6 +39,7 @@
   hosts: logging*
   roles:
     - log-collector
+    - splunk
 
 - name: Monitoring roles
   hosts: all:!logging*
