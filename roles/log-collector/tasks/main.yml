@@ -23,6 +23,7 @@
     path: /etc/rsyslog.conf
     regexp: '^global\(umask'
     line: 'global(umask="0000")'
+    insertbefore: '\$IncludeConfig /etc/rsyslog'
   notify: restart rsyslogd
 
 - name: Fix the file creation mode for splunk
