@@ -175,6 +175,15 @@
     - "(sat6_server is defined) and (sat6_server != 'None')"
     become: yes
 
+  - name: "Enable satellite tools yum repo"
+    ignore_errors: yes
+    shell: "subscription-manager repos --enable satellite-client-6-for-rhel-{{ ansible_distribution_major_version }}-x86_64-rpms"
+    when:
+    - "item != ''"
+    - "ansible_distribution == 'RedHat'"
+    - "(sat6_server is defined) and (sat6_server != 'None')"
+    become: yes
+
   - name: "Save the satellite key for remote execution"
     shell: |
       curl -k https://{{ sat6['lb_fqdn'] }}:9090/ssh/pubkey >> /root/.ssh/authorized_keys
