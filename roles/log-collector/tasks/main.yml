@@ -6,10 +6,10 @@
     logging_inputs:
       - name: remote_udp_input
         type: remote
-        udp_ports: [ 601 ]
+        udp_ports: [ 514 ]
       - name: remote_tcp_input
         type: remote
-        tcp_ports: [ 601 ]
+        tcp_ports: [ 514 ]
     logging_outputs:
       - name: remote_files_output
         type: remote_files
@@ -17,5 +17,42 @@
       - name: flow_0
         inputs: [remote_udp_input, remote_tcp_input]
         outputs: [remote_files_output]
+
+- name: Fix the umask mode for splunk
+  ansible.builtin.lineinfile:
+    path: /etc/rsyslog.conf
+    regexp: '^global(umask='
+    line: 'global(umask="0000")'
+  notify: restart rsyslogd
+
+- name: Fix the file creation mode for splunk
+  ansible.builtin.lineinfile:
+    path: /etc/rsyslog.d/10-output-files-modules.conf
+    regexp: '^module(load="builtin:omfile'
+    line: 'module(load="builtin:omfile" FileCreateMode="0644" DirCreateMode="0755")'
+  notify: restart rsyslogd
+
+- name: Start splunk container
+  containers.podman.podman_container:
+    name: so1
+    image: splunk/splunk:latest
+    state: started
+    detach: true
+    exposed_ports:
+      - 8000
+    ports:
+      - 8000:8000
+    volumes: /var/log/remote/:/home/splunk:Z
+    restart_policy: "always"
+    env:
+      SPLUNK_PASSWORD: "{{ tower_pass }}"
+      SPLUNK_START_ARGS: "--accept-license"
+      SPLUNK_GENERAL_TERMS: "--accept-sgt-current-at-splunk-com"
+    generate_systemd:
+      path: /tmp/
+      restart_policy: always
+      stop_timeout: 120
+      names: true
+      container_prefix: ainer
 
 - include_tasks: "tower.yml"
