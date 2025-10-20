@@ -21,14 +21,14 @@
 - name: Fix the umask mode for splunk
   ansible.builtin.lineinfile:
     path: /etc/rsyslog.conf
-    regexp: '^global(umask='
+    regexp: '^global\(umask'
     line: 'global(umask="0000")'
   notify: restart rsyslogd
 
 - name: Fix the file creation mode for splunk
   ansible.builtin.lineinfile:
     path: /etc/rsyslog.d/10-output-files-modules.conf
-    regexp: '^module(load="builtin:omfile'
+    regexp: '^module\(load="builtin:omfile'
     line: 'module(load="builtin:omfile" FileCreateMode="0644" DirCreateMode="0755")'
   notify: restart rsyslogd
 
@@ -54,5 +54,18 @@
       stop_timeout: 120
       names: true
       container_prefix: ainer
+
+- name: "Enable proxyied services"
+  ansible.builtin.firewalld:
+    immediate: yes
+    port: "{{ item }}"
+    state: enabled
+    permanent: yes
+  loop: 
+    - 514/tcp
+    - 514/udp
+    - 8000/tcp
+  notify:
+    - restart firewalld
 
 - include_tasks: "tower.yml"

@@ -3,3 +3,10 @@
   ansible.builtin.service:
     name: rsyslog
     state: restarted
+
+- name: restart firewalld
+  service:
+    name: firewalld
+    state: restarted
+    enabled: true
+  become: yes
