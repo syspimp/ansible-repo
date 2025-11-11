@@ -6,7 +6,7 @@
 
 - name: Start splunk container
   containers.podman.podman_container:
-    name: so1
+    name: splunk
     image: docker.io/splunk/splunk:latest
     state: started
     detach: true
@@ -21,11 +21,17 @@
       SPLUNK_START_ARGS: "--accept-license"
       SPLUNK_GENERAL_TERMS: "--accept-sgt-current-at-splunk-com"
     generate_systemd:
-      path: /tmp/
+      path: /etc/systemd/system/
       restart_policy: always
       stop_timeout: 120
       names: true
-      container_prefix: ainer
+      container_prefix: logging
+  notify:
+    - enable splunk service
+
+- name: Force systemd to reread configs (daemon-reload)
+  ansible.builtin.systemd:
+    daemon_reload: yes
 
 - name: "Enable firewall services"
   ansible.builtin.firewalld:
