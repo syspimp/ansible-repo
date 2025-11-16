@@ -1,11 +1,42 @@
-- hosts: localhost
+# we received a DHCPACK, maybe a new device on the network
+- name: Handle Network Events
+  hosts: localhost
   connection: local
   gather_facts: no
   vars:
-   msg: "..."
-   x: 45
+   msgpayload: "not set"
+   msghost: "not set"
   tasks:
-  - debug:
-      msg: "Please wait {{ x }} mins: {{ msg }}"
-  - pause:
-      minutes: "{{ x }}"
+  - name: block for network scan
+    block:
+    - name: grab the ip address
+      set_fact:
+        hostip: "{{ msgpayload | split }}"
+
+    - name: see if the ip has a reverse dns record
+      ansible.builtin.shell: |
+        dig -x {{ hostip[5] }}
+      register: ipchk
+
+    - name: output of ip dns check
+      debug:
+        var: ipchk.stdout
+
+    - name: see if the hostname has a dns record
+      ansible.builtin.shell: |
+        dig any {{ hostip[9] }}
+      register: hostchk
+      when:
+        - hostip[9] != 'via'
+
+    - name: output of hostname check
+      debug:
+        var: hostchk.stdout
+
+    - name: scan the ip
+      ansible.builtin.shell: |
+        nmap -sS -Pn -T5 -p- -vv {{ hostip[9] }}
+      become: yes
+    when:
+      - when 'DHCPACK' in msgpayload
+
