@@ -40,9 +40,14 @@
     - name: scan the ip
       ansible.builtin.shell: |
         /usr/bin/nmap -sS -Pn -T5 -p- -vv {{ hostip[9] }}
+      register: nmapchk
       args:
         executable: /bin/bash
       become: yes
+
+    - name: output of ip scan
+      debug:
+        var: nmapchk.stdout
 
     - name: wag the tail
       ansible.builtin.shell: |
