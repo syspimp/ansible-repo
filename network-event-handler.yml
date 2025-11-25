@@ -22,7 +22,7 @@
 
     - name: output of ip dns check
       debug:
-        var: ipchk.stdout
+        var: ipchk.stdout_lines
 
     - name: see if the hostname has a dns record
       ansible.builtin.shell: |
@@ -35,7 +35,7 @@
 
     - name: output of hostname check
       debug:
-        var: hostchk.stdout
+        var: hostchk.stdout_lines
 
     - name: scan the ip
       ansible.builtin.shell: |
@@ -47,7 +47,7 @@
 
     - name: output of ip scan
       debug:
-        var: nmapchk.stdout
+        var: nmapchk.stdout_lines
 
     - name: wag the tail
       ansible.builtin.shell: |
