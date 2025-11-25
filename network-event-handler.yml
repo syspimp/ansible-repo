@@ -31,7 +31,7 @@
         executable: /bin/bash
       register: hostchk
       when:
-        - hostip[9] != 'via'
+        - hostip[9] == 'via'
 
     - name: output of hostname check
       debug:
@@ -39,7 +39,7 @@
 
     - name: scan the ip
       ansible.builtin.shell: |
-        /usr/bin/nmap -sS -Pn -T5 -p- -vv {{ hostip[9] }}
+        /usr/bin/nmap -sS -Pn -T5 -p- -vv {{ hostip[5] }}
       register: nmapchk
       args:
         executable: /bin/bash
