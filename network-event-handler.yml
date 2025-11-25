@@ -43,6 +43,14 @@
       args:
         executable: /bin/bash
       become: yes
+
+    - name: wag the tail
+      ansible.builtin.shell: |
+        python /home/pi/testmotor.py
+      args:
+        executable: /bin/bash
+      become: yes
+      delegate_to: trashcanpi
     when:
       - "'DHCPACK' in msgpayload"
 
