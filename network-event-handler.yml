@@ -11,7 +11,7 @@
     block:
     - name: grab the ip address
       set_fact:
-        hostip: "{{ msgpayload | split }}"
+        hostip: "{{ msgpayload | split(' ') }}"
 
     - name: see if the ip has a reverse dns record
       ansible.builtin.shell: |
