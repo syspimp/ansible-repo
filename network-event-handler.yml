@@ -26,7 +26,7 @@
 
     - name: grab the hostname from dns
       set_fact:
-        hostname: "{{ ipchk.stdout_lines[13] | split('\t') }}"
+        hostname: "{{ ipchk.stdout_lines[13] | split('\t')[2] }}"
     when:
       - "'DHCPACK' in msgpayload"
 
