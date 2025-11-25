@@ -40,3 +40,7 @@
     when:
       - "'DHCPACK' in msgpayload"
 
+  - name:
+    debug:
+      msg: "host: {{ msghost }}, payload: {{ msgpayload }}"
+
