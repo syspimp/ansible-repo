@@ -26,7 +26,7 @@
 
     - name: grab the hostname from dns
       set_fact:
-        hostname: "{{ (ipchk.stdout_lines[13] | split('\t'))[3] | ansible.builtin.trim('.')}}"
+        hostname: "{{ (ipchk.stdout_lines[13] | split('\t'))[3] | trim('.') }}"
     when:
       - "'DHCPACK' in msgpayload"
 
