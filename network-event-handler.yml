@@ -1,6 +1,6 @@
 # we received a DHCPACK, maybe a new device on the network
 - name: Handle Network Events
-  hosts: "lab-services"
+  hosts: 10.55.102.34
   #connection: local
   gather_facts: no
   vars:
