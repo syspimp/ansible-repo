@@ -1,6 +1,6 @@
 # we received a DHCPACK, maybe a new device on the network
 - name: Handle Network Events
-  hosts: localhost
+  hosts: 10.55.102.5 
   #connection: local
   gather_facts: no
   vars:
@@ -15,7 +15,9 @@
 
     - name: see if the ip has a reverse dns record
       ansible.builtin.shell: |
-        dig -x {{ hostip[5] }}
+        /usr/bin/dig -x {{ hostip[5] }}
+      args:
+        executable: /bin/bash
       register: ipchk
 
     - name: output of ip dns check
@@ -25,6 +27,8 @@
     - name: see if the hostname has a dns record
       ansible.builtin.shell: |
         dig any {{ hostip[9] }}
+      args:
+        executable: /bin/bash
       register: hostchk
       when:
         - hostip[9] != 'via'
@@ -36,6 +40,8 @@
     - name: scan the ip
       ansible.builtin.shell: |
         nmap -sS -Pn -T5 -p- -vv {{ hostip[9] }}
+      args:
+        executable: /bin/bash
       become: yes
     when:
       - "'DHCPACK' in msgpayload"
