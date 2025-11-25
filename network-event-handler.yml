@@ -39,7 +39,7 @@
     block:
     - name: see if the hostname has a dns record
       ansible.builtin.shell: |
-        dig any {{ hostname }}.tfound.org
+        dig any {{ hostname }}
       args:
         executable: /bin/bash
       register: hostchk
