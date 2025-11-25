@@ -50,7 +50,7 @@
 
     - name: scan the ip
       ansible.builtin.shell: |
-        /usr/bin/nmap -sS -Pn -T5 -p- -vv {{ hostip[5] }}
+        /usr/bin/nmap -sS -Pn -T5 -p- --open {{ hostip[5] }}
       register: nmapchk
       args:
         executable: /bin/bash
