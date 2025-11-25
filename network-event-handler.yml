@@ -26,7 +26,7 @@
 
     - name: grab the hostname from dns
       set_fact:
-        hostname: "{{ (ipchk.stdout_lines[13] | split('\t'))[3] }}"
+        hostname: "{{ (ipchk.stdout_lines[13] | split('\t'))[3] | ansible.builtin.trim('.')}}"
     when:
       - "'DHCPACK' in msgpayload"
 
@@ -39,18 +39,14 @@
     block:
     - name: see if the hostname has a dns record
       ansible.builtin.shell: |
-        dig any {{ hostip[9] }}
+        dig any {{ hostname }}.tfound.org
       args:
         executable: /bin/bash
       register: hostchk
-      when:
-        - hostip[9] == 'via'
 
     - name: output of hostname check
       debug:
         var: hostchk.stdout_lines
-      when:
-        - hostip[9] == 'via'
 
     - name: scan the ip
       ansible.builtin.shell: |
@@ -64,11 +60,21 @@
       debug:
         var: nmapchk.stdout_lines
 
-    - name: wag the tail
+    - name: wag the tail light
       ansible.builtin.shell: |
-        /home/pi/toggleled.sh &
-        python /home/pi/testmotor.py &
-        disown
+        nohup /home/pi/toggleled.sh &
+      async: 1
+      poll: 0
+      args:
+        executable: /bin/bash
+      become: yes
+      delegate_to: trashcanpi
+
+    - name: pet the cat motor
+      ansible.builtin.shell: |
+        nohup python /home/pi/testmotor.py &
+      async: 1
+      poll: 0
       args:
         executable: /bin/bash
       become: yes
