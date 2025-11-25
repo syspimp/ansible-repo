@@ -1,7 +1,7 @@
 # we received a DHCPACK, maybe a new device on the network
 - name: Handle Network Events
   hosts: localhost
-  connection: local
+  #connection: local
   gather_facts: no
   vars:
    msgpayload: "not set"
