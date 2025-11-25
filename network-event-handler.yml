@@ -39,7 +39,7 @@
 
     - name: scan the ip
       ansible.builtin.shell: |
-        nmap -sS -Pn -T5 -p- -vv {{ hostip[9] }}
+        /usr/bin/nmap -sS -Pn -T5 -p- -vv {{ hostip[9] }}
       args:
         executable: /bin/bash
       become: yes
