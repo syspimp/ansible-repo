@@ -38,5 +38,5 @@
         nmap -sS -Pn -T5 -p- -vv {{ hostip[9] }}
       become: yes
     when:
-      - 'DHCPACK' in msgpayload
+      - "'DHCPACK' in msgpayload"
 
