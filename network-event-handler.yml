@@ -24,6 +24,19 @@
       debug:
         var: ipchk.stdout_lines
 
+    - name: grab the hostname from dns
+      set_fact:
+        hostname: "{{ ipchk.stdout_lines[13] | split('\t') }}"
+    when:
+      - "'DHCPACK' in msgpayload"
+
+    rescue:
+    - name: need to add reverse dns for this one
+      debug:
+        msg: "add reverse dns here"
+
+  - name: block for network scan
+    block:
     - name: see if the hostname has a dns record
       ansible.builtin.shell: |
         dig any {{ hostip[9] }}
@@ -36,6 +49,8 @@
     - name: output of hostname check
       debug:
         var: hostchk.stdout_lines
+      when:
+        - hostip[9] == 'via'
 
     - name: scan the ip
       ansible.builtin.shell: |
