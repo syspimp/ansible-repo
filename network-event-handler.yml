@@ -70,7 +70,7 @@
         type: "TXT"
         ttl: "{{ ttl }}"
         #value: ["{{ macid }}", "{{ conntype }}", "{{ device_model }}", "{{ ssid }}",  "added by ansible {{ ansible_date_time.iso8601 }}"]
-        value: ["added: by ansible eda {{ ansible_date_time.iso8601 }}"]
+        value: ["added: by ansible eda {{ now(utc=true,fmt='%Y-%m-%d %H:%M:%S') }}"]
       when: 
         - hostchk is defined
         - "'by ansible' not in hostchk.stdout"
