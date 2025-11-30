@@ -43,7 +43,7 @@
 
     always:
     - name: need to add reverse dns for this one
-      ansible.builtin.fail:
+      debug:
         msg: "add reverse dns here"
       when: hostname is not defined
 
@@ -130,57 +130,6 @@
 
   - name: block for monitoring
     block:
-#      #get
-#      #{"action":"DeviceRouter","method":"getDevices","data":[{"uid":"/zport/dmd/Devices","keys":["name","ipAddress","uid","productionState","events","ipAddressString","pythonClass"],"params":{"name":"test123"},"page":1,"start":0,"limit":100,"sort":"name","dir":"ASC"}],"type":"rpc","tid":14}
-#      #response
-#      #{
-#    "uuid": "5f0ac3c8-14d0-484e-bca6-48496575f53f",
-#    "action": "DeviceRouter",
-#    "result": {
-#        "totalCount": 1,
-#        "hash": "1",
-#        "success": true,
-#        "devices": [
-#            {
-#                "ipAddressString": "10.55.102.105",
-#                "name": "test123.tfound.org",
-#                "productionState": 1000,
-#                "uid": "/zport/dmd/Devices/Server/Linux/devices/test123.tfound.org",
-#                "ipAddress": 171402857,
-#                "events": {
-#                    "info": {
-#                        "count": 0,
-#                        "acknowledged_count": 0
-#                    },
-#                    "clear": {
-#                        "count": 0,
-#                        "acknowledged_count": 0
-#                    },
-#                    "warning": {
-#                        "count": 1,
-#                        "acknowledged_count": 0
-#                    },
-#                    "critical": {
-#                        "count": 0,
-#                        "acknowledged_count": 0
-#                    },
-#                    "error": {
-#                        "count": 0,
-#                        "acknowledged_count": 0
-#                    },
-#                    "debug": {
-#                        "count": 0,
-#                        "acknowledged_count": 0
-#                    }
-#                },
-#                "pythonClass": "Products.ZenModel.Device"
-#            }
-#        ]
-#    },
-#    "tid": 14,
-#    "type": "rpc",
-#    "method": "getDevices"
-#}
     - name: Check if already monitored
       ansible.builtin.uri:
         url: "{{ zenosshost }}"
@@ -253,6 +202,12 @@
         - isitmonitored.json.result.totalCount | int == 0
     when:
       - hostname is defined
+
+    always:
+    - name: need to add reverse dns for this one
+      ansible.builtin.fail:
+        msg: "add reverse dns here"
+      when: hostname is not defined
 
   - name:
     debug:
