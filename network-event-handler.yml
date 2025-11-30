@@ -88,6 +88,8 @@
         executable: /bin/bash
       become: yes
       delegate_to: trashcanpi
+    when:
+      - 'added by ansible' in hostchk.stdout
 
     - name: Add to monitoring
       ansible.builtin.uri:
