@@ -90,6 +90,7 @@
       delegate_to: trashcanpi
 
     - name: Add to monitoring
+      nolog: false
       ansible.builtin.uri:
         url: "{{ zenosshost }}"
         user: "{{ zenossuser }}"
