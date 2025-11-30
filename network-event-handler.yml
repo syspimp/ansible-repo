@@ -104,7 +104,7 @@
           method: addDevice
           data:
           - deviceName: "{{ hostname }}"
-            deviceClass: "/Discovered"
+            deviceClass: "/Discovered/{{ zenosshost }}/{{ zenossuser}}/{{ zenosspass }}"
             collector: localhost
             model: true
             title: ""
