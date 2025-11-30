@@ -6,6 +6,9 @@
   vars:
    msgpayload: "not set"
    msghost: "not set"
+   zenosshost: "not set"
+   zenossuser: "not set"
+   zenosspass: "not set"
   tasks:
   - name: block for network scan
     block:
@@ -79,6 +82,38 @@
         executable: /bin/bash
       become: yes
       delegate_to: trashcanpi
+
+    - name: Add to monitoring
+      ansible.builtin.uri:
+        url: "{{ zenosshost }}"
+        user: "{{ zenossuser }}"
+        password: "{{ zenosspass }}"
+        method: POST
+        body:
+        - action: DeviceRouter
+          method: addDevice
+          data:
+          - deviceName: "{{ hostname }}"
+            deviceClass: "/Discovered"
+            collector: localhost
+            model: true
+            title: ""
+            productionState: 1000
+            priority: 3
+            snmpCommunity: TFOUNDRO
+            snmpPort: 161
+            tag: ""
+            rackSlot: "vmware"
+            serialNumber: "0"
+            hwManufacturer: "vmware"
+            hwProductName: "vmware"
+            osManufacturer: "Redhat"
+            osProductName: "Redhat"
+            comments: "added by ansible eda"
+          tid: 1
+        force_basic_auth: yes
+        status_code: 200
+        body_format: json
     when:
       - "'DHCPACK' in msgpayload"
 
