@@ -92,9 +92,8 @@
     - name: Add to monitoring
       ansible.builtin.uri:
         url: "{{ zenosshost }}"
-        user: "{{ zenossuser }}"
-        password: "{{ zenosspass }}"
-        nolog: false
+        url_username: "{{ zenossuser }}"
+        url_password: "{{ zenosspass }}"
         method: POST
         body:
         - action: DeviceRouter
