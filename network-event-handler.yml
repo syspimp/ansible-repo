@@ -90,11 +90,11 @@
       delegate_to: trashcanpi
 
     - name: Add to monitoring
-      nolog: false
       ansible.builtin.uri:
         url: "{{ zenosshost }}"
         user: "{{ zenossuser }}"
         password: "{{ zenosspass }}"
+        nolog: false
         method: POST
         body:
         - action: DeviceRouter
