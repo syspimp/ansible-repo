@@ -41,10 +41,11 @@
     when:
       - "'DHCPACK' in msgpayload"
 
-    rescue:
+    always:
     - name: need to add reverse dns for this one
-      debug:
+      ansible.builtin.fail:
         msg: "add reverse dns here"
+      when: hostname is not defined
 
   - name: block for dns
     block:
