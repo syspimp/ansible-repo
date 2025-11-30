@@ -200,7 +200,7 @@
                 - ipAddressString
                 - pythonClass
               params:
-                name: "{{ hostname }}"
+                ipAddress: "{{ hostip[5] }}"
               page: 1
               start: 0
               limit: 100
