@@ -95,7 +95,7 @@
     block:
     - name: Add to monitoring
       ansible.builtin.uri:
-        url: "{{ zenosshost }}"
+        url: "http://zenoss4-nginx-monitoring.apps.compute7-sno.tfound.org/zport/dmd/device_router"
         url_username: "{{ zenossuser }}"
         url_password: "{{ zenosspass }}"
         method: POST
