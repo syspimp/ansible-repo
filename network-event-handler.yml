@@ -53,7 +53,10 @@
     - name: output of hostname check
       debug:
         var: hostchk.stdout_lines
+    when: hostname is defined
 
+  - name: block for network scan
+    block:
     - name: scan the ip
       ansible.builtin.shell: |
         /usr/bin/nmap -sS -Pn -T5 -p- --open {{ hostip[5] }}
