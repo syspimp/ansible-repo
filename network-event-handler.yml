@@ -188,7 +188,7 @@
         method: POST
         body:
         - action: DeviceRouter
-          method: getDevice
+          method: getDevices
           data:
             - uid: /zport/dmd/Devices
               keys:
