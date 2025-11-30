@@ -27,9 +27,12 @@
       debug:
         var: ipchk.stdout_lines
 
+  - name: block for dns scan
+    block:
     - name: grab the hostname from dns
       set_fact:
-        hostname: "{{ (ipchk.stdout_lines[13] | split('\t'))[3] | trim('.') }}"
+        #hostname: "{{ (ipchk.stdout_lines[13] | split('\t'))[3] | trim('.') }}"
+        hostname: "{{ (ipchk.stdout_lines[13] | | regex_search('PTR\\t(*.).tfound.org.$') | trim('.') }}"
     when:
       - "'DHCPACK' in msgpayload"
 
