@@ -40,6 +40,8 @@
   roles:
     - log-collector
     - splunk
+    - lldp-client
+    - snmp-client
 
 - name: Monitoring roles
   hosts: all:!logging*
