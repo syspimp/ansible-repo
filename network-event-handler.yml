@@ -193,7 +193,6 @@
             - uid: /zport/dmd/Devices
               keys:
                 - name
-                - title
                 - ipAddress
                 - uid
                 - productionState
@@ -201,7 +200,7 @@
                 - ipAddressString
                 - pythonClass
               params:
-                title: "{{ hostname }}"
+                name: "{{ hostname }}"
               page: 1
               start: 0
               limit: 100
