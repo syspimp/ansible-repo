@@ -89,8 +89,10 @@
       become: yes
       delegate_to: trashcanpi
     when:
-      - "'added by ansible' in hostchk.stdout"
+      - "'added by ansible' not in hostchk.stdout"
 
+  - name: block for monitoring
+    block:
     - name: Add to monitoring
       ansible.builtin.uri:
         url: "{{ zenosshost }}"
