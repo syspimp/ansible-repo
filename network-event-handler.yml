@@ -139,11 +139,11 @@
         - action: DeviceRouter
           method: addDevice
           data:
-          - deviceName: "{{ hostname }}"
+          - deviceName: "{{ hostip[5] }}"
             deviceClass: "/Discovered"
             collector: localhost
             model: true
-            title: ""
+            title: "{{ hostname }}"
             productionState: 1000
             priority: 3
             snmpCommunity: TFOUNDRO
