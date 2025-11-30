@@ -129,7 +129,96 @@
 
   - name: block for monitoring
     block:
-    - name: Add to monitoring
+#      #get
+#      #{"action":"DeviceRouter","method":"getDevices","data":[{"uid":"/zport/dmd/Devices","keys":["name","ipAddress","uid","productionState","events","ipAddressString","pythonClass"],"params":{"name":"test123"},"page":1,"start":0,"limit":100,"sort":"name","dir":"ASC"}],"type":"rpc","tid":14}
+#      #response
+#      #{
+#    "uuid": "5f0ac3c8-14d0-484e-bca6-48496575f53f",
+#    "action": "DeviceRouter",
+#    "result": {
+#        "totalCount": 1,
+#        "hash": "1",
+#        "success": true,
+#        "devices": [
+#            {
+#                "ipAddressString": "10.55.102.105",
+#                "name": "test123.tfound.org",
+#                "productionState": 1000,
+#                "uid": "/zport/dmd/Devices/Server/Linux/devices/test123.tfound.org",
+#                "ipAddress": 171402857,
+#                "events": {
+#                    "info": {
+#                        "count": 0,
+#                        "acknowledged_count": 0
+#                    },
+#                    "clear": {
+#                        "count": 0,
+#                        "acknowledged_count": 0
+#                    },
+#                    "warning": {
+#                        "count": 1,
+#                        "acknowledged_count": 0
+#                    },
+#                    "critical": {
+#                        "count": 0,
+#                        "acknowledged_count": 0
+#                    },
+#                    "error": {
+#                        "count": 0,
+#                        "acknowledged_count": 0
+#                    },
+#                    "debug": {
+#                        "count": 0,
+#                        "acknowledged_count": 0
+#                    }
+#                },
+#                "pythonClass": "Products.ZenModel.Device"
+#            }
+#        ]
+#    },
+#    "tid": 14,
+#    "type": "rpc",
+#    "method": "getDevices"
+#}
+    - name: Check if already monitored
+      ansible.builtin.uri:
+        url: "{{ zenosshost }}"
+        url_username: "{{ zenossuser }}"
+        url_password: "{{ zenosspass }}"
+        method: POST
+        body:
+        - action: DeviceRouter
+          method: getDevice
+          data:
+            - uid: /zport/dmd/Devices
+              keys:
+                - name
+                - title
+                - ipAddress
+                - uid
+                - productionState
+                - events
+                - ipAddressString
+                - pythonClass
+              params:
+                title: "{{ hostname }}"
+              page: 1
+              start: 0
+              limit: 100
+              sort: name
+              dir: ASC
+          type: rpc
+          tid: 1
+        force_basic_auth: yes
+        status_code: 200
+        body_format: json
+        register: isitmonitored
+    
+    - name: debug monitoring check
+      debug:
+        var: isitmonitored.json.result
+
+    - name: Add to monitoring if missing
       ansible.builtin.uri:
         url: "{{ zenosshost }}"
         url_username: "{{ zenossuser }}"
@@ -156,11 +245,12 @@
             osManufacturer: "Redhat"
             osProductName: "Redhat"
             comments: "added by ansible eda"
-          tid: 1
+          tid: 2
         force_basic_auth: yes
         status_code: 200
         body_format: json
-      when: hostname is defined
+      when:
+        - isitmonitored.json.result.totalCount | int == 0
     when:
       - hostname is defined
 
