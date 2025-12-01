@@ -132,7 +132,7 @@
     block:
     - name: set the monitoring location
       set_fact:
-        classlocation: "{{{% if hostname == 'None' %}Ping{% else %}Discovered{% endif %}}}"
+        classlocation: "{% if hostname == 'None' %}Ping{% else %}Discovered{% endif %}"
       when:
         - hostname is defined
 
