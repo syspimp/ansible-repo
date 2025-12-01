@@ -60,35 +60,35 @@
       debug:
         var: hostchk.stdout_lines
 
-#    - name: Add TXT record if missing
-#      community.general.nsupdate:
-#        key_name: "{{ dns_key_name }}"
-#        key_secret: "{{ dns_key }}"
-#        server: "{{ dns_server }}"
-#        zone: "{{ dns_domain }}"
-#        record: "{{ hostname | replace('.' + dns_domain,'') }}"
-#        type: "TXT"
-#        ttl: "{{ ttl }}"
-#        #value: ["{{ macid }}", "{{ conntype }}", "{{ device_model }}", "{{ ssid }}",  "added by ansible {{ ansible_date_time.iso8601 }}"]
-#        value: ["added: by ansible eda {{ now(utc=true,fmt='%Y-%m-%d %H:%M:%S') }}"]
-#      when: 
-#        - hostchk is defined
-#        - "'by ansible' not in hostchk.stdout"
-#
-#    - name: Add PTR record if missing
-#      community.general.nsupdate:
-#        key_name: "{{ dns_key_name }}"
-#        key_secret: "{{ dns_key }}"
-#        server: "{{ dns_server }}"
-#        record: "{{ hostip[5] | ansible.netcommon.ipaddr('revdns') }}"
-#        type: "PTR"
-#        value: "{{ hostname }}."
-#        ttl: "{{ ttl }}"
-#        state: present
-#      when: 
-#        - hostname is defined
-#        - ipchk is defined
-#        - "'NXDOMAIN' in ipchk.stdout"
+    - name: Add TXT record if missing
+      community.general.nsupdate:
+        key_name: "{{ dns_key_name }}"
+        key_secret: "{{ dns_key }}"
+        server: "{{ dns_server }}"
+        zone: "{{ dns_domain }}"
+        record: "{{ hostname | replace('.' + dns_domain,'') }}"
+        type: "TXT"
+        ttl: "{{ ttl }}"
+        #value: ["{{ macid }}", "{{ conntype }}", "{{ device_model }}", "{{ ssid }}",  "added by ansible {{ ansible_date_time.iso8601 }}"]
+        value: ["added: by ansible eda {{ now(utc=true,fmt='%Y-%m-%d %H:%M:%S') }}"]
+      when: 
+        - hostchk is defined
+        - "'by ansible' not in hostchk.stdout"
+
+    - name: Add PTR record if missing
+      community.general.nsupdate:
+        key_name: "{{ dns_key_name }}"
+        key_secret: "{{ dns_key }}"
+        server: "{{ dns_server }}"
+        record: "{{ hostip[5] | ansible.netcommon.ipaddr('revdns') }}"
+        type: "PTR"
+        value: "{{ hostname }}."
+        ttl: "{{ ttl }}"
+        state: present
+      when: 
+        - hostname is defined
+        - ipchk is defined
+        - "'NXDOMAIN' in ipchk.stdout"
     when:
       - hostname is defined
 
