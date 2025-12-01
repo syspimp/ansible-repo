@@ -133,8 +133,8 @@
     - name: set the monitoring location
       set_fact:
         classlocation: "{{{% if hostname == 'None' %}Ping{% else %}Discovered{% endif %}}}"
-    when:
-      - hostname is defined
+      when:
+        - hostname is defined
 
     - name: Check if already monitored
       ansible.builtin.uri:
