@@ -94,7 +94,7 @@
         
     - name: add the by ansible TXT if the hostname is known but its missing
       ansible.builtin.shell: |
-        /opt/dnsupdate.sh "{{ hostname }}" "{{ hostip[5] }}"
+        /opt/dnsupdate.sh "{{ hostname | replace('.' + dns_domain,'') }}" "{{ hostip[5] }}"
       args:
         executable: /bin/bash
       become: yes
@@ -104,7 +104,7 @@
           
     - name: add the PTR if the hostname is known but its missing
       ansible.builtin.shell: |
-        /opt/dnsupdate.sh "{{ hostname }}" "{{ hostip[5] }}" reverse
+        /opt/dnsupdate.sh "{{ hostname | replace('.' + dns_domain,'') }}" "{{ hostip[5] }}" reverse
       args:
         executable: /bin/bash
       become: yes
