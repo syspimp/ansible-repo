@@ -45,7 +45,9 @@
     - name: need to add reverse dns for this one
       debug:
         msg: "add reverse dns here"
-      when: hostname is not defined
+      when:
+        - hostname is not defined
+        - hostname == "None"
 
   - name: block for dns
     block:
@@ -89,8 +91,28 @@
 #        - hostname is defined
 #        - ipchk is defined
 #        - "'NXDOMAIN' in ipchk.stdout"
+    - name: add the by ansible TXT if the hostname is known but its missing
+      ansible.builtin.shell: |
+        /opt/dnsupdate.sh {{ hostname }}{{ hostip[5] }}
+      args:
+        executable: /bin/bash
+      become: yes
+      when: 
+        - hostchk is defined
+        - "'by ansible' not in hostchk.stdout"
+          
+    - name: add the PTR if the hostname is known but its missing
+      ansible.builtin.shell: |
+        /opt/dnsupdate.sh "{{ hostname }}" "{{ hostip[5] }}" reverse
+      args:
+        executable: /bin/bash
+      become: yes
+      when: 
+        - ipchk is defined
+        - "'NXDOMAIN' in ipchk.stdout"
     when:
       - hostname is defined
+      - hostname != 'None'
 
   - name: block for network scan
     block:
@@ -199,7 +221,7 @@
             hwProductName: "vmware"
             osManufacturer: "Redhat"
             osProductName: "Redhat"
-            comments: "added by ansible eda"
+            comments: "added: by ansible eda"
           tid: 2
         force_basic_auth: yes
         status_code: 200
@@ -210,10 +232,11 @@
       - hostname is defined
 
     always:
-    - name: need to add reverse dns for this one
+    - name: need to add dns for this one
       ansible.builtin.fail:
         msg: "add reverse dns here"
-      when: hostname is not defined
+      when:
+        - (hostname is not defined) or (hostname == "None")
 
   - name:
     debug:
