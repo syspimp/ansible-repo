@@ -130,6 +130,12 @@
 
   - name: block for monitoring
     block:
+    - name: set the monitoring location
+      set_fact:
+        classlocation: "{{{% if hostname == 'None' %}Ping{% else %}Discovered{% endif %}}}"
+    when:
+      - hostname is defined
+
     - name: Check if already monitored
       ansible.builtin.uri:
         url: "{{ zenosshost }}"
@@ -178,10 +184,10 @@
           method: addDevice
           data:
           - deviceName: "{{ hostip[5] }}"
-            deviceClass: "/Discovered"
+            deviceClass: "/{{ classlocation }}"
             collector: localhost
             model: true
-            title: "{{ hostname }}"
+            title: "{{ hostname | replace('None','Unknown') }}"
             productionState: 1000
             priority: 3
             snmpCommunity: TFOUNDRO
