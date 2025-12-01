@@ -8,3 +8,7 @@ newusers:
 - newusername: dataylor
   newgroups: "wheel,root"
   public_key: lookup('file', '/home/dataylor/ansiblesvc.pub')
+- newusername: nolan
+  newgroups: "wheel,root"
+  public_key: lookup('file', '/home/dataylor/nolan-east-gdc.pub')
+

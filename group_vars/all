@@ -194,3 +194,5 @@ DOCKERPASS: !vault |
 tmuxusers:
  - name: dataylor
    home: /home/dataylor
+ - name: nolan
+   home: /home/nolan
