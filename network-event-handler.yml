@@ -91,9 +91,10 @@
 #        - hostname is defined
 #        - ipchk is defined
 #        - "'NXDOMAIN' in ipchk.stdout"
+        
     - name: add the by ansible TXT if the hostname is known but its missing
       ansible.builtin.shell: |
-        /opt/dnsupdate.sh {{ hostname }}{{ hostip[5] }}
+        /opt/dnsupdate.sh "{{ hostname }}" "{{ hostip[5] }}"
       args:
         executable: /bin/bash
       become: yes
