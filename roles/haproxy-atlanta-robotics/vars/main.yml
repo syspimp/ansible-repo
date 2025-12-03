@@ -1,0 +1,14 @@
+---
+capsule_loadbalancer_fqdn: capsule-lb.prod.maskedadmins.com
+aap_group_name: capsule-lb
+capsule_lb_inventory_group: 851
+iface: "{{ ansible_default_ipv4.interface }}"
+haproxy_services:
+  - name: http
+    port: 80
+    balance: roundrobin
+    mode: tcp
+  - name: https
+    port: 443
+    balance: source
+    mode: tcp

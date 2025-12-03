@@ -1,0 +1,69 @@
+---
+- name: "haproxy setup check"
+  stat:
+    path: /opt/setup/haproxy-rpms
+  register: initialsetup
+
+
+- name: "Block to perform initial setup"
+  block:
+  - name: "Installing haproxy rpms"
+    ansible.builtin.yum:
+      name: ["haproxy"]
+      state: latest
+    become: true
+    notify:
+      - restart haproxy
+
+  - name: "Set selinux flag to allow haproxy connections"
+    ansible.builtin.shell: |
+      /usr/sbin/semanage boolean --modify --on haproxy_connect_any
+    become: yes
+
+
+  - name: "Enable proxyied services"
+    ansible.builtin.firewalld:
+      immediate: yes
+      port: "{{ item.port }}/{{ item.mode }}"
+      state: enabled
+      permanent: yes
+    loop: "{{ haproxy_services }}"
+    notify:
+      - restart firewalld
+
+  - name: "haproxy setup complete"
+    ansible.builtin.file:
+      path: /opt/setup/haproxy-rpms
+      state: touch
+      mode: 0440
+    become: true
+  when: initialsetup.stat.exists == false
+
+- name: "Block to perform configure haproxy"
+  block:
+  - name: "Fixing haproxy config"
+    ansible.builtin.template:
+      src: haproxy-atl-robotics.cfg.j2
+      dest: /etc/haproxy/haproxy.cfg
+      owner: root
+      group: root
+      mode: 0644
+    become: yes
+    notify:
+      - restart haproxy
+
+  - name: "Fixing haproxy config"
+    ansible.builtin.template:
+      src: haproxy-atl-domains.txt.j2
+      dest: /etc/haproxy/atlanta-robotics-domains.txt
+      owner: root
+      group: root
+      mode: 0644
+    become: yes
+    notify:
+      - restart haproxy
+  rescue:
+  - name: "You will need to rerun this playbook"
+    ansible.builtin.debug:
+      msg:  "Something went wrong when building the haproxy.cfg file. Are there any servers in the AAP/tower capusle groups?"
+
