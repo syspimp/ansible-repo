@@ -70,6 +70,12 @@
   roles:
     - ansible-builder
 
+- name: Create atlanta robotics proxy
+  hosts: gdc-proxy*
+  become: yes
+  roles:
+    - haproxy-atlanta-robotics
+
 - name: Install Jboss Standalone
   hosts: jboss*
   become: yes
