@@ -43,6 +43,12 @@
     - lldp-client
     - snmp-client
 
+- name: Storage servers
+  hosts: storage*
+  roles:
+    - nfs-server
+    - iscsi-server
+
 - name: Monitoring roles
   hosts: all:!logging*
   become: yes

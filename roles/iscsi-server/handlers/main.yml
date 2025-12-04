@@ -1,0 +1,9 @@
+- name: "TARGETCLI Enable and start targetclid services"
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: "restarted"
+    enabled: yes
+  become: yes
+  loop:
+    - target
+    - firewalld

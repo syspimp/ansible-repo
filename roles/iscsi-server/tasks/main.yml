@@ -1,0 +1,22 @@
+---
+- name: "ensure targetcli is installed and configured"
+  block:
+    - name: "TARGETCLI sanity check"
+      shell: "rpm -q targetcli"
+  rescue:
+    - name: "TARGETCLI install the package"
+      ansible.builtin.dnf:
+        name: targetcli
+        state: present
+      notify:
+        - "Enable and start targetclid services"
+        
+    - name: "TARGETCLI Allow port 3260/tcp in firewalld rules"
+      ansible.builtin.firewalld:
+        immediate: yes
+        port: 3260/tcp
+        state: enabled
+        permanent: yes
+      notify:
+        - "Enable and start targetclid services"
+
