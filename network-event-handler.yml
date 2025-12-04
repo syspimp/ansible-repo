@@ -162,7 +162,7 @@
           type: rpc
           tid: 1
         force_basic_auth: yes
-        status_code: 200
+        status_code: [200,302]
         body_format: json
       register: isitmonitored
     
